@@ -24,8 +24,8 @@ These instructions will get you a copy of the project up and running on your loc
 1. **Clone the repository**
 
     ```sh
-    git clone https://github.com/yourusername/your-repo.git
-    cd your-repo
+    git clone https://github.com/Jasmine-Mogadam/Super-Shopping-Service.git
+    cd Super-Shopping-Service
     ```
 
 2. **Build and start the containers**
