@@ -2,11 +2,11 @@
   "name": "silly-stuffs-service-api",
   "version": "1.0.0",
   "description": "API for managing art, clothing, toys, and other items",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/server.ts"
   },
   "dependencies": {
     "express": "^4.19.2"
