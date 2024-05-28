@@ -1,23 +1,22 @@
-document.getElementById('addUserBtn').addEventListener('click', async () => {
-  const username = document.getElementById('username').value;
-  const email = document.getElementById('email').value;
+document.getElementById('addCustomerBtn').addEventListener('click', async () => {
+  const name = document.getElementById('name').value;
 
-  if (!username || !email) {
-    document.getElementById('message').innerText = 'Username and email are required.';
+  if (!name) {
+    document.getElementById('message').innerText = 'Name is required.';
     return;
   }
 
-  const response = await fetch('http://localhost:3000/users', {
+  const response = await fetch('http://localhost:3000/customers', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ username, email })
+    body: JSON.stringify({ name })
   });
 
   const result = await response.json();
   if (response.ok) {
-    document.getElementById('message').innerText = 'User added successfully!';
+    document.getElementById('message').innerText = 'Customer added successfully!';
   } else {
     document.getElementById('message').innerText = `Error: ${result.error}`;
   }
