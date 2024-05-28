@@ -5,23 +5,23 @@ const router = Router();
 
 router.post("/", customerController.createCustomer);
 router.get("/:customerId", customerController.getCustomerDetails);
-router.put("/:customerId", customerController.updateCustomerDetails);
-router.delete("/:customerId", customerController.deleteCustomerAccount);
+// router.put("/:customerId", customerController.updateCustomerDetails);
+// router.delete("/:customerId", customerController.deleteCustomerAccount);
 
-router.post("/:customerId/credit-cards", customerController.addCreditCard);
-router.get("/:customerId/credit-cards", customerController.getCreditCards);
-router.put("/:customerId/credit-cards/:cardId", customerController.updateCreditCard);
-router.delete("/:customerId/credit-cards/:cardId", customerController.deleteCreditCard);
+// router.post("/:customerId/credit-cards", customerController.addCreditCard);
+// router.get("/:customerId/credit-cards", customerController.getCreditCards);
+// router.put("/:customerId/credit-cards/:cardId", customerController.updateCreditCard);
+// router.delete("/:customerId/credit-cards/:cardId", customerController.deleteCreditCard);
 
-router.post("/:customerId/addresses", customerController.addAddress);
-router.get("/:customerId/addresses", customerController.getAddresses);
-router.put("/:customerId/addresses/:addressId", customerController.updateAddress);
-router.delete("/:customerId/addresses/:addressId", customerController.deleteAddress);
+// router.post("/:customerId/addresses", customerController.addAddress);
+// router.get("/:customerId/addresses", customerController.getAddresses);
+// router.put("/:customerId/addresses/:addressId", customerController.updateAddress);
+// router.delete("/:customerId/addresses/:addressId", customerController.deleteAddress);
 
-router.post("/:customerId/cart", customerController.addToCart);
-router.get("/:customerId/cart", customerController.getCartItems);
-router.put("/:customerId/cart/:itemId", customerController.updateCartItem);
-router.delete("/:customerId/cart/:itemId", customerController.removeCartItem);
-router.post("/:customerId/orders", customerController.submitOrder);
+// router.post("/:customerId/cart", customerController.addToCart);
+// router.get("/:customerId/cart", customerController.getCartItems);
+// router.put("/:customerId/cart/:itemId", customerController.updateCartItem);
+// router.delete("/:customerId/cart/:itemId", customerController.removeCartItem);
+// router.post("/:customerId/orders", customerController.submitOrder);
 
 export default router;

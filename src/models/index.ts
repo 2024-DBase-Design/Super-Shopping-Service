@@ -1,4 +1,7 @@
-export { Customer } from "./user/Customer";
+import User from './user/User';
+import Customer from './user/Customer';
+
+export { User, Customer };
 export { CreditCard } from "./user/CreditCard";
 export { Address } from "./user/Address";
 export { Product } from "./product/Product";
