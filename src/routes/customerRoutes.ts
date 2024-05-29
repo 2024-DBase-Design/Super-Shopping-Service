@@ -18,10 +18,11 @@ router.get("/:customerId/addresses", customerController.getAddresses);
 router.put("/:customerId/addresses/:addressId", customerController.updateAddress);
 router.delete("/:customerId/addresses/:addressId", customerController.deleteAddress);
 
-// router.post("/:customerId/cart", customerController.addToCart);
-// router.get("/:customerId/cart", customerController.getCartItems);
-// router.put("/:customerId/cart/:itemId", customerController.updateCartItem);
-// router.delete("/:customerId/cart/:itemId", customerController.removeCartItem);
+router.post("/:customerId/cart", customerController.addToCart);
+router.get("/:customerId/cart", customerController.getCartItems);
+router.put("/:customerId/cart/:itemId", customerController.updateCartItem);
+router.delete("/:customerId/cart/:itemId", customerController.removeCartItem);
+
 // router.post("/:customerId/orders", customerController.submitOrder);
 
 export default router;

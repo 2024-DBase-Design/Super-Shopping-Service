@@ -10,9 +10,6 @@ import {
 } from "../models";
 import { AddressableType } from "../models/user/Address";
 
-let customers: Customer[] = [];
-let orders: Order[] = [];
-
 /**
  * Create a new customer.
  * 
@@ -117,9 +114,9 @@ export const addCreditCard = async (req: Request, res: Response) => {
       customerId: customer.id,
     };
 
-    await customer.addCreditCard(newCreditCard);
+    const cardId = await customer.addCreditCard(newCreditCard);
 
-    res.status(201).json({ message: 'Credit card added successfully' });
+    res.status(201).json({ message: 'Credit card added successfully', cardId: cardId});
   } catch (error) {
     console.error('Error adding credit card:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -289,57 +286,101 @@ export const deleteAddress = async (req: Request, res: Response) => {
   }
 };
 
-// export const addToCart = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   const newItem: ProductWithQuantity = { product: req.body, quantity: 1 };
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     customer.cart.push(newItem);
-//     res.status(201).json(newItem);
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Add to a customer's cart items.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const addToCart = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const { product, quantity } = req.body;
+    const item: ProductWithQuantity = { product, quantity };
+    console.log('Current cart:', customer.cart);
+    await customer.addToCart(item);
+    console.log('Updated cart:', customer.cart);
+    res.status(201).json(item);
+  } catch (error) {
+    console.error('Error adding to cart:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// export const getCartItems = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     res.json(customer.cart);
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Get a customer's cart items.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getCartItems = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    res.json(customer.cart);
+  } catch (error) {
+    console.error('Error fetching cart items:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// export const updateCartItem = (req: Request, res: Response) => {
-//   const { customerId, itemId } = req.params;
-//   const { quantity } = req.body;
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     const itemIndex = customer.cart.findIndex(
-//       (item) => item.product.id === itemId
-//     );
-//     if (itemIndex !== -1) {
-//       customer.cart[itemIndex].quantity = quantity;
-//       res.json(customer.cart[itemIndex]);
-//     } else {
-//       res.status(404).json({ message: "Item not found in cart" });
-//     }
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Update a customer's cart item.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const updateCartItem = async (req: Request, res: Response) => {
+  try {
+    const { customerId, itemId } = req.params;
+    const customer = await Customer.findByPk(customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const itemIndex = customer.cart.findIndex((item) => item.product.id === itemId);
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    customer.cart[itemIndex].quantity = req.body;
+    (customer as any).setDataValue('cart', customer.cart);
+    await customer.save();
+    res.json(customer.cart[itemIndex]);
+  } catch (error) {
+    console.error('Error updating cart item:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// export const removeCartItem = (req: Request, res: Response) => {
-//   const { customerId, itemId } = req.params;
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     customer.cart = customer.cart.filter((item) => item.product.id !== itemId);
-//     res.status(204).send();
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Remove a customer's cart item.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const removeCartItem = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const itemId = req.params.itemId;
+    const itemIndex = customer.cart.findIndex((item) => item.product.id === itemId);
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    customer.cart.splice(itemIndex, 1);
+    await customer.save();
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error removing cart item:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
 // export const submitOrder = (req: Request, res: Response) => {
 //   const { customerId } = req.params;

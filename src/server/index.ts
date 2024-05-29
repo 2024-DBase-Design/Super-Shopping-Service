@@ -27,7 +27,7 @@ app.use("/products", productRoutes);
 // app.use("/delivery", deliveryRoutes);
 
 // Sync database and start server
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync({ force: true, alter: true }).then(() => {
   console.log('Database & tables created!');
   
   app.listen(port, () => {

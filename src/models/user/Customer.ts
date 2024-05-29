@@ -1,9 +1,14 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../../server/sequelize';
 import User, { UserAttributes } from './User';
 import CreditCard, { CreditCardCreationAttributes } from "./CreditCard";
 import Address, { AddressableType } from "./Address";
 import { Product } from "../product/Product";
+
+export interface ProductWithQuantity {
+  product: Product;
+  quantity: number;
+}
 
 /**
  * Interface defining the unique attributes of the Customer model.
@@ -24,11 +29,12 @@ class Customer extends User implements CustomerAttributes {
   public cart!: ProductWithQuantity[];
 
   // Method to add a credit card to the customer
-  public async addCreditCard(newCreditCard: CreditCardCreationAttributes): Promise<void> {
-    await CreditCard.create({
+  public async addCreditCard(newCreditCard: CreditCardCreationAttributes): Promise<number> {
+    const newCard = await CreditCard.create({
       ...newCreditCard,
       customerId: this.id
     });
+    return newCard.id;
   }
 
   // Method to add an address to the customer
@@ -38,6 +44,13 @@ class Customer extends User implements CustomerAttributes {
       addressableId: this.id,
       addressableType: AddressableType.CUSTOMER
     });
+  }
+
+  // Method to add a product to the customer's cart
+  public async addToCart(item: ProductWithQuantity): Promise<void> {
+    const newCart = [...this.cart, item];
+    (this as any).setDataValue('cart', newCart);
+    await this.save();
   }
 }
 
@@ -78,8 +91,3 @@ CreditCard.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
 Address.belongsTo(Customer, { foreignKey: 'addressableId', constraints: false });
 
 export default Customer;
-
-export interface ProductWithQuantity {
-  product: Product;
-  quantity: number;
-}
