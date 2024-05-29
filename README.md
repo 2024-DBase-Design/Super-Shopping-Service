@@ -7,7 +7,7 @@ This project is an API for an application that manages art, clothing, toys, and 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
+- [Postman Collection](#postman-collection)
 - [Development](#development)
 - [Scripts](#scripts)
 
