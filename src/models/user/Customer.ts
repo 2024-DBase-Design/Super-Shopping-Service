@@ -23,6 +23,12 @@ class Customer extends User implements CustomerAttributes {
   public creditCards!: CreditCard[];
   public balance!: number;
   public cart!: ProductWithQuantity[];
+
+  // Method to add a credit card to the customer
+  public async addCreditCard(newCreditCard: CreditCard): Promise<void> {
+    this.creditCards.push(newCreditCard);
+    await this.save();
+  }
 }
 
 /**
