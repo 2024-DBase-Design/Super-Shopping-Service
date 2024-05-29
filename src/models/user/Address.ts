@@ -4,7 +4,12 @@ import sequelize from '../../server/sequelize';
 export enum AddressType {
   DELIVERY = 'delivery',
   PAYMENT = 'payment'
-}
+};
+
+export enum AddressableType {
+  CUSTOMER = "customer",
+  STAFF = "staff"
+};
 
 export interface AddressAttributes {
   id: number;
@@ -15,9 +20,11 @@ export interface AddressAttributes {
   zip: string;
   country: string;
   type: AddressType;
-}
+  addressableId: number; // Foreign key to associate with User
+  addressableType: AddressableType;
+};
 
-interface AddressCreationAttributes extends Optional<AddressAttributes, 'id'> {}
+interface AddressCreationAttributes extends Optional<AddressAttributes, 'id'> {};
 
 class Address extends Model<AddressAttributes, AddressCreationAttributes> implements AddressAttributes {
   public id!: number;
@@ -28,6 +35,8 @@ class Address extends Model<AddressAttributes, AddressCreationAttributes> implem
   public zip!: string;
   public country!: string;
   public type!: AddressType;
+  public addressableId!: number;
+  public addressableType!: AddressableType;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -65,6 +74,14 @@ Address.init({
   },
   type: {
     type: DataTypes.ENUM(...Object.values(AddressType)),
+    allowNull: false,
+  },
+  addressableId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  addressableType: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
 }, {

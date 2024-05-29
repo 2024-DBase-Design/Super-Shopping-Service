@@ -1,4 +1,4 @@
-import { Address } from "../user/Address";
+import Address from "../user/Address";
 import { Product } from "../product/Product";
 
 export interface Supplier {

@@ -8,6 +8,7 @@ import {
   ShoppingCartItem,
   DeliveryPlan,
 } from "../models";
+import { AddressableType } from "../models/user/Address";
 
 let customers: Customer[] = [];
 let orders: Order[] = [];
@@ -90,31 +91,63 @@ export const deleteCustomerAccount = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Add a credit card to a customer's account.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
 export const addCreditCard = async (req: Request, res: Response) => {
   try {
     const customer = await Customer.findByPk(req.params.customerId);
-    if (customer) {
-      const newCard = await CreditCard.create(req.body);
-      await customer.addCreditCard(newCard);
-      res.status(201).json(newCard);
-    } else {
-      res.status(404).json({ error: 'User not found' });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
     }
+
+    const { cardNumber, expiryDate, cvv, billingAddress } = req.body;
+
+    const newAddress = await Address.create({
+      ...billingAddress,
+      addressableId: customer.id,
+      addressableType: AddressableType.CUSTOMER,
+    });
+
+    const newCreditCard = {
+      cardNumber,
+      expiryDate,
+      cvv,
+      billingAddressId: newAddress.id,
+      customerId: customer.id,
+    };
+
+    await customer.addCreditCard(newCreditCard);
+
+    res.status(201).json({ message: 'Credit card added successfully' });
   } catch (error) {
     console.error('Error adding credit card:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
   }
 };
 
-// export const getCreditCards = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     res.json(customer.creditCards);
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Get a customer's credit cards.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getCreditCards = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const creditCards = await CreditCard.findAll({ where: { customerId: customer.id } });
+    res.json(creditCards);
+  } catch (error) {
+    console.error('Error fetching credit cards:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
 // export const updateCreditCard = (req: Request, res: Response) => {
 //   const { customerId, cardId } = req.params;

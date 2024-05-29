@@ -23,19 +23,19 @@ Before you begin, ensure you have met the following requirements:
 
 1. **Clone the repository**
 
-    ```bash
-    git clone https://github.com/Jasmine-Mogadam/Super-Shopping-Service.git
-    cd Super-Shopping-Service
-    ```
+   ```bash
+   git clone https://github.com/Jasmine-Mogadam/Super-Shopping-Service.git
+   cd Super-Shopping-Service
+   ```
 
 2. **Set up environment variables**:
-    - Create a .env file in the root of the project and add the following environment variables:
-      ```dotenv
-      DB_HOST=db
-      DB_USER=sssadmin
-      DB_PASSWORD=ssspassword
-      DB_NAME=supershoppingservice
-      ``` 
+   - Create a .env file in the root of the project and add the following environment variables:
+     ```dotenv
+     DB_HOST=db
+     DB_USER=sssadmin
+     DB_PASSWORD=ssspassword
+     DB_NAME=supershoppingservice
+     ```
 
 ## Running the Application
 
@@ -52,9 +52,11 @@ Before you begin, ensure you have met the following requirements:
    npm run electron
    ```
 
-## API Endpoints
+## Postman Collection
 
-### Users
+For easy testing and integration, we have created a Postman collection that includes all the API endpoints available in this service. You can access the collection using the following public link:
+
+[View the SuperShoppingService Postman Collection](https://www.postman.com/lunar-module-pilot-51980864/workspace/super-shopping-service)
 
 ## Development
 

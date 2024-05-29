@@ -1,14 +1,14 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../server/sequelize';
 import User, { UserAttributes } from './User';
-import { CreditCard } from "./CreditCard";
+import CreditCard, { CreditCardCreationAttributes } from "./CreditCard";
+import Address, { AddressableType } from "./Address";
 import { Product } from "../product/Product";
 
 /**
  * Interface defining the unique attributes of the Customer model.
  */
 interface CustomerAttributes extends UserAttributes {
-  creditCards: CreditCard[];
   balance: number;
   cart: ProductWithQuantity[];
 }
@@ -20,14 +20,24 @@ interface CustomerAttributes extends UserAttributes {
  * It defines the shape of the Customer table and includes methods for interacting with customer data.
  */
 class Customer extends User implements CustomerAttributes {
-  public creditCards!: CreditCard[];
   public balance!: number;
   public cart!: ProductWithQuantity[];
 
   // Method to add a credit card to the customer
-  public async addCreditCard(newCreditCard: CreditCard): Promise<void> {
-    this.creditCards.push(newCreditCard);
-    await this.save();
+  public async addCreditCard(newCreditCard: CreditCardCreationAttributes): Promise<void> {
+    await CreditCard.create({
+      ...newCreditCard,
+      customerId: this.id
+    });
+  }
+
+  // Method to add an address to the customer
+  public async addAddress(newAddress: Address): Promise<void> {
+    await Address.create({
+      ...newAddress,
+      addressableId: this.id,
+      addressableType: AddressableType.CUSTOMER
+    });
   }
 }
 
@@ -35,11 +45,6 @@ class Customer extends User implements CustomerAttributes {
  * Define the unique attributes for the Customer model.
  */
 const customerAttributes = {
-  creditCards: {
-    type: DataTypes.ARRAY(DataTypes.JSONB),
-    allowNull: false,
-    defaultValue: [],
-  },
   balance: {
     type: DataTypes.FLOAT,
     allowNull: false,
@@ -65,6 +70,12 @@ Customer.init({
     sequelize,
     tableName: 'customers',
 });
+
+Customer.hasMany(CreditCard, { foreignKey: 'customerId', as: 'creditCards' });
+Customer.hasMany(Address, { foreignKey: 'addressableId', constraints: false, scope: { addressableType: 'customer' } });
+
+CreditCard.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+Address.belongsTo(Customer, { foreignKey: 'addressableId', constraints: false });
 
 export default Customer;
 
