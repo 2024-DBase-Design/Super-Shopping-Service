@@ -36,6 +36,10 @@ Before you begin, ensure you have met the following requirements:
      DB_PASSWORD=ssspassword
      DB_NAME=supershoppingservice
      ```
+   - Install Node Packages:
+     ```bash
+     npm install
+     ```
 
 ## Running the Application
 
