@@ -1,24 +1,30 @@
-version: '3.8'
-
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      NODE_ENV: production
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    command: ["npm", "start"]
     depends_on:
       - db
-  db:
-    image: "postgres:13"
     environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - DB_HOST=db
+      - DB_USER=sssadmin
+      - DB_PASSWORD=ssspassword
+      - DB_NAME=supershoppingservice
+    command: ["npm", "start"]
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: supershoppingservice
+      POSTGRES_USER: sssadmin
+      POSTGRES_PASSWORD: ssspassword
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:

@@ -1,49 +1,81 @@
 # SillyStuffs API
 
-This project is an API for an application that manages art, clothing, toys, and other items. It is built using TypeScript and Node.js, and is containerized using Docker.
+This project is an API for an application that manages art, clothing, toys, and other items. It is built using TypeScript leveraging Express.js for REST API calls and PostgreSQL for database storage. The application is containerized using Docker and Docker Compose.
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Running the Application](#running-the-application)
+- [Postman Collection](#postman-collection)
+- [Development](#development)
 - [Scripts](#scripts)
-
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+Before you begin, ensure you have met the following requirements:
+
+- **Docker**: Install Docker from [Docker's official website](https://www.docker.com/get-started).
+- **Docker Compose**: Docker Compose is included in Docker Desktop for Windows and Mac. For Linux, follow the instructions [here](https://docs.docker.com/compose/install/).
+- **NodeJS**: Install NodeJS using [Node Version Manager](https://github.com/coreybutler/nvm-windows) or from [NodeJS's official website](https://nodejs.org/dist/v22.2.0/node-v22.2.0-x64.msi).
 
 ## Installation
 
 1. **Clone the repository**
 
-    ```sh
-    git clone https://github.com/Jasmine-Mogadam/Super-Shopping-Service.git
-    cd Super-Shopping-Service
-    ```
+   ```bash
+   git clone https://github.com/Jasmine-Mogadam/Super-Shopping-Service.git
+   cd Super-Shopping-Service
+   ```
 
-2. **Build and start the containers**
-
-    ```sh
-    docker-compose up --build
-    ```
-
-3. **Access the application**
-
-- The application will be running at http://localhost:3000.
+2. **Set up environment variables**:
+   - Create a .env file in the root of the project and add the following environment variables:
+     ```dotenv
+     DB_HOST=db
+     DB_USER=sssadmin
+     DB_PASSWORD=ssspassword
+     DB_NAME=supershoppingservice
+     ```
 
 ## Running the Application
 
-1. 
-    ```sh
-    docker-compose up --build
-    ```
+1. **Build and start the application**:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+2. **The application should now be running at http://localhost:3000.**
+
+3. **Start the electron app**:
+   ```bash
+   npm run electron
+   ```
+
+## Postman Collection
+
+For easy testing and integration, we have created a Postman collection that includes all the API endpoints available in this service. You can access the collection using the following public link:
+
+[View the SuperShoppingService Postman Collection](https://www.postman.com/lunar-module-pilot-51980864/workspace/super-shopping-service)
+
+## Development
+
+1. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+2. **Run the application locally**:
+
+   ```bash
+   npm run start
+   ```
+
+3. **Build the application**:
+   ```bash
+   npm run build
+   ```
 
 ## Scripts
 

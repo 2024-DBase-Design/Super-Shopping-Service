@@ -1,6 +1,6 @@
 import { DeliveryPlan } from "../delivery/DeliveryPlan";
 import { ShoppingCartItem } from "./ShoppingCartItem";
-import { CreditCard } from "../user/CreditCard";
+import CreditCard from "../user/CreditCard";
 
 export interface Order {
   id: string;
