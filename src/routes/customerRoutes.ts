@@ -5,13 +5,13 @@ const router = Router();
 
 router.post("/", customerController.createCustomer);
 router.get("/:customerId", customerController.getCustomerDetails);
-// router.put("/:customerId", customerController.updateCustomerDetails);
-// router.delete("/:customerId", customerController.deleteCustomerAccount);
+router.put("/:customerId", customerController.updateCustomerDetails);
+router.delete("/:customerId", customerController.deleteCustomerAccount);
 
-// router.post("/:customerId/credit-cards", customerController.addCreditCard);
-// router.get("/:customerId/credit-cards", customerController.getCreditCards);
-// router.put("/:customerId/credit-cards/:cardId", customerController.updateCreditCard);
-// router.delete("/:customerId/credit-cards/:cardId", customerController.deleteCreditCard);
+router.post("/:customerId/creditCards", customerController.addCreditCard);
+router.get("/:customerId/creditCards", customerController.getCreditCards);
+// router.put("/:customerId/creditCards/:cardId", customerController.updateCreditCard);
+// router.delete("/:customerId/creditCards/:cardId", customerController.deleteCreditCard);
 
 // router.post("/:customerId/addresses", customerController.addAddress);
 // router.get("/:customerId/addresses", customerController.getAddresses);

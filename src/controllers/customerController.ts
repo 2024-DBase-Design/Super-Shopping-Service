@@ -8,6 +8,7 @@ import {
   ShoppingCartItem,
   DeliveryPlan,
 } from "../models";
+import { AddressableType } from "../models/user/Address";
 
 let customers: Customer[] = [];
 let orders: Order[] = [];
@@ -48,46 +49,105 @@ export const getCustomerDetails = async (req: Request, res: Response) => {
   }
 };
 
-// export const updateCustomerDetails = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   const updatedDetails = req.body;
-//   let customer = customers.find((c) => c.id === customerId) as Customer;
-//   if (customer) {
-//     customer = { ...customer, ...updatedDetails };
-//     customers = customers.map((c) => (c.id === customerId ? customer : c));
-//     res.json(customer);
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Update a customer's details.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const updateCustomerDetails = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (customer) {
+      await customer.update(req.body);
+      res.json(customer);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error updating user:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// export const deleteCustomerAccount = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   customers = customers.filter((c) => c.id !== customerId);
-//   res.status(204).send();
-// };
+/**
+ * Delete a customer's account.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const deleteCustomerAccount = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (customer) {
+      await customer.destroy();
+      res.status(204).send();
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting user:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// export const addCreditCard = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   const newCard: CreditCard = req.body;
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     customer.creditCards.push(newCard);
-//     res.status(201).json(newCard);
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Add a credit card to a customer's account.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const addCreditCard = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
 
-// export const getCreditCards = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     res.json(customer.creditCards);
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+    const { cardNumber, expiryDate, cvv, billingAddress } = req.body;
+
+    const newAddress = await Address.create({
+      ...billingAddress,
+      addressableId: customer.id,
+      addressableType: AddressableType.CUSTOMER,
+    });
+
+    const newCreditCard = {
+      cardNumber,
+      expiryDate,
+      cvv,
+      billingAddressId: newAddress.id,
+      customerId: customer.id,
+    };
+
+    await customer.addCreditCard(newCreditCard);
+
+    res.status(201).json({ message: 'Credit card added successfully' });
+  } catch (error) {
+    console.error('Error adding credit card:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Get a customer's credit cards.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getCreditCards = async (req: Request, res: Response) => {
+  try {
+    const customer = await Customer.findByPk(req.params.customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const creditCards = await CreditCard.findAll({ where: { customerId: customer.id } });
+    res.json(creditCards);
+  } catch (error) {
+    console.error('Error fetching credit cards:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
 // export const updateCreditCard = (req: Request, res: Response) => {
 //   const { customerId, cardId } = req.params;

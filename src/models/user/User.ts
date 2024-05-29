@@ -1,4 +1,4 @@
-import { Address } from "./Address";
+import Address from "./Address";
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../../server/sequelize';
 
@@ -9,7 +9,6 @@ export interface UserAttributes {
   id: number;
   name: string;
   profilePicture?: string;
-  addresses: Address[];
 }
 
 /**
@@ -28,7 +27,6 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public id!: number;
   public name!: string;
   public profilePicture?: string;
-  public addresses!: Address[];
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -55,14 +53,11 @@ User.init({
     allowNull: true,
     defaultValue: null,
   },
-  addresses: {
-    type: DataTypes.ARRAY(DataTypes.JSONB),
-    allowNull: false,
-    defaultValue: [],
-  },
 }, {
   sequelize,
   tableName: 'users',
 });
+
+User.hasMany(Address, { foreignKey: 'userId', as: 'addresses' });
 
 export default User;
