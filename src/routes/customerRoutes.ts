@@ -23,6 +23,7 @@ router.get("/:customerId/cart", customerController.getCartItems);
 router.put("/:customerId/cart/:itemId", customerController.updateCartItem);
 router.delete("/:customerId/cart/:itemId", customerController.removeCartItem);
 
-// router.post("/:customerId/orders", customerController.submitOrder);
+router.post("/:customerId/orders", customerController.submitOrder);
+router.get("/:customerId/orders", customerController.getOrders);
 
 export default router;

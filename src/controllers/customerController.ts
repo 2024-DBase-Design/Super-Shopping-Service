@@ -5,10 +5,11 @@ import {
   Address,
   ProductWithQuantity,
   Order,
+  OrderStatus,
   ShoppingCartItem,
-  DeliveryPlan,
 } from "../models";
 import { AddressableType } from "../models/user/Address";
+import { randomUUID } from "crypto";
 
 /**
  * Create a new customer.
@@ -383,30 +384,75 @@ export const removeCartItem = async (req: Request, res: Response) => {
   }
 };
 
-// export const submitOrder = (req: Request, res: Response) => {
-//   const { customerId } = req.params;
-//   const {
-//     items,
-//     cardUsed,
-//     deliveryPlan,
-//   }: {
-//     items: ShoppingCartItem[];
-//     cardUsed: CreditCard;
-//     deliveryPlan: DeliveryPlan;
-//   } = req.body;
-//   const customer = customers.find((c) => c.id === customerId);
-//   if (customer) {
-//     const newOrder: Order = {
-//       id: "order-" + new Date().getTime(),
-//       customerId,
-//       items,
-//       status: "issued",
-//       cardUsed,
-//       deliveryPlan,
-//     };
-//     orders.push(newOrder);
-//     res.status(201).json(newOrder);
-//   } else {
-//     res.status(404).json({ message: "Customer not found" });
-//   }
-// };
+/**
+ * Submit an order for a customer.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const submitOrder = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.params;
+    const { cardId, deliveryPlan } = req.body;
+
+    const customer = await Customer.findByPk(customerId);
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    // Validate the card used
+    const cardUsed = await CreditCard.findOne({ where: { id: cardId, customerId: customerId } });
+    if (!cardUsed) {
+      return res.status(400).json({ error: 'Invalid card used' });
+    }
+
+    const items: ShoppingCartItem[] = customer.cart.map((item) => {
+      const { product, quantity } = item;
+      const newItem: ShoppingCartItem = { productId: product.id, quantity };
+      return newItem
+    });
+
+    const order = await Order.create({
+      id: generateUniqueId(),
+      customerId,
+      items,
+      status: OrderStatus.ISSUED,
+      cardUsed,
+      deliveryPlan,
+    });
+
+    customer.cart = [];
+    customer.changed('cart', true);
+    await customer.save();
+    res.status(201).json(order);
+  } catch (error) {
+    console.error('Error submitting order:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Generate a unique order ID.
+ * 
+ * @returns A unique order ID.
+ */
+const generateUniqueId = (): string => {
+  return randomUUID();
+}
+
+/**
+ * Get a customer's orders.
+ * 
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getOrders = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.params;
+    const orders = await Order.findAll({ where: { customerId } });
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+}

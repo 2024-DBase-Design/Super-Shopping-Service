@@ -1,6 +1,7 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../../server/sequelize';
 import User, { UserAttributes } from './User';
+import Address from './Address';
 
 /**
  * Interface defining the unique attributes of the Staff model.
@@ -10,13 +11,18 @@ interface StaffAttributes extends UserAttributes {
   jobTitle: string;
 }
 
+export interface StaffCreationAttributes extends Optional<StaffAttributes, 'id'> {}
+
 /**
  * Staff model class definition.
  * 
  * This class extends the User model class and implements the StaffAttributes interface.
  * It defines the shape of the Staff table and includes methods for interacting with staff data.
  */
-class Staff extends User implements StaffAttributes {
+class Staff extends Model<StaffAttributes, StaffCreationAttributes> implements StaffAttributes {
+  public id!: number;
+  public name!: string;
+  public profilePicture?: string | undefined;
   public salary!: number;
   public jobTitle!: string;
 }
@@ -49,5 +55,8 @@ Staff.init({
     sequelize,
     tableName: 'staff',
 });
+
+Staff.hasMany(Address, { foreignKey: 'addressableId', constraints: false, scope: { addressableType: 'customer' } });
+Address.belongsTo(Staff, { foreignKey: 'addressableId', constraints: false });
 
 export default Staff;

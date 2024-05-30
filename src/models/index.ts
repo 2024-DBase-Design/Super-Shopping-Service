@@ -5,7 +5,7 @@ import Address from './user/Address';
 
 export { User, Customer, CreditCard, Address };
 export { Product } from "./product/Product";
-export { Order } from "./shoppingCart/Order";
+export { Order, OrderStatus } from "./shoppingCart/Order";
 export { ProductWithQuantity } from "./user/Customer";
 export { ShoppingCartItem } from "./shoppingCart/ShoppingCartItem";
 export { DeliveryPlan } from "./delivery/DeliveryPlan";
