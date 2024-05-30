@@ -49,6 +49,13 @@ Before you begin, ensure you have met the following requirements:
    docker-compose up --build
    ```
 
+**Temporary step for running the nextjs client visuals**:
+
+```bash
+cd client
+npm run dev
+```
+
 2. **The application should now be running at http://localhost:3000.**
 
 3. **Start the electron app**:
