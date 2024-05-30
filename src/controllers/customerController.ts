@@ -3,12 +3,12 @@ import {
   Customer,
   CreditCard,
   Address,
+  AddressableType,
   ProductWithQuantity,
   Order,
   OrderStatus,
   ShoppingCartItem
 } from '../models';
-import { AddressableType } from '../models/user/Address';
 import { randomUUID } from 'crypto';
 
 /**
@@ -158,7 +158,9 @@ export const updateCreditCard = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const creditCard = await CreditCard.findByPk(req.params.cardId);
+    const creditCard = await CreditCard.findOne({
+      where: { id: req.params.cardId, customerId: customer.id }
+    });
     if (!creditCard) {
       return res.status(404).json({ error: 'Credit card not found' });
     }
@@ -182,7 +184,9 @@ export const deleteCreditCard = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const creditCard = await CreditCard.findByPk(req.params.cardId);
+    const creditCard = await CreditCard.findOne({
+      where: { id: req.params.cardId, customerId: customer.id }
+    });
     if (!creditCard) {
       return res.status(404).json({ error: 'Credit card not found' });
     }
@@ -206,13 +210,11 @@ export const addAddress = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-
     const newAddress = await Address.create({
       ...req.body,
       addressableId: customer.id,
       addressableType: AddressableType.CUSTOMER
     });
-
     res.status(201).json(newAddress);
   } catch (error) {
     console.error('Error adding address:', (error as Error).message);
@@ -233,8 +235,11 @@ export const getAddresses = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Customer not found' });
     }
     const addresses = await Address.findAll({
-      where: { addressableId: customer.id }
+      where: { addressableId: customer.id, addressableType: AddressableType.CUSTOMER }
     });
+    if (!addresses.length) {
+      return res.status(404).json({ error: 'Addresses not found' });
+    }
     res.json(addresses);
   } catch (error) {
     console.error('Error fetching addresses:', (error as Error).message);
@@ -254,7 +259,13 @@ export const updateAddress = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const address = await Address.findByPk(req.params.addressId);
+    const address = await Address.findOne({
+      where: {
+        id: req.params.addressId,
+        addressableId: customer.id,
+        addressableType: AddressableType.CUSTOMER
+      }
+    });
     if (!address) {
       return res.status(404).json({ error: 'Address not found' });
     }
@@ -278,7 +289,13 @@ export const deleteAddress = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const address = await Address.findByPk(req.params.addressId);
+    const address = await Address.findOne({
+      where: {
+        id: req.params.addressId,
+        addressableId: customer.id,
+        addressableType: AddressableType.CUSTOMER
+      }
+    });
     if (!address) {
       return res.status(404).json({ error: 'Address not found' });
     }
@@ -426,6 +443,7 @@ export const submitOrder = async (req: Request, res: Response) => {
       deliveryPlan
     });
 
+    // TODO: Implement balance logic
     customer.cart = [];
     customer.changed('cart', true);
     await customer.save();
