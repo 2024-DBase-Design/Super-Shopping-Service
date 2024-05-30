@@ -15,7 +15,7 @@ export interface ProductWithQuantity {
  */
 export interface CustomerAttributes extends UserAttributes {
   balance: number;
-  cart: string;
+  cart: ProductWithQuantity[];
 }
 
 export interface CustomerCreationAttributes extends Optional<CustomerAttributes, 'id'> {}
@@ -31,7 +31,7 @@ class Customer extends Model<CustomerAttributes, CustomerCreationAttributes> imp
   public name!: string;
   public profilePicture?: string | undefined;
   public balance!: number;
-  public cart!: string;
+  public cart!: ProductWithQuantity[];
 
   // Method to add a credit card to the customer
   public async addCreditCard(newCreditCard: CreditCardCreationAttributes): Promise<number> {
@@ -50,24 +50,6 @@ class Customer extends Model<CustomerAttributes, CustomerCreationAttributes> imp
       addressableType: AddressableType.CUSTOMER
     });
   }
-
-  // Method to get the parsed cart
-  public getCart(): ProductWithQuantity[] {
-    return JSON.parse(this.cart);
-  }
-
-  // Method to set the cart with a JSON array
-  public setCart(cart: ProductWithQuantity[]): void {
-    this.cart = JSON.stringify(cart);
-  }
-
-  // Method to add a product to the customer's cart
-  public async addToCart(item: ProductWithQuantity): Promise<void> {
-    const currentCart = this.getCart();
-    currentCart.push(item);
-    this.setCart(currentCart);
-    await this.save();
-  }
 }
 
 /**
@@ -80,9 +62,9 @@ const customerAttributes = {
     defaultValue: 0.0,
   },
   cart: {
-    type: DataTypes.TEXT,
+    type: DataTypes.ARRAY(DataTypes.JSON),
     allowNull: false,
-    defaultValue: '[]',
+    defaultValue: [],
   },
 };
 
