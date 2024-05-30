@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   Product,
   ProductPrice,
   SearchProductsRequest,
-  AddProductRequest,
-} from "../models";
+  AddProductRequest
+} from '../models';
 
 let products: Product[] = [];
 let productPrices: ProductPrice[] = [];
@@ -18,7 +18,7 @@ export const addProduct = (req: Request, res: Response) => {
     brand,
     size,
     image,
-    price,
+    price
   }: AddProductRequest = req.body;
 
   // Ensure all required fields are present
@@ -31,7 +31,7 @@ export const addProduct = (req: Request, res: Response) => {
     !size ||
     price === undefined
   ) {
-    return res.status(400).json({ message: "Missing required fields" });
+    return res.status(400).json({ message: 'Missing required fields' });
   }
 
   const newProduct: Product = {
@@ -41,7 +41,7 @@ export const addProduct = (req: Request, res: Response) => {
     category,
     brand,
     size,
-    image,
+    image
   };
   products.push(newProduct);
 
@@ -55,10 +55,12 @@ export const getProductDetails = (req: Request, res: Response) => {
   const { productId } = req.params;
   const product = products.find((p) => p.id === Number(productId));
   if (product) {
-    const productPrice = productPrices.find((pp) => pp.productId === Number(productId));
+    const productPrice = productPrices.find(
+      (pp) => pp.productId === Number(productId)
+    );
     res.json({ ...product, price: productPrice?.price });
   } else {
-    res.status(404).json({ message: "Product not found" });
+    res.status(404).json({ message: 'Product not found' });
   }
 };
 
@@ -71,14 +73,16 @@ export const updateProduct = (req: Request, res: Response) => {
     products = products.map((p) => (p.id === Number(productId) ? product : p));
     res.json(product);
   } else {
-    res.status(404).json({ message: "Product not found" });
+    res.status(404).json({ message: 'Product not found' });
   }
 };
 
 export const deleteProduct = (req: Request, res: Response) => {
   const { productId } = req.params;
   products = products.filter((p) => p.id !== Number(productId));
-  productPrices = productPrices.filter((pp) => pp.productId !== Number(productId));
+  productPrices = productPrices.filter(
+    (pp) => pp.productId !== Number(productId)
+  );
   res.status(204).send();
 };
 
@@ -87,7 +91,7 @@ export const setProductPrice = (req: Request, res: Response) => {
   const { price }: { price: number } = req.body;
   const existingProduct = products.find((p) => p.id === Number(productId));
   if (!existingProduct) {
-    return res.status(404).json({ message: "Product not found" });
+    return res.status(404).json({ message: 'Product not found' });
   }
   const existingPriceIndex = productPrices.findIndex(
     (pp) => pp.productId === Number(productId)
@@ -95,7 +99,7 @@ export const setProductPrice = (req: Request, res: Response) => {
   if (existingPriceIndex !== -1) {
     productPrices[existingPriceIndex].price = price;
   } else {
-    return res.status(404).json({ message: "Product price not found" });
+    return res.status(404).json({ message: 'Product price not found' });
   }
   res.json({ productId, price });
 };

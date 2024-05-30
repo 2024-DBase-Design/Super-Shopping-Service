@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../../server/sequelize';
-import Address from "./Address";
+import Address from './Address';
 
 export interface CreditCardAttributes {
   id: number;
@@ -11,9 +11,13 @@ export interface CreditCardAttributes {
   customerId: number; // Foreign key associated with Customer
 }
 
-export interface CreditCardCreationAttributes extends Optional<CreditCardAttributes, 'id'> {}
+export interface CreditCardCreationAttributes
+  extends Optional<CreditCardAttributes, 'id'> {}
 
-class CreditCard extends Model<CreditCardAttributes, CreditCardCreationAttributes> implements CreditCardAttributes {
+class CreditCard
+  extends Model<CreditCardAttributes, CreditCardCreationAttributes>
+  implements CreditCardAttributes
+{
   public id!: number;
   public cardNumber!: string;
   public expiryDate!: string;
@@ -25,45 +29,51 @@ class CreditCard extends Model<CreditCardAttributes, CreditCardCreationAttribute
   public readonly updatedAt!: Date;
 }
 
-CreditCard.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  cardNumber: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  expiryDate: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  cvv: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  billingAddressId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'addresses',
-      key: 'id',
+CreditCard.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
     },
-  },
-  customerId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'customers',
-      key: 'id',
+    cardNumber: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
+    expiryDate: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    cvv: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    billingAddressId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'addresses',
+        key: 'id'
+      }
+    },
+    customerId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'customers',
+        key: 'id'
+      }
+    }
   },
-}, {
-  sequelize,
-  tableName: 'creditCards',
-});
+  {
+    sequelize,
+    tableName: 'creditCards'
+  }
+);
 
-CreditCard.belongsTo(Address, { foreignKey: 'billingAddressId', as: 'billingAddress' });
+CreditCard.belongsTo(Address, {
+  foreignKey: 'billingAddressId',
+  as: 'billingAddress'
+});
 
 export default CreditCard;

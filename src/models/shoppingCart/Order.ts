@@ -1,22 +1,22 @@
-import { DeliveryPlan } from "../delivery/DeliveryPlan";
-import { ShoppingCartItem } from "./ShoppingCartItem";
-import CreditCard from "../user/CreditCard";
-import { Model, Optional, DataTypes } from "sequelize";
-import sequelize from "../../server/sequelize";
+import { DeliveryPlan } from '../delivery/DeliveryPlan';
+import { ShoppingCartItem } from './ShoppingCartItem';
+import CreditCard from '../user/CreditCard';
+import { Model, Optional, DataTypes } from 'sequelize';
+import sequelize from '../../server/sequelize';
 
 /**
  * Enum defining the possible statuses for an Order.
  */
 export enum OrderStatus {
-  ISSUED = "issued",
-  SENT = "sent",
-  RECEIVED = "received"
+  ISSUED = 'issued',
+  SENT = 'sent',
+  RECEIVED = 'received'
 }
 
 /**
  * Interface defining the unique attributes of the Order model.
  */
-export interface OrderAttributes  {
+export interface OrderAttributes {
   id: string;
   customerId: string;
   items: ShoppingCartItem[];
@@ -25,15 +25,19 @@ export interface OrderAttributes  {
   deliveryPlan: DeliveryPlan;
 }
 
-export interface OrderCreationAttributes extends Optional<OrderAttributes, 'id'> {}
+export interface OrderCreationAttributes
+  extends Optional<OrderAttributes, 'id'> {}
 
 /**
  * Order model class definition.
- * 
+ *
  * This class extends the Sequelize Model class and implements the OrderAttributes interface.
  * It defines the shape of the Order table and includes methods for interacting with order data.
  */
-export class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
+export class Order
+  extends Model<OrderAttributes, OrderCreationAttributes>
+  implements OrderAttributes
+{
   public id!: string;
   public customerId!: string;
   public items!: ShoppingCartItem[];
@@ -49,33 +53,33 @@ Order.init(
   {
     id: {
       type: DataTypes.STRING,
-      primaryKey: true,
+      primaryKey: true
     },
     customerId: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     items: {
       type: DataTypes.JSON,
       allowNull: false,
-      defaultValue: [],
+      defaultValue: []
     },
     status: {
       type: DataTypes.ENUM(...Object.values(OrderStatus)),
       allowNull: false,
-      defaultValue: OrderStatus.ISSUED,
+      defaultValue: OrderStatus.ISSUED
     },
     cardUsed: {
       type: DataTypes.JSON,
-      allowNull: false,
+      allowNull: false
     },
     deliveryPlan: {
       type: DataTypes.JSON,
-      allowNull: false,
-    },
+      allowNull: false
+    }
   },
   {
     sequelize,
-    tableName: 'orders',
+    tableName: 'orders'
   }
 );

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import {
   Customer,
   CreditCard,
@@ -6,14 +6,14 @@ import {
   ProductWithQuantity,
   Order,
   OrderStatus,
-  ShoppingCartItem,
-} from "../models";
-import { AddressableType } from "../models/user/Address";
-import { randomUUID } from "crypto";
+  ShoppingCartItem
+} from '../models';
+import { AddressableType } from '../models/user/Address';
+import { randomUUID } from 'crypto';
 
 /**
  * Create a new customer.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -29,7 +29,7 @@ export const createCustomer = async (req: Request, res: Response) => {
 
 /**
  * Get a customer by ID.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -48,7 +48,7 @@ export const getCustomerDetails = async (req: Request, res: Response) => {
 
 /**
  * Update a customer's details.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -68,7 +68,7 @@ export const updateCustomerDetails = async (req: Request, res: Response) => {
 
 /**
  * Delete a customer's account.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -88,7 +88,7 @@ export const deleteCustomerAccount = async (req: Request, res: Response) => {
 
 /**
  * Add a credit card to a customer's account.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -104,7 +104,7 @@ export const addCreditCard = async (req: Request, res: Response) => {
     const newAddress = await Address.create({
       ...billingAddress,
       addressableId: customer.id,
-      addressableType: AddressableType.CUSTOMER,
+      addressableType: AddressableType.CUSTOMER
     });
 
     const newCreditCard = {
@@ -112,12 +112,14 @@ export const addCreditCard = async (req: Request, res: Response) => {
       expiryDate,
       cvv,
       billingAddressId: newAddress.id,
-      customerId: customer.id,
+      customerId: customer.id
     };
 
     const cardId = await customer.addCreditCard(newCreditCard);
 
-    res.status(201).json({ message: 'Credit card added successfully', cardId: cardId});
+    res
+      .status(201)
+      .json({ message: 'Credit card added successfully', cardId: cardId });
   } catch (error) {
     console.error('Error adding credit card:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -126,7 +128,7 @@ export const addCreditCard = async (req: Request, res: Response) => {
 
 /**
  * Get a customer's credit cards.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -136,7 +138,9 @@ export const getCreditCards = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const creditCards = await CreditCard.findAll({ where: { customerId: customer.id } });
+    const creditCards = await CreditCard.findAll({
+      where: { customerId: customer.id }
+    });
     res.json(creditCards);
   } catch (error) {
     console.error('Error fetching credit cards:', (error as Error).message);
@@ -146,7 +150,7 @@ export const getCreditCards = async (req: Request, res: Response) => {
 
 /**
  * Update a customer's credit card details.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -170,7 +174,7 @@ export const updateCreditCard = async (req: Request, res: Response) => {
 
 /**
  * Delete a customer's credit card.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -194,7 +198,7 @@ export const deleteCreditCard = async (req: Request, res: Response) => {
 
 /**
  * Add a customer's address.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -208,20 +212,19 @@ export const addAddress = async (req: Request, res: Response) => {
     const newAddress = await Address.create({
       ...req.body,
       addressableId: customer.id,
-      addressableType: AddressableType.CUSTOMER,
+      addressableType: AddressableType.CUSTOMER
     });
 
     res.status(201).json(newAddress);
   } catch (error) {
     console.error('Error adding address:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
-  
   }
 };
 
 /**
  * Get a customer's addresses.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -231,7 +234,9 @@ export const getAddresses = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const addresses = await Address.findAll({ where: { addressableId: customer.id } });
+    const addresses = await Address.findAll({
+      where: { addressableId: customer.id }
+    });
     res.json(addresses);
   } catch (error) {
     console.error('Error fetching addresses:', (error as Error).message);
@@ -241,7 +246,7 @@ export const getAddresses = async (req: Request, res: Response) => {
 
 /**
  * Update a customer's address.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -265,7 +270,7 @@ export const updateAddress = async (req: Request, res: Response) => {
 
 /**
  * Delete a customer's address.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -289,7 +294,7 @@ export const deleteAddress = async (req: Request, res: Response) => {
 
 /**
  * Add to a customer's cart items.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -312,7 +317,7 @@ export const addToCart = async (req: Request, res: Response) => {
 
 /**
  * Get a customer's cart items.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -331,7 +336,7 @@ export const getCartItems = async (req: Request, res: Response) => {
 
 /**
  * Update a customer's cart item.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -343,7 +348,9 @@ export const updateCartItem = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Customer not found' });
     }
     const { quantity } = req.body;
-    const itemIndex = customer.cart.findIndex((item) => item.product.id === Number(itemId));
+    const itemIndex = customer.cart.findIndex(
+      (item) => item.product.id === Number(itemId)
+    );
     if (itemIndex === -1) {
       return res.status(404).json({ error: 'Item not found' });
     }
@@ -359,7 +366,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
 
 /**
  * Remove a customer's cart item.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -370,7 +377,9 @@ export const removeCartItem = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const itemIndex = customer.cart.findIndex((item) => item.product.id === Number(itemId));
+    const itemIndex = customer.cart.findIndex(
+      (item) => item.product.id === Number(itemId)
+    );
     if (itemIndex === -1) {
       return res.status(404).json({ error: 'Item not found' });
     }
@@ -386,7 +395,7 @@ export const removeCartItem = async (req: Request, res: Response) => {
 
 /**
  * Submit an order for a customer.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -401,7 +410,9 @@ export const submitOrder = async (req: Request, res: Response) => {
     }
 
     // Validate the card used
-    const cardUsed = await CreditCard.findOne({ where: { id: cardId, customerId: customerId } });
+    const cardUsed = await CreditCard.findOne({
+      where: { id: cardId, customerId: customerId }
+    });
     if (!cardUsed) {
       return res.status(400).json({ error: 'Invalid card used' });
     }
@@ -409,7 +420,7 @@ export const submitOrder = async (req: Request, res: Response) => {
     const items: ShoppingCartItem[] = customer.cart.map((item) => {
       const { product, quantity } = item;
       const newItem: ShoppingCartItem = { productId: product.id, quantity };
-      return newItem
+      return newItem;
     });
 
     const order = await Order.create({
@@ -418,7 +429,7 @@ export const submitOrder = async (req: Request, res: Response) => {
       items,
       status: OrderStatus.ISSUED,
       cardUsed,
-      deliveryPlan,
+      deliveryPlan
     });
 
     customer.cart = [];
@@ -433,16 +444,16 @@ export const submitOrder = async (req: Request, res: Response) => {
 
 /**
  * Generate a unique order ID.
- * 
+ *
  * @returns A unique order ID.
  */
 const generateUniqueId = (): string => {
   return randomUUID();
-}
+};
 
 /**
  * Get a customer's orders.
- * 
+ *
  * @param req Express request object.
  * @param res Express response object.
  */
@@ -455,4 +466,4 @@ export const getOrders = async (req: Request, res: Response) => {
     console.error('Error fetching orders:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
   }
-}
+};
