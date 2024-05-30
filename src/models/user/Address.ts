@@ -1,14 +1,19 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../../server/sequelize';
+import Warehouse from '../warehouse/Warehouse';
 
 export enum AddressType {
   DELIVERY = 'delivery',
-  PAYMENT = 'payment'
+  BILLING = 'billing',
+  WAREHOUSE = 'warehouses',
+  SUPPLIER = 'supplier'
 }
 
 export enum AddressableType {
   CUSTOMER = 'customer',
-  STAFF = 'staff'
+  STAFF = 'staff',
+  WAREHOUSE = 'warehouses',
+  SUPPLIER = 'supplier'
 }
 
 export interface AddressAttributes {
@@ -94,5 +99,20 @@ Address.init(
     tableName: 'addresses'
   }
 );
+
+Warehouse.hasOne(Address, {
+  as: 'addresses',
+  foreignKey: 'addressableId',
+  constraints: false,
+  scope: {
+    addressableType: AddressableType.WAREHOUSE
+  }
+});
+
+Address.belongsTo(Warehouse, {
+  foreignKey: 'addressableId',
+  constraints: false,
+  as: 'warehouses'
+});
 
 export default Address;

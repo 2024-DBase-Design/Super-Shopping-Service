@@ -2,11 +2,12 @@ import express from 'express';
 import path from 'path';
 import sequelize from './sequelize';
 import customerRoutes from '../routes/customerRoutes';
-// import staffRoutes from "./routes/staffRoutes";
+import staffRoutes from '../routes/staffRoutes';
 import productRoutes from '../routes/productRoutes';
-// import warehouseRoutes from "./routes/warehouseRoutes";
-// import supplierRoutes from "./routes/supplierRoutes";
-// import deliveryRoutes from "./routes/deliveryRoutes";
+import warehouseRoutes from '../routes/warehouseRoutes';
+import supplierRoutes from '../routes/supplierRoutes';
+import stockRoutes from '../routes/stockRoutes';
+// import deliveryRoutes from "../routes/deliveryRoutes";
 
 const app = express();
 const port = 3000;
@@ -20,10 +21,11 @@ app.get('/', (req, res) => {
 });
 
 app.use('/customers', customerRoutes);
-// app.use("/staff", staffRoutes);
+app.use('/staff', staffRoutes);
 app.use('/products', productRoutes);
-// app.use("/warehouses", warehouseRoutes);
-// app.use("/suppliers", supplierRoutes);
+app.use('/warehouses', warehouseRoutes);
+app.use('/suppliers', supplierRoutes);
+app.use('/stock', stockRoutes);
 // app.use("/delivery", deliveryRoutes);
 
 // Sync database and start server

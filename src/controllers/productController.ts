@@ -1,97 +1,130 @@
 import { Request, Response } from 'express';
-import { Product, ProductPrice, SearchProductsRequest, AddProductRequest } from '../models';
+import { Product } from '../models';
+import { Op, WhereOptions } from 'sequelize';
 
-let products: Product[] = [];
-let productPrices: ProductPrice[] = [];
-
-export const addProduct = (req: Request, res: Response) => {
-  const { id, name, description, category, brand, size, image, price }: AddProductRequest =
-    req.body;
-
-  // Ensure all required fields are present
-  if (!id || !name || !description || !category || !brand || !size || price === undefined) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  const newProduct: Product = {
-    id,
-    name,
-    description,
-    category,
-    brand,
-    size,
-    image
-  };
-  products.push(newProduct);
-
-  const newProductPrice: ProductPrice = { productId: id, price };
-  productPrices.push(newProductPrice);
-
-  res.status(201).json({ ...newProduct, price });
-};
-
-export const getProductDetails = (req: Request, res: Response) => {
-  const { productId } = req.params;
-  const product = products.find((p) => p.id === Number(productId));
-  if (product) {
-    const productPrice = productPrices.find((pp) => pp.productId === Number(productId));
-    res.json({ ...product, price: productPrice?.price });
-  } else {
-    res.status(404).json({ message: 'Product not found' });
+/**
+ * Add a new product.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const addProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await Product.create(req.body);
+    res.status(201).json(product);
+  } catch (error) {
+    console.error('Error adding product:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
-export const updateProduct = (req: Request, res: Response) => {
-  const { productId } = req.params;
-  const updatedDetails = req.body;
-  let product = products.find((p) => p.id === Number(productId)) as Product;
-  if (product) {
-    product = { ...product, ...updatedDetails };
-    products = products.map((p) => (p.id === Number(productId) ? product : p));
-    res.json(product);
-  } else {
-    res.status(404).json({ message: 'Product not found' });
+/**
+ * Get a product by ID.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getProductDetails = async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findByPk(req.params.productId);
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('Error getting product by ID:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
-export const deleteProduct = (req: Request, res: Response) => {
-  const { productId } = req.params;
-  products = products.filter((p) => p.id !== Number(productId));
-  productPrices = productPrices.filter((pp) => pp.productId !== Number(productId));
-  res.status(204).send();
+/**
+ * Get all products.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getAllProducts = async (req: Request, res: Response) => {
+  try {
+    const products = await Product.findAll();
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Error getting products:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
 };
 
-export const setProductPrice = (req: Request, res: Response) => {
-  const { productId } = req.params;
-  const { price }: { price: number } = req.body;
-  const existingProduct = products.find((p) => p.id === Number(productId));
-  if (!existingProduct) {
-    return res.status(404).json({ message: 'Product not found' });
+/**
+ * Update product details.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const updateProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findByPk(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    await product.update(req.body);
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('Error updating product:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
   }
-  const existingPriceIndex = productPrices.findIndex((pp) => pp.productId === Number(productId));
-  if (existingPriceIndex !== -1) {
-    productPrices[existingPriceIndex].price = price;
-  } else {
-    return res.status(404).json({ message: 'Product price not found' });
-  }
-  res.json({ productId, price });
 };
 
-export const searchProducts = (req: Request, res: Response) => {
-  const { query, category, brand, size }: SearchProductsRequest =
-    req.query as unknown as SearchProductsRequest;
-  const result = products
-    .filter((p) => {
-      return (
-        (!query || p.name.includes(query)) &&
-        (!category || p.category === category) &&
-        (!brand || p.brand === brand) &&
-        (!size || p.size === size)
-      );
-    })
-    .map((product) => {
-      const productPrice = productPrices.find((pp) => pp.productId === product.id);
-      return { ...product, price: productPrice?.price };
+/**
+ * Delete a product.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findByPk(req.params.productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    await product.destroy();
+    res.status(204).end();
+  } catch (error) {
+    console.error('Error deleting product:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Search for products by name, category, brand, size, or description.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const searchProducts = async (req: Request, res: Response) => {
+  try {
+    const { name, category, brand, size, description } = req.query;
+    // add explit type here
+
+    const whereClause: WhereOptions = {};
+
+    if (name) {
+      whereClause.name = { [Op.iLike]: `%${name}%` };
+    }
+    if (category) {
+      whereClause.category = { [Op.iLike]: `%${category}%` };
+    }
+    if (brand) {
+      whereClause.brand = { [Op.iLike]: `%${brand}%` };
+    }
+    if (size) {
+      whereClause.size = { [Op.iLike]: `%${size}%` };
+    }
+    if (description) {
+      whereClause.description = { [Op.iLike]: `%${description}%` };
+    }
+
+    const products = await Product.findAll({
+      where: whereClause
     });
-  res.json(result);
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Error searching products:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
 };

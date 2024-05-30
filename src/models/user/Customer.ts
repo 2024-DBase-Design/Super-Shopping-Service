@@ -1,14 +1,9 @@
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import sequelize from '../../server/sequelize';
 import User, { UserAttributes } from './User';
 import CreditCard, { CreditCardCreationAttributes } from './CreditCard';
-import Address, { AddressableType } from './Address';
-import { Product } from '../product/Product';
-
-export interface ProductWithQuantity {
-  product: Product;
-  quantity: number;
-}
+import Address from './Address';
+import { ProductWithQuantity } from '../warehouse/ProductWithQuantity';
 
 /**
  * Interface defining the unique attributes of the Customer model.
@@ -18,21 +13,13 @@ export interface CustomerAttributes extends UserAttributes {
   cart: ProductWithQuantity[];
 }
 
-export interface CustomerCreationAttributes extends Optional<CustomerAttributes, 'id'> {}
-
 /**
  * Customer model class definition.
  *
  * This class extends the User model class and implements the CustomerAttributes interface.
  * It defines the shape of the Customer table and includes methods for interacting with customer data.
  */
-class Customer
-  extends Model<CustomerAttributes, CustomerCreationAttributes>
-  implements CustomerAttributes
-{
-  public id!: number;
-  public name!: string;
-  public profilePicture?: string | undefined;
+class Customer extends User implements CustomerAttributes {
   public balance!: number;
   public cart!: ProductWithQuantity[];
 
@@ -43,15 +30,6 @@ class Customer
       customerId: this.id
     });
     return newCard.id;
-  }
-
-  // Method to add an address to the customer
-  public async addAddress(newAddress: Address): Promise<void> {
-    await Address.create({
-      ...newAddress,
-      addressableId: this.id,
-      addressableType: AddressableType.CUSTOMER
-    });
   }
 }
 
