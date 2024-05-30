@@ -12,11 +12,11 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '..', '..', 'public')));
+//app.use(express.static(path.join(__dirname, '..', '..', 'client')));
 
 // Define the root route to serve the HTML file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
+  //res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
 });
 
 app.use("/customers", customerRoutes);
