@@ -2,7 +2,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.server
     ports:
       - "5431:5431"
     depends_on:
@@ -12,7 +12,19 @@ services:
       - DB_USER=sssadmin
       - DB_PASSWORD=ssspassword
       - DB_NAME=supershoppingservice
-    command: ["npm", "start"]
+    networks:
+      - app-network
+  
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - app-network
 
   db:
     image: postgres:16
@@ -24,6 +36,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:

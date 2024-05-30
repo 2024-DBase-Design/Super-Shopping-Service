@@ -5,6 +5,7 @@
   "main": "src/electron-app/main.js",
   "scripts": {
     "start": "node dist/server/index.js",
+    "start-client": "next start -p 3000",
     "dev": "ts-node src/server/index.ts",
     "electron": "electron .",
     "build": "tsc",

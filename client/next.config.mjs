@@ -6,7 +6,7 @@ const nextConfig = {
     return [
       {
         //rewrites all API requests to your Express server
-        source: "/api/:path*", // Matches all requests starting with /api/
+        source: `/api/:path*`, // Matches all requests starting with /api/
         destination: `http://localhost:${port}/:path*`, // Redirects them to the Express server
       },
     ];
