@@ -11,8 +11,7 @@ interface StaffAttributes extends UserAttributes {
   jobTitle: string;
 }
 
-export interface StaffCreationAttributes
-  extends Optional<StaffAttributes, 'id'> {}
+export interface StaffCreationAttributes extends Optional<StaffAttributes, 'id'> {}
 
 /**
  * Staff model class definition.
@@ -20,10 +19,7 @@ export interface StaffCreationAttributes
  * This class extends the User model class and implements the StaffAttributes interface.
  * It defines the shape of the Staff table and includes methods for interacting with staff data.
  */
-class Staff
-  extends Model<StaffAttributes, StaffCreationAttributes>
-  implements StaffAttributes
-{
+class Staff extends Model<StaffAttributes, StaffCreationAttributes> implements StaffAttributes {
   public id!: number;
   public name!: string;
   public profilePicture?: string | undefined;

@@ -11,8 +11,7 @@ export interface CreditCardAttributes {
   customerId: number; // Foreign key associated with Customer
 }
 
-export interface CreditCardCreationAttributes
-  extends Optional<CreditCardAttributes, 'id'> {}
+export interface CreditCardCreationAttributes extends Optional<CreditCardAttributes, 'id'> {}
 
 class CreditCard
   extends Model<CreditCardAttributes, CreditCardCreationAttributes>

@@ -117,9 +117,7 @@ export const addCreditCard = async (req: Request, res: Response) => {
 
     const cardId = await customer.addCreditCard(newCreditCard);
 
-    res
-      .status(201)
-      .json({ message: 'Credit card added successfully', cardId: cardId });
+    res.status(201).json({ message: 'Credit card added successfully', cardId: cardId });
   } catch (error) {
     console.error('Error adding credit card:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -348,9 +346,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Customer not found' });
     }
     const { quantity } = req.body;
-    const itemIndex = customer.cart.findIndex(
-      (item) => item.product.id === Number(itemId)
-    );
+    const itemIndex = customer.cart.findIndex((item) => item.product.id === Number(itemId));
     if (itemIndex === -1) {
       return res.status(404).json({ error: 'Item not found' });
     }
@@ -377,9 +373,7 @@ export const removeCartItem = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const itemIndex = customer.cart.findIndex(
-      (item) => item.product.id === Number(itemId)
-    );
+    const itemIndex = customer.cart.findIndex((item) => item.product.id === Number(itemId));
     if (itemIndex === -1) {
       return res.status(404).json({ error: 'Item not found' });
     }

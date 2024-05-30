@@ -25,8 +25,7 @@ export interface OrderAttributes {
   deliveryPlan: DeliveryPlan;
 }
 
-export interface OrderCreationAttributes
-  extends Optional<OrderAttributes, 'id'> {}
+export interface OrderCreationAttributes extends Optional<OrderAttributes, 'id'> {}
 
 /**
  * Order model class definition.

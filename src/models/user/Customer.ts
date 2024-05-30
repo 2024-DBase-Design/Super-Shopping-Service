@@ -18,8 +18,7 @@ export interface CustomerAttributes extends UserAttributes {
   cart: ProductWithQuantity[];
 }
 
-export interface CustomerCreationAttributes
-  extends Optional<CustomerAttributes, 'id'> {}
+export interface CustomerCreationAttributes extends Optional<CustomerAttributes, 'id'> {}
 
 /**
  * Customer model class definition.
@@ -38,9 +37,7 @@ class Customer
   public cart!: ProductWithQuantity[];
 
   // Method to add a credit card to the customer
-  public async addCreditCard(
-    newCreditCard: CreditCardCreationAttributes
-  ): Promise<number> {
+  public async addCreditCard(newCreditCard: CreditCardCreationAttributes): Promise<number> {
     const newCard = await CreditCard.create({
       ...newCreditCard,
       customerId: this.id
