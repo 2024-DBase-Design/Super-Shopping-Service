@@ -14,6 +14,18 @@ pnpm dev
 bun dev
 ```
 
+## Frontend-to-API
+
+Next is running on port 3000, so we have moved express to 5431.
+
+- How can I query the API?
+
+    ```REST
+    localhost:3000/api/any-other-current-route
+    ```
+
+The above will allow you to call any backend routes.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.

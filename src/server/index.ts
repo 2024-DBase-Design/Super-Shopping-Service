@@ -9,7 +9,7 @@ import productRoutes from "../routes/productRoutes";
 // import deliveryRoutes from "./routes/deliveryRoutes";
 
 const app = express();
-const port = 3000;
+const port = 5431;
 
 app.use(express.json());
 //app.use(express.static(path.join(__dirname, '..', '..', 'client')));
