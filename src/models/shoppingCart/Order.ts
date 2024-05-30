@@ -27,6 +27,12 @@ export interface OrderAttributes  {
 
 export interface OrderCreationAttributes extends Optional<OrderAttributes, 'id'> {}
 
+/**
+ * Order model class definition.
+ * 
+ * This class extends the Sequelize Model class and implements the OrderAttributes interface.
+ * It defines the shape of the Order table and includes methods for interacting with order data.
+ */
 export class Order extends Model<OrderAttributes, OrderCreationAttributes> implements OrderAttributes {
   public id!: string;
   public customerId!: string;
@@ -36,6 +42,9 @@ export class Order extends Model<OrderAttributes, OrderCreationAttributes> imple
   public deliveryPlan!: DeliveryPlan;
 }
 
+/**
+ * Define the unique attributes for the Order model.
+ */
 Order.init(
   {
     id: {
@@ -47,7 +56,7 @@ Order.init(
       allowNull: false,
     },
     items: {
-      type: DataTypes.JSONB, // Use JSONB to store array of objects
+      type: DataTypes.JSON,
       allowNull: false,
       defaultValue: [],
     },
@@ -57,11 +66,11 @@ Order.init(
       defaultValue: OrderStatus.ISSUED,
     },
     cardUsed: {
-      type: DataTypes.JSONB, // Use JSONB to store the CreditCard object
+      type: DataTypes.JSON,
       allowNull: false,
     },
     deliveryPlan: {
-      type: DataTypes.JSONB, // Use JSONB to store the DeliveryPlan object
+      type: DataTypes.JSON,
       allowNull: false,
     },
   },
