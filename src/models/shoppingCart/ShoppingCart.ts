@@ -1,4 +1,4 @@
-import { ShoppingCartItem } from "./ShoppingCartItem";
+import { ShoppingCartItem } from './ShoppingCartItem';
 
 export interface ShoppingCart {
   items: ShoppingCartItem[];

@@ -1,3 +1,3 @@
 export interface UpdateOrderStatusRequest {
-  status: "issued" | "sent" | "received";
+  status: 'issued' | 'sent' | 'received';
 }
