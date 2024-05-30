@@ -8,7 +8,7 @@ import sequelize from '../../server/sequelize';
 export interface UserAttributes {
   id: number;
   name: string;
-  profilePicture?: string;
+  profilePicture?: string | undefined;
 }
 
 /**
@@ -26,7 +26,7 @@ export interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: number;
   public name!: string;
-  public profilePicture?: string;
+  public profilePicture?: string | undefined;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;

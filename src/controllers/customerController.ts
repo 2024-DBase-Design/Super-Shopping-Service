@@ -18,8 +18,12 @@ import { AddressableType } from "../models/user/Address";
  */
 export const createCustomer = async (req: Request, res: Response) => {
   try {
-    const user = await Customer.create(req.body);
-    res.status(201).json(user);
+    const customer = await Customer.create(req.body);
+    const customerDetails = {
+      ...customer.get(),
+      cart: customer.getCart(),
+    };
+    res.status(201).json(customerDetails);
   } catch (error) {
     console.error('Error creating customer:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -38,7 +42,11 @@ export const getCustomerDetails = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    res.json(customer);
+    const customerDetails = {
+      ...customer.get(),
+      cart: customer.getCart(),
+    };
+    res.json(customerDetails);
   } catch (error) {
     console.error('Error fetching user:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -300,9 +308,10 @@ export const addToCart = async (req: Request, res: Response) => {
     }
     const { product, quantity } = req.body;
     const item: ProductWithQuantity = { product, quantity };
-    console.log('Current cart:', customer.cart);
-    await customer.addToCart(item);
-    console.log('Updated cart:', customer.cart);
+    const currentCart = customer.getCart();
+    currentCart.push(item);
+    customer.setCart(currentCart);
+    await customer.save();
     res.status(201).json(item);
   } catch (error) {
     console.error('Error adding to cart:', (error as Error).message);
@@ -322,7 +331,7 @@ export const getCartItems = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    res.json(customer.cart);
+    res.json(customer.getCart());
   } catch (error) {
     console.error('Error fetching cart items:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -342,14 +351,16 @@ export const updateCartItem = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const itemIndex = customer.cart.findIndex((item) => item.product.id === itemId);
+    const { quantity } = req.body;
+    const cart = customer.getCart();
+    const itemIndex = cart.findIndex((item) => item.product.id === Number(itemId));
     if (itemIndex === -1) {
       return res.status(404).json({ error: 'Item not found' });
     }
-    customer.cart[itemIndex].quantity = req.body;
-    (customer as any).setDataValue('cart', customer.cart);
+    cart[itemIndex].quantity = quantity;
+    customer.setCart(cart);
     await customer.save();
-    res.json(customer.cart[itemIndex]);
+    res.json(cart[itemIndex]);
   } catch (error) {
     console.error('Error updating cart item:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -364,16 +375,19 @@ export const updateCartItem = async (req: Request, res: Response) => {
  */
 export const removeCartItem = async (req: Request, res: Response) => {
   try {
-    const customer = await Customer.findByPk(req.params.customerId);
+    const { customerId, itemId } = req.params;
+    const customer = await Customer.findByPk(customerId);
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const itemId = req.params.itemId;
-    const itemIndex = customer.cart.findIndex((item) => item.product.id === itemId);
+    const cart = customer.getCart();
+    const itemIndex = cart.findIndex((item) => item.product.id === Number(itemId));
     if (itemIndex === -1) {
       return res.status(404).json({ error: 'Item not found' });
     }
-    customer.cart.splice(itemIndex, 1);
+    cart.splice(itemIndex, 1);
+    customer.setCart(cart);
+
     await customer.save();
     res.status(204).send();
   } catch (error) {

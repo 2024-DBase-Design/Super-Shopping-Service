@@ -1,4 +1,4 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../../server/sequelize';
 import User, { UserAttributes } from './User';
 import CreditCard, { CreditCardCreationAttributes } from "./CreditCard";
@@ -13,10 +13,12 @@ export interface ProductWithQuantity {
 /**
  * Interface defining the unique attributes of the Customer model.
  */
-interface CustomerAttributes extends UserAttributes {
+export interface CustomerAttributes extends UserAttributes {
   balance: number;
-  cart: ProductWithQuantity[];
+  cart: string;
 }
+
+export interface CustomerCreationAttributes extends Optional<CustomerAttributes, 'id'> {}
 
 /**
  * Customer model class definition.
@@ -24,9 +26,12 @@ interface CustomerAttributes extends UserAttributes {
  * This class extends the User model class and implements the CustomerAttributes interface.
  * It defines the shape of the Customer table and includes methods for interacting with customer data.
  */
-class Customer extends User implements CustomerAttributes {
+class Customer extends Model<CustomerAttributes, CustomerCreationAttributes> implements CustomerAttributes {
+  public id!: number;
+  public name!: string;
+  public profilePicture?: string | undefined;
   public balance!: number;
-  public cart!: ProductWithQuantity[];
+  public cart!: string;
 
   // Method to add a credit card to the customer
   public async addCreditCard(newCreditCard: CreditCardCreationAttributes): Promise<number> {
@@ -46,10 +51,21 @@ class Customer extends User implements CustomerAttributes {
     });
   }
 
+  // Method to get the parsed cart
+  public getCart(): ProductWithQuantity[] {
+    return JSON.parse(this.cart);
+  }
+
+  // Method to set the cart with a JSON array
+  public setCart(cart: ProductWithQuantity[]): void {
+    this.cart = JSON.stringify(cart);
+  }
+
   // Method to add a product to the customer's cart
   public async addToCart(item: ProductWithQuantity): Promise<void> {
-    const newCart = [...this.cart, item];
-    (this as any).setDataValue('cart', newCart);
+    const currentCart = this.getCart();
+    currentCart.push(item);
+    this.setCart(currentCart);
     await this.save();
   }
 }
@@ -64,9 +80,9 @@ const customerAttributes = {
     defaultValue: 0.0,
   },
   cart: {
-    type: DataTypes.ARRAY(DataTypes.JSONB),
+    type: DataTypes.TEXT,
     allowNull: false,
-    defaultValue: [],
+    defaultValue: '[]',
   },
 };
 
