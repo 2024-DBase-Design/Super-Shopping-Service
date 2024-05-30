@@ -53,6 +53,7 @@ Before you begin, ensure you have met the following requirements:
 
 ```bash
 cd client
+npm install
 npm run dev
 ```
 

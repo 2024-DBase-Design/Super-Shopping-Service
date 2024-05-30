@@ -1,0 +1,19 @@
+h1 {
+  font-size: 10vw;
+  width: 100%;
+  text-align: center;
+  padding: 15px;
+  color: white;
+  filter: drop-shadow(3px 2px 1px var(--blue));
+  /*transform: translateX(-50%);
+  position: absolute;
+  left: 50%;*/
+}
+
+.mainContainer {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../public/fun-background.png");
+  background-size: auto;
+}
