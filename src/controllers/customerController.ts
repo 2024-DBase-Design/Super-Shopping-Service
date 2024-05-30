@@ -7,7 +7,8 @@ import {
   ProductWithQuantity,
   Order,
   OrderStatus,
-  ShoppingCartItem
+  ShoppingCartItem,
+  Product
 } from '../models';
 import { randomUUID } from 'crypto';
 
@@ -434,6 +435,17 @@ export const submitOrder = async (req: Request, res: Response) => {
       return newItem;
     });
 
+    items.forEach(async (item) => {
+      const product = await Product.findByPk(item.productId);
+      if (!product) {
+        return res.status(404).json({ error: 'Cart product not found' });
+      }
+
+      customer.balance += item.quantity * product.price;
+    });
+
+    customer.changed('balance', true);
+
     const order = await Order.create({
       id: generateUniqueId(),
       customerId,
@@ -443,7 +455,6 @@ export const submitOrder = async (req: Request, res: Response) => {
       deliveryPlan
     });
 
-    // TODO: Implement balance logic
     customer.cart = [];
     customer.changed('cart', true);
     await customer.save();
