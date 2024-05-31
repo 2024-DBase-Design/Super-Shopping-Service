@@ -1,17 +1,13 @@
-import React from "react";
-import "./login.scss";
-import { shrikhand } from "../fonts";
-import Image from "next/image";
+import React from 'react';
+import './login.scss';
+import { shrikhand } from '../fonts';
+import Image from 'next/image';
 
 export default function Page() {
   return (
     <div className="main-container">
       <h1 className={shrikhand.className}>Silly Stuffs</h1>
-      <Image
-        className="mx-auto h-11 w-auto logo"
-        src="/logo.png"
-        alt="Your Company"
-      />
+      <Image className="mx-auto h-11 w-auto logo" src="/logo.png" alt="Your Company" />
       <div className="form-container">
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -25,10 +21,7 @@ export default function Page() {
           <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
             <form className="space-y-6" action="#" method="POST">
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium leading-6"
-                >
+                <label htmlFor="email" className="block text-sm font-medium leading-6">
                   Email address
                 </label>
                 <div className="mt-2">
@@ -45,10 +38,7 @@ export default function Page() {
 
               <div>
                 <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium leading-6"
-                  >
+                  <label htmlFor="password" className="block text-sm font-medium leading-6">
                     Password
                   </label>
                 </div>
@@ -75,7 +65,7 @@ export default function Page() {
             </form>
 
             <p className="mt-10 text-center text-sm text-white">
-              Don&apos;t have an account?{" "}
+              Don&apos;t have an account?{' '}
               <a href="#" className="font-semibold leading-6">
                 Create a new account
               </a>

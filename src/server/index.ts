@@ -1,5 +1,5 @@
 import express from 'express';
-import path from 'path';
+// import path from 'path';
 import sequelize from './sequelize';
 import customerRoutes from '../routes/customerRoutes';
 import staffRoutes from '../routes/staffRoutes';
@@ -16,9 +16,9 @@ app.use(express.json());
 //app.use(express.static(path.join(__dirname, '..', '..', 'client')));
 
 // Define the root route to serve the HTML file
-app.get('/', (req, res) => {
-  //res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
-});
+// app.get('/', (req, res) => {
+//   res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
+// });
 
 app.use('/customers', customerRoutes);
 app.use('/staff', staffRoutes);
