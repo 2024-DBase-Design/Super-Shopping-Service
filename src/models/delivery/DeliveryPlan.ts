@@ -1,6 +1,6 @@
 enum DeliveryPlanType {
-  Standard = "standard",
-  Express = "express",
+  Standard = 'standard',
+  Express = 'express'
 }
 
 export interface DeliveryPlan {
