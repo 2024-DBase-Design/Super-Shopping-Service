@@ -5,13 +5,12 @@
   "main": "src/electron-app/main.js",
   "scripts": {
     "start": "node dist/server/index.js",
-    "start-client": "next start -p 3000",
     "dev": "ts-node src/server/index.ts",
     "electron": "electron .",
     "build": "tsc",
     "test": "jest --passWithNoTests",
     "prep": "prettier --config .prettierrc src/**/*.ts --write && eslint . --ext .ts",
-    "lint": "eslint . --ext .ts",
+    "lint-fix": "eslint . --ext .ts --fix",
     "prettier-format": "prettier --config .prettierrc src/**/*.ts --write"
   },
   "keywords": [],
