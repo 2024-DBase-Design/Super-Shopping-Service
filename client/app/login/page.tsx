@@ -1,12 +1,13 @@
 import React from "react";
 import "./login.scss";
 import { shrikhand } from "../fonts";
+import Image from "next/image";
 
 export default function Page() {
   return (
     <div className="main-container">
       <h1 className={shrikhand.className}>Silly Stuffs</h1>
-      <img
+      <Image
         className="mx-auto h-11 w-auto logo"
         src="/logo.png"
         alt="Your Company"
