@@ -38,45 +38,48 @@ export const getCustomerDetails = async (req: Request, res: Response) => {
   }
 };
 
-// /**
-//  * Update a customer's details.
-//  *
-//  * @param req Express request object.
-//  * @param res Express response object.
-//  */
-// export const updateCustomerDetails = async (req: Request, res: Response) => {
-//   try {
-//     const customer = await Customer.findByPk(req.params.customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
-//     await customer.update(req.body);
-//     res.json(customer);
-//   } catch (error) {
-//     console.error('Error updating user:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+/**
+ * Update a customer's details.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const updateCustomerDetails = async (req: Request, res: Response) => {
+  try {
+    const customer = await prisma.customer.update({
+      where: { id: Number(req.params.customerId) },
+      data: req.body
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    res.json(customer);
+  } catch (error) {
+    console.error('Error updating user:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// /**
-//  * Delete a customer's account.
-//  *
-//  * @param req Express request object.
-//  * @param res Express response object.
-//  */
-// export const deleteCustomerAccount = async (req: Request, res: Response) => {
-//   try {
-//     const customer = await Customer.findByPk(req.params.customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
-//     await customer.destroy();
-//     res.status(204).send();
-//   } catch (error) {
-//     console.error('Error deleting user:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+/**
+ * Delete a customer's account.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const deleteCustomerAccount = async (req: Request, res: Response) => {
+  try {
+    const customer = await prisma.customer.delete({
+      where: { id: Number(req.params.customerId) }
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting user:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
 // /**
 //  * Add a credit card to a customer's account.

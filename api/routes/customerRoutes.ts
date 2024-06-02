@@ -5,8 +5,8 @@ const router = Router();
 
 router.post('/', customerController.createCustomer);
 router.get('/:customerId', customerController.getCustomerDetails);
-// router.put('/:customerId', customerController.updateCustomerDetails);
-// router.delete('/:customerId', customerController.deleteCustomerAccount);
+router.put('/:customerId', customerController.updateCustomerDetails);
+router.delete('/:customerId', customerController.deleteCustomerAccount);
 
 // router.post('/:customerId/creditCards', customerController.addCreditCard);
 // router.get('/:customerId/creditCards', customerController.getCreditCards);
