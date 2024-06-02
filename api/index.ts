@@ -1,23 +1,23 @@
-import { PrismaClient } from "@prisma/client";
-// requires = require("@prisma/client");
-import express from "express";
+import { PrismaClient } from '@prisma/client';
+import express from 'express';
+import customerRoutes from './routes/customerRoutes';
+// import staffRoutes from './routes/staffRoutes';
+// import productRoutes from './routes/productRoutes';
+// import warehouseRoutes from './routes/warehouseRoutes';
+// import supplierRoutes from './routes/supplierRoutes';
+// import stockRoutes from './routes/stockRoutes';
 
+export const prisma = new PrismaClient();
 const port = 5431;
-
-const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
 
-app.get("/users", async (req, res) => {
-  const users = await prisma.user.findMany();
-  res.json(users);
-});
+app.use('/customers', customerRoutes);
+// app.use('/staff', staffRoutes);
+// app.use('/products', productRoutes);
+// app.use('/warehouses', warehouseRoutes);
+// app.use('/suppliers', supplierRoutes);
+// app.use('/stock', stockRoutes);
 
-app.get("/", async (req, res) => {
-  res.send("Hello World");
-});
-
-app.listen(port, () =>
-  console.log("REST API server ready at: http://localhost:5431")
-);
+app.listen(port, () => console.log('REST API server ready at: http://localhost:' + port));

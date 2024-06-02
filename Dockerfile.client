@@ -15,6 +15,9 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Remove the api directory
+RUN rm -rf ./api
+
 # Build Next.js app
 RUN npm run build
 
