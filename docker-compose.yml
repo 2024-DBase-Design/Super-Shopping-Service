@@ -2,28 +2,46 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.api
     ports:
-      - "3000:3000"
+      - "5431:5431"
     depends_on:
-      - db
+      - postgres
     environment:
       - DB_HOST=db
       - DB_USER=sssadmin
       - DB_PASSWORD=ssspassword
       - DB_NAME=supershoppingservice
-    command: ["npm", "start"]
+    networks:
+      - sss-network
 
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: supershoppingservice
-      POSTGRES_USER: sssadmin
-      POSTGRES_PASSWORD: ssspassword
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
     ports:
-      - "5432:5432"
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - sss-network
+
+  postgres:
+    image: postgres:16
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=supershoppingservice
+      - POSTGRES_USER=sssadmin
+      - POSTGRES_PASSWORD=ssspassword
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sss-network
 
 volumes:
   postgres_data:
+
+networks:
+  sss-network:

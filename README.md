@@ -49,7 +49,14 @@ Before you begin, ensure you have met the following requirements:
    docker-compose up --build
    ```
 
+- To only develop NEXT.js, run the following command:
+  ```bash
+  npm run dev
+  ```
+
 2. **The application should now be running at http://localhost:3000.**
+
+- To access the API, use the following URL: http://localhost:3000/api/:path.
 
 3. **Start the electron app**:
    ```bash
