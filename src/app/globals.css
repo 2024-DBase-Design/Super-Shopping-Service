@@ -46,3 +46,7 @@ body {
     text-wrap: balance;
   }
 }
+
+.error {
+  color: var(--red);
+}
