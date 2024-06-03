@@ -40,7 +40,7 @@ button:hover {
   position: absolute;
   height: 100vh;
   width: 100vw;
-  background-image: url("/fun-background.png");
+  background-image: url('/fun-background.png');
   background-size: auto;
   overflow: hidden;
 }
@@ -55,8 +55,8 @@ button:hover {
   bottom: 0;
   background-image: linear-gradient(
     to bottom,
-    rgba(var(--rgb-orange), 0.8),
-    rgba(var(--rgb-dark-orange), 0.8)
+    rgba(var(--rgb-orange), 0.9),
+    rgba(var(--rgb-dark-orange), 0.9)
   );
   border-radius: 10px;
   margin: 25px;
@@ -64,9 +64,4 @@ button:hover {
   transform: translateX(-50%);
   margin-left: 0;
   width: 85vw;
-}
-
-input[type="text"],
-input[type="email"] {
-  padding-left: 10px; /* Adjust this value as needed */
 }

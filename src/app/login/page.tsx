@@ -1,14 +1,68 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import { LogoComponent } from '@/components/svgs/logo';
 import '@/styles/login.scss';
 import { shrikhand } from '../fonts';
 import TextInputComponent from '@/components/input/textInput';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
+import Link from 'next/link';
+import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 
 const LoginPage = () => {
-  function onSubmit(){
+  const [emailValue, setEmailValue] = useState('');
+  const [emailIsValid, setEmailIsValid] = useState(false);
+  const [passwordValue, setPasswordValue] = useState('');
+  const [passwordIsValid, setPasswordIsValid] = useState(false);
+  const [formIsValid, setFormIsValid] = useState(true);
+  const manualValidate = new ClientEventEmitter();
 
-  }
+  const handleEmailChange = (emailValue: string, emailIsValid: boolean) => {
+    setEmailValue(emailValue);
+    setEmailIsValid(emailIsValid);
+    setFormIsValid(emailIsValid && passwordIsValid);
+  };
+
+  const handlePasswordChange = (passwordValue: string, passwordIsValid: boolean) => {
+    setPasswordValue(passwordValue);
+    setPasswordIsValid(passwordIsValid);
+    setFormIsValid(emailIsValid && passwordIsValid);
+  };
+
+  const handleLogin = async (event: any) => {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    // check in case user immediately hit login
+    if (formIsValid) {
+      setFormIsValid(emailIsValid && passwordIsValid);
+      if (!(emailIsValid && passwordIsValid)) {
+        manualValidate.emit('validate');
+        return;
+      }
+    } else {
+      return; // form is not valid
+    }
+
+    // attempt to make api call
+    try {
+      const response = await fetch('YOUR_API_ENDPOINT', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: emailValue, password: passwordValue })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Handle successful API call
+      console.log('API call successful');
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  };
 
   return (
     <div className="main-container">
@@ -23,37 +77,45 @@ const LoginPage = () => {
               Login
             </h2>
           </div>
-
           <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-4" onSubmit={handleLogin}>
               <div>
-                  <TextInputComponent name="Email Address" validationRuleNames={[ValidationRuleEnum.Required, ValidationRuleEnum.Email]}></TextInputComponent>
+                <TextInputComponent
+                  name="Email Address"
+                  validationRuleNames={[ValidationRuleEnum.Required, ValidationRuleEnum.Email]}
+                  onValueChanged={(value, isValid) => handleEmailChange(value, isValid)}
+                  manualValidate={manualValidate}
+                ></TextInputComponent>
               </div>
-
               <div>
-                  <TextInputComponent name="Password" inputType="password" validationRuleNames={[ValidationRuleEnum.Required]}></TextInputComponent>
+                <TextInputComponent
+                  name="Password"
+                  inputType="password"
+                  validationRuleNames={[ValidationRuleEnum.Required]}
+                  onValueChanged={(value, isValid) => handlePasswordChange(value, isValid)}
+                  manualValidate={manualValidate}
+                ></TextInputComponent>
               </div>
-
               <div>
                 <button
                   type="submit"
-                  className="flex mt-10 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+                  style={{ opacity: formIsValid ? 1 : 0.5 }}
                 >
                   Login
                 </button>
               </div>
             </form>
-
-            <p className="mt-5 text-center text-sm text-white">
+            <p className="mt-3 text-center text-xs text-white">
               Don&apos;t have an account?{' '}
-              <a href="#" className="font-semibold leading-6">
+              <Link href="/signup" className="font-semibold leading-6">
                 Create a new account
-              </a>
+              </Link>
             </p>
-            <p className="mt-2 text-center text-sm text-white">
-              <a href="#" className="font-semibold leading-6">
-                Create a new account
-              </a>
+            <p className="mt-2 text-center text-xs text-white">
+              <Link href="/supplier" className="font-semibold">
+                Go to Supplier Portal
+              </Link>
             </p>
           </div>
         </div>
