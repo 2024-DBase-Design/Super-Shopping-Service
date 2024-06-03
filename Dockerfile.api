@@ -25,4 +25,5 @@ RUN npx prisma generate
 EXPOSE 5431
 
 # Define the command to run the app
+# CMD ["npx", "prisma", "migrate", "dev", "&&", "npm", "run", "start-api-dev"]
 CMD ["npm", "run", "start-api-dev"]

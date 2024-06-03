@@ -102,9 +102,6 @@ model Address {
   country        String
   type           AddressType
 
-  addressableId   Int?
-  addressableType String?
-
   createdAt DateTime @default(now()) @updatedAt
   updatedAt DateTime @default(now())
 

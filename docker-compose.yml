@@ -1,4 +1,18 @@
 services:
+  postgres:
+    image: postgres:16
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=supershoppingservice
+      - POSTGRES_USER=sssadmin
+      - POSTGRES_PASSWORD=ssspassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sss-network
+
   api:
     build:
       context: .
@@ -23,20 +37,6 @@ services:
       - "3000:3000"
     depends_on:
       - api
-    networks:
-      - sss-network
-
-  postgres:
-    image: postgres:16
-    restart: always
-    ports:
-      - '5432:5432'
-    environment:
-      - POSTGRES_DB=supershoppingservice
-      - POSTGRES_USER=sssadmin
-      - POSTGRES_PASSWORD=ssspassword
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks:
       - sss-network
 
