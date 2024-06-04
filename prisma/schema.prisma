@@ -41,6 +41,8 @@ model Customer {
   id             Int     @id @default(autoincrement())
   firstName      String
   lastName       String
+  email          String  @unique
+  password       String
   profilePicture String?
   balance        Float   @default(0.0)
   cart           Json    @default("[]")
@@ -58,6 +60,8 @@ model Staff {
   id             Int     @id @default(autoincrement())
   firstName      String
   lastName       String
+  email          String  @unique
+  password       String
   profilePicture String?
   salary         Float   @default(0.0)
   jobTitle       String

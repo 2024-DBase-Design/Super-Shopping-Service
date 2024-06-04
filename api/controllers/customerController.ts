@@ -1,5 +1,6 @@
 import { prisma } from '../index';
 import { Request, Response } from 'express';
+import { registerCustomer } from './authController';
 
 /**
  * Create a new customer.
@@ -9,7 +10,7 @@ import { Request, Response } from 'express';
  */
 export const createCustomer = async (req: Request, res: Response) => {
   try {
-    const customer = await prisma.customer.create({ data: req.body });
+    const customer = await registerCustomer(req.body);
     res.status(201).json(customer);
   } catch (error) {
     console.error('Error creating customer:', (error as Error).message);
