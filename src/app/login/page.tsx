@@ -2,42 +2,48 @@
 
 import React, { useState } from 'react';
 import { LogoComponent } from '@/components/svgs/logo';
-import '@/styles/login.scss';
+import '@/styles/noSession.scss';
+import styles from './login.module.scss';
 import { shrikhand } from '../fonts';
 import TextInputComponent from '@/components/input/textInput';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import Link from 'next/link';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
+import { FormValues, NewValue } from '@/helpers/formValues';
 
 const LoginPage = () => {
-  const [emailValue, setEmailValue] = useState('');
-  const [emailIsValid, setEmailIsValid] = useState(false);
-  const [passwordValue, setPasswordValue] = useState('');
-  const [passwordIsValid, setPasswordIsValid] = useState(false);
-  const [formIsValid, setFormIsValid] = useState(true);
+  const newValues: NewValue[] = [
+    {name: 'email', defaultValue: ''}, 
+    {name: 'emailIsValid', defaultValue: false}, 
+    {name: 'password', defaultValue: ''}, 
+    {name: 'passwordIsValid', defaultValue: false}, 
+    {name: 'formIsValid', defaultValue: true}
+  ]
+  const formValues: FormValues = new FormValues(newValues);
   const manualValidate = new ClientEventEmitter();
 
   const handleEmailChange = (emailValue: string, emailIsValid: boolean) => {
-    setEmailValue(emailValue);
-    setEmailIsValid(emailIsValid);
-    setFormIsValid(emailIsValid && passwordIsValid);
+    formValues.updateValue('email', emailValue);
+    formValues.updateValue('emailIsValid', emailIsValid);
+    formValues.updateValue('formIsValid', emailIsValid && formValues.getValue('password'));
   };
 
   const handlePasswordChange = (passwordValue: string, passwordIsValid: boolean) => {
-    setPasswordValue(passwordValue);
-    setPasswordIsValid(passwordIsValid);
-    setFormIsValid(emailIsValid && passwordIsValid);
+    formValues.updateValue('password', passwordValue);
+    formValues.updateValue('passwordIsValid', passwordIsValid);
+    formValues.updateValue('formIsValid', passwordIsValid && formValues.getValue('email'));
   };
 
   const handleLogin = async (event: any) => {
     event.preventDefault(); // Prevent default form submission behavior
 
-    // check in case user immediately hit login
-    if (formIsValid) {
-      setFormIsValid(emailIsValid && passwordIsValid);
-      if (!(emailIsValid && passwordIsValid)) {
+    // check in case user immediately hit login button
+    if (formValues.getValue('formIsValid')) {
+      const formIsValid = formValues.getValue('password') && formValues.getValue('email');
+      formValues.updateValue('formIsValid', formIsValid);
+      if (!formIsValid) {
         manualValidate.emit('validate');
-        return;
+        return; // form is not valid
       }
     } else {
       return; // form is not valid
@@ -50,14 +56,14 @@ const LoginPage = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email: emailValue, password: passwordValue })
+        body: JSON.stringify({ email: formValues.getValue('email'), password: formValues.getValue('password') })
       });
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
-      // Handle successful API call
+      // Handle successful API call, like storing cookies
       console.log('API call successful');
     } catch (error) {
       console.error('There has been a problem with your fetch operation:', error);
@@ -65,10 +71,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="main-container">
-      <h1 className={shrikhand.className}>Silly Stuffs</h1>
-      <LogoComponent className="mx-auto h-11 w-auto logo" />
-      <div className="form-container">
+    <div className={"main-container " + styles.mainContainer}>
+      <div className={styles.brandLogo}>
+        <h1 className={shrikhand.className + " " + styles.header}>Silly Stuffs</h1>
+        <LogoComponent className={"mx-auto h-11 w-auto logo " + styles.logo} />
+      </div>
+      <div className={"form-container " + styles.formContainer}>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2
@@ -100,7 +108,7 @@ const LoginPage = () => {
                 <button
                   type="submit"
                   className="flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-                  style={{ opacity: formIsValid ? 1 : 0.5 }}
+                  style={{ opacity: formValues.getValue('formIsValid') ? 1 : 0.5 }}
                 >
                   Login
                 </button>

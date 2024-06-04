@@ -42,29 +42,29 @@ const TextInputComponent: React.FC<TextInputProps> = ({
     }
   }
 
-  function validate() {
+  function validate(ToValidate: any) {
     setErrorMessages([]);
     if (!validationRules || validationRules.length === 0) return;
 
     const newErrorMessages = validationRules
-      .map((rule) => rule.checkValue(value))
+      .map((rule) => rule.checkValue(ToValidate))
       .filter((v) => v !== ''); // Filter out empty error messages (passes rule)
     setErrorMessages(newErrorMessages);
 
     const isValid = newErrorMessages.length === 0;
     if (onValueChanged) {
-      onValueChanged(value, isValid);
+      onValueChanged(ToValidate, isValid);
     }
   }
 
   const handleChange = (event: any) => {
     const newValue = event.target?.value;
     setValue(newValue);
-    validate();
+    validate(newValue);
   };
 
   manualValidate?.on('validate', () => {
-    validate();
+    validate(value);
   });
 
   return (
