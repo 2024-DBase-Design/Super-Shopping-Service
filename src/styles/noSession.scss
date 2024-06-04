@@ -21,12 +21,12 @@ label {
     color: white;
 }
 
-button {
+.submit-button {
     background-color: var(--blue);
     transition: 1s;
 }
 
-button:hover {
+.submit-button:hover {
     background-color: var(--dark-blue);
     transition: 1s;
 }

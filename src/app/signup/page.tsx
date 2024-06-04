@@ -115,9 +115,9 @@ const SignUpPage = () => {
               </div>
             </form>
             <p className="mt-3 text-center text-xs text-white">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="font-semibold leading-6">
-                Create a new account
+              Already have an account?{' '}
+              <Link href="/login" className="font-semibold leading-6">
+                Log in
               </Link>
             </p>
             <p className="mt-2 text-center text-xs text-white">
