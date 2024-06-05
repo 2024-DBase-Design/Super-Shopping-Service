@@ -2,7 +2,12 @@
 
 import React, { useState } from 'react';
 import { ErrorMessageComponent } from './errorMessage';
-import { getValidationTest, ValidationRule, ValidationRuleEnum, ValidationRuleType } from './validationRules';
+import {
+  getValidationTest,
+  ValidationRule,
+  ValidationRuleEnum,
+  ValidationRuleType
+} from './validationRules';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import { FormValues } from '@/helpers/formValues';
 
@@ -35,7 +40,8 @@ const TextInputComponent: React.FC<TextInputProps> = ({
 
   if (validationRuleNames) {
     for (const validationRuleName of validationRuleNames) {
-      const rule: (formValues: FormValues, value: any) => string = getValidationTest(validationRuleName)
+      const rule: (formValues: FormValues, value: any) => string =
+        getValidationTest(validationRuleName);
       if (rule) {
         validationRules.push(new ValidationRule(formValues, rule));
       }
@@ -71,7 +77,10 @@ const TextInputComponent: React.FC<TextInputProps> = ({
     <>
       <div className={`flex items-center justify-between ${className}`}>
         <label htmlFor={id} className="block text-sm font-medium leading-4">
-          {name + (validationRuleNames?.map(n => n.type).includes(ValidationRuleEnum.Required) ? ' *' : '')}
+          {name +
+            (validationRuleNames?.map((n) => n.type).includes(ValidationRuleEnum.Required)
+              ? ' *'
+              : '')}
         </label>
       </div>
       <div className="mt-1">

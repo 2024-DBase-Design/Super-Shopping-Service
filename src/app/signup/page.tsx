@@ -15,40 +15,49 @@ const SignUpPage = () => {
     {
       name: 'Name',
       inputType: InputTypeEnum.Text,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: "Name"}]
+      defaultValue: '',
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
     },
     {
       name: 'Email Address',
       inputType: InputTypeEnum.Text,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Email address'}, {type: ValidationRuleEnum.Email}]
+      defaultValue: '',
+      validationRuleNames: [
+        { type: ValidationRuleEnum.Required, args: 'Email address' },
+        { type: ValidationRuleEnum.Email }
+      ]
     },
     {
       name: 'Password',
       inputType: InputTypeEnum.Password,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Password'}]
+      defaultValue: '',
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Password' }]
     },
     {
       name: 'Confirm Password',
       inputType: InputTypeEnum.Password,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Password'}, { type: ValidationRuleEnum.ConfirmMatch, args: 'password'}]
+      defaultValue: '',
+      validationRuleNames: [
+        { type: ValidationRuleEnum.Required, args: 'Password' },
+        { type: ValidationRuleEnum.ConfirmMatch, args: 'password' }
+      ]
     },
     {
       name: 'Credit Card Number',
       inputType: InputTypeEnum.Number,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Credit card number'}, {type: ValidationRuleEnum.CreditCard}]
+      defaultValue: '',
+      validationRuleNames: [
+        { type: ValidationRuleEnum.Required, args: 'Credit card number' },
+        { type: ValidationRuleEnum.CreditCard }
+      ]
     },
     {
       name: 'Address',
       inputType: InputTypeEnum.Address,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Address'}]
+      defaultValue: '',
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Address' }]
     }
-  ]
+  ];
 
   const attemptSignup = async (formValues: FormValues) => {
     try {
@@ -57,9 +66,9 @@ const SignUpPage = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-          email: formValues.getValue('email'), 
-          password: formValues.getValue('password') 
+        body: JSON.stringify({
+          email: formValues.getValue('email'),
+          password: formValues.getValue('password')
         })
       });
 
@@ -77,7 +86,7 @@ const SignUpPage = () => {
   return (
     <div className={styles.mainContainer}>
       <BrandHeaderComponent></BrandHeaderComponent>
-      <div className={"form-container " + styles.formContainer}>
+      <div className={'form-container ' + styles.formContainer}>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2
@@ -87,13 +96,12 @@ const SignUpPage = () => {
             </h2>
           </div>
           <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-          <FormComponent
-            inputs={inputs}
-            submitAction={attemptSignup}
-            submitName = "Sign Up"
-            buttonClassName='submit-button'
-            >
-            </FormComponent>
+            <FormComponent
+              inputs={inputs}
+              submitAction={attemptSignup}
+              submitName="Sign Up"
+              buttonClassName="submit-button"
+            ></FormComponent>
             <p className="mt-3 text-center text-xs text-white">
               Already have an account?{' '}
               <Link href="/login" className="font-semibold leading-6">

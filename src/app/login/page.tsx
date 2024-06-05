@@ -15,16 +15,19 @@ const LoginPage = () => {
     {
       name: 'Email Address',
       inputType: InputTypeEnum.Text,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Email address'}, {type: ValidationRuleEnum.Email}]
+      defaultValue: '',
+      validationRuleNames: [
+        { type: ValidationRuleEnum.Required, args: 'Email address' },
+        { type: ValidationRuleEnum.Email }
+      ]
     },
     {
       name: 'Password',
       inputType: InputTypeEnum.Password,
-      defaultValue: "",
-      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Password'}]
-    },
-  ]
+      defaultValue: '',
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Password' }]
+    }
+  ];
 
   const attemptLogin = async (formValues: FormValues) => {
     try {
@@ -33,7 +36,10 @@ const LoginPage = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email: formValues.getValue('email'), password: formValues.getValue('password') })
+        body: JSON.stringify({
+          email: formValues.getValue('email'),
+          password: formValues.getValue('password')
+        })
       });
 
       if (!response.ok) {
@@ -48,12 +54,12 @@ const LoginPage = () => {
   };
 
   return (
-    <div className={"main-container " + styles.mainContainer}>
+    <div className={'main-container ' + styles.mainContainer}>
       <div className={styles.brandLogo}>
-        <h1 className={shrikhand.className + " " + styles.header}>Silly Stuffs</h1>
-        <LogoComponent className={"mx-auto h-11 w-auto logo " + styles.logo} />
+        <h1 className={shrikhand.className + ' ' + styles.header}>Silly Stuffs</h1>
+        <LogoComponent className={'mx-auto h-11 w-auto logo ' + styles.logo} />
       </div>
-      <div className={"form-container " + styles.formContainer}>
+      <div className={'form-container ' + styles.formContainer}>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2
@@ -64,12 +70,11 @@ const LoginPage = () => {
           </div>
           <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
             <FormComponent
-            inputs={inputs}
-            submitAction={attemptLogin}
-            submitName = "Login"
-            buttonClassName='submit-button'
-            >
-            </FormComponent>
+              inputs={inputs}
+              submitAction={attemptLogin}
+              submitName="Login"
+              buttonClassName="submit-button"
+            ></FormComponent>
             <p className="mt-3 text-center text-xs text-white">
               Don&apos;t have an account?{' '}
               <Link href="/signup" className="font-semibold leading-6">
