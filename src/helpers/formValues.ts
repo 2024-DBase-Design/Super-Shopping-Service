@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Dispatch, useState } from 'react';
 import { ClientEventEmitter } from './clientEventEmitter';
 
@@ -64,7 +66,7 @@ export class FormValues {
   checkFormValidity(newlyValidInputName?: string): boolean {
     let isValidAll = true;
 
-    for (let [key, value] of this.validDictionary.entries()) {
+    for (const [key, value] of this.validDictionary.entries()) {
       if (key !== newlyValidInputName && key !== formIsValidName) {
         // If the validDictionary contains an invalid input,
         // end early and return false

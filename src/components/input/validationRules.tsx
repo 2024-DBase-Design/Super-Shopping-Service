@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FormValues } from '@/helpers/formValues';
 
 export class ValidationRule {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* stolen kindly from https://gist.github.com/mudge/5830382 */
 /* Polyfill indexOf. */
 type Listener = (...args: any[]) => void;
@@ -36,12 +37,12 @@ export class ClientEventEmitter {
     this.events[event].forEach((listener) => listener.apply(this, args));
   }
 
-  public once(event: string, listener: Listener): void {
-    const remove: () => void = this.on(event, (...args: any[]) => {
-      remove();
-      listener.apply(this, args);
-    });
+  // public once(event: string, listener: Listener): void {
+  //   const remove: () => void = this.on(event, (...args: any[]) => {
+  //     remove();
+  //     listener.apply(this, args);
+  //   });
 
-    return remove;
-  }
+  //   return remove;
+  // }
 }
