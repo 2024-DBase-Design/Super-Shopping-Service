@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { getUserId, setUserId } from './_app';
 
 export default function Home() {
   return (
