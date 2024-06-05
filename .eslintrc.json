@@ -1,0 +1,18 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "prettier"],
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "no-console": 0,
+    "prettier/prettier": 1,
+    "no-prototype-builtins": "off",
+    "@typescript-eslint/no-unused-vars": "off"
+  }
+}

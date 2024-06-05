@@ -49,7 +49,14 @@ Before you begin, ensure you have met the following requirements:
    docker-compose up --build
    ```
 
+   - To develop NEXT.js, only run the following command:
+     ```bash
+     npm run dev
+     ```
+
 2. **The application should now be running at http://localhost:3000.**
+
+   - To access the API, use the following URL: http://localhost:3000/api/:path.
 
 3. **Start the electron app**:
    ```bash
@@ -77,9 +84,19 @@ For easy testing and integration, we have created a Postman collection that incl
    ```
 
 3. **Build the application**:
+
    ```bash
    npm run build
    ```
+
+4. **Pushing Prisma Migrations**:
+
+   - Change the prisma schema db url from DATABASE_URL to DATABASE_URL_DEV.
+   - Run the following command to create a new migration:
+     ```bash
+     npx prisma migrate dev --name <migration-name>
+     ```
+   - Change the prisma schema db url back from DATABASE_URL_DEV to DATABASE_URL.
 
 ## Scripts
 
