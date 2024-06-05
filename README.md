@@ -24,7 +24,7 @@ Before you begin, ensure you have met the following requirements:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/Jasmine-Mogadam/Super-Shopping-Service.git
+   git clone https://github.com/2024-DBase-Design/Super-Shopping-Service.git
    cd Super-Shopping-Service
    ```
 
@@ -35,6 +35,10 @@ Before you begin, ensure you have met the following requirements:
      DB_USER=sssadmin
      DB_PASSWORD=ssspassword
      DB_NAME=supershoppingservice
+     ```
+   - Install Node Packages:
+     ```bash
+     npm install
      ```
 
 ## Running the Application

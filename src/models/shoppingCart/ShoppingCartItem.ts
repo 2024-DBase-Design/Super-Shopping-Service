@@ -1,4 +1,4 @@
 export interface ShoppingCartItem {
-  productId: string;
+  productId: number;
   quantity: number;
 }
