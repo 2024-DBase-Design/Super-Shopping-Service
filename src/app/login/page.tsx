@@ -7,7 +7,7 @@ const LoginPage = () => {
   return (
     <div className="main-container">
       <h1 className={shrikhand.className}>Silly Stuffs</h1>
-      <LogoComponent className="mx-auto h-11 w-auto logo"/>
+      <LogoComponent className="mx-auto h-11 w-auto logo" />
       <div className="form-container">
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
