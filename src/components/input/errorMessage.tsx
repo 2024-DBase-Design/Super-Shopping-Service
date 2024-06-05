@@ -6,7 +6,7 @@ export const ErrorMessageComponent: React.FC<{ messages: string[]; className?: s
   className = ''
 }) => {
   return (
-    <div className="min-h-5 mt-1">
+    <div className="min-h-5 mt-1 mb-1">
       <div className={`${className} error`} style={{ display: messages.length > 0 ? '' : 'none' }}>
         <ErrorIconComponent fillColor="#c76e77" />
         <p>{messages[0]}</p>

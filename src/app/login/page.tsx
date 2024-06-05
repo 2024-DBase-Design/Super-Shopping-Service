@@ -8,21 +8,21 @@ import { shrikhand } from '../fonts';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
-import FormComponent, { FormInput, InputType } from '@/components/form/form';
+import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 
 const LoginPage = () => {
   const inputs: FormInput[] = [
     {
       name: 'Email Address',
-      inputType: InputType.Text,
+      inputType: InputTypeEnum.Text,
       defaultValue: "",
-      validationRuleNames: [ValidationRuleEnum.Required, ValidationRuleEnum.Email]
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Email address'}, {type: ValidationRuleEnum.Email}]
     },
     {
       name: 'Password',
-      inputType: InputType.Password,
+      inputType: InputTypeEnum.Password,
       defaultValue: "",
-      validationRuleNames: [ValidationRuleEnum.Required]
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Password'}]
     },
   ]
 

@@ -1,57 +1,66 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import '@/styles/noSession.scss';
 import styles from './signup.module.scss';
 import { shrikhand } from '../fonts';
-import TextInputComponent from '@/components/input/textInput';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import Link from 'next/link';
-import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
+import { FormValues } from '@/helpers/formValues';
 
 const SignUpPage = () => {
-  const [emailValue, setEmailValue] = useState('');
-  const [emailIsValid, setEmailIsValid] = useState(false);
-  const [passwordValue, setPasswordValue] = useState('');
-  const [passwordIsValid, setPasswordIsValid] = useState(false);
-  const [formIsValid, setFormIsValid] = useState(true);
-  const manualValidate = new ClientEventEmitter();
-
-  const handleEmailChange = (emailValue: string, emailIsValid: boolean) => {
-    setEmailValue(emailValue);
-    setEmailIsValid(emailIsValid);
-    setFormIsValid(emailIsValid && passwordIsValid);
-  };
-
-  const handlePasswordChange = (passwordValue: string, passwordIsValid: boolean) => {
-    setPasswordValue(passwordValue);
-    setPasswordIsValid(passwordIsValid);
-    setFormIsValid(emailIsValid && passwordIsValid);
-  };
-
-  const handleLogin = async (event: any) => {
-    event.preventDefault(); // Prevent default form submission behavior
-
-    // check in case user immediately hit login button
-    if (formIsValid) {
-      setFormIsValid(emailIsValid && passwordIsValid);
-      if (!(emailIsValid && passwordIsValid)) {
-        manualValidate.emit('validate');
-        return; // form is not valid
-      }
-    } else {
-      return; // form is not valid
+  const inputs: FormInput[] = [
+    {
+      name: 'Name',
+      inputType: InputTypeEnum.Text,
+      defaultValue: "",
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: "Name"}]
+    },
+    {
+      name: 'Email Address',
+      inputType: InputTypeEnum.Text,
+      defaultValue: "",
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Email address'}, {type: ValidationRuleEnum.Email}]
+    },
+    {
+      name: 'Password',
+      inputType: InputTypeEnum.Password,
+      defaultValue: "",
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Password'}]
+    },
+    {
+      name: 'Confirm Password',
+      inputType: InputTypeEnum.Password,
+      defaultValue: "",
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Password'}, { type: ValidationRuleEnum.ConfirmMatch, args: 'password'}]
+    },
+    {
+      name: 'Credit Card Number',
+      inputType: InputTypeEnum.Number,
+      defaultValue: "",
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Credit card number'}, {type: ValidationRuleEnum.CreditCard}]
+    },
+    {
+      name: 'Address',
+      inputType: InputTypeEnum.Address,
+      defaultValue: "",
+      validationRuleNames: [{type: ValidationRuleEnum.Required, args: 'Address'}]
     }
+  ]
 
-    // attempt to make api call
+  const attemptSignup = async (formValues: FormValues) => {
     try {
       const response = await fetch('YOUR_API_ENDPOINT', {
-        method: 'GET',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email: emailValue, password: passwordValue })
+        body: JSON.stringify({ 
+          email: formValues.getValue('email'), 
+          password: formValues.getValue('password') 
+        })
       });
 
       if (!response.ok) {
@@ -66,7 +75,7 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="main-container">
+    <div className={styles.mainContainer}>
       <BrandHeaderComponent></BrandHeaderComponent>
       <div className={"form-container " + styles.formContainer}>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
@@ -78,42 +87,13 @@ const SignUpPage = () => {
             </h2>
           </div>
           <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-4" onSubmit={handleLogin}>
-              <div>
-                <TextInputComponent
-                  name="Name"
-                  validationRuleNames={[ValidationRuleEnum.Required]}
-                  onValueChanged={(value, isValid) => handleEmailChange(value, isValid)}
-                  manualValidate={manualValidate}
-                ></TextInputComponent>
-              </div>
-              <div>
-                <TextInputComponent
-                  name="Email Address"
-                  validationRuleNames={[ValidationRuleEnum.Required, ValidationRuleEnum.Email]}
-                  onValueChanged={(value, isValid) => handleEmailChange(value, isValid)}
-                  manualValidate={manualValidate}
-                ></TextInputComponent>
-              </div>
-              <div>
-                <TextInputComponent
-                  name="Password"
-                  inputType="password"
-                  validationRuleNames={[ValidationRuleEnum.Required]}
-                  onValueChanged={(value, isValid) => handlePasswordChange(value, isValid)}
-                  manualValidate={manualValidate}
-                ></TextInputComponent>
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  className="flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
-                  style={{ opacity: formIsValid ? 1 : 0.5 }}
-                >
-                  Sign Up
-                </button>
-              </div>
-            </form>
+          <FormComponent
+            inputs={inputs}
+            submitAction={attemptSignup}
+            submitName = "Sign Up"
+            buttonClassName='submit-button'
+            >
+            </FormComponent>
             <p className="mt-3 text-center text-xs text-white">
               Already have an account?{' '}
               <Link href="/login" className="font-semibold leading-6">

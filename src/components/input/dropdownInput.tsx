@@ -6,24 +6,24 @@ import { getValidationTest, ValidationRule, ValidationRuleEnum, ValidationRuleTy
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import { FormValues } from '@/helpers/formValues';
 
-type TextInputProps = {
+type DropDownInputProps = {
   name: string;
+  options: string[];
   formValues: FormValues;
   id?: string;
   className?: string;
-  inputType?: string;
   defaultValue?: any;
   validationRuleNames?: ValidationRuleType[];
   onValueChanged?: (value: any, isValid: boolean) => void;
   manualValidate?: ClientEventEmitter;
 };
 
-const TextInputComponent: React.FC<TextInputProps> = ({
+const DropDownInputComponent: React.FC<DropDownInputProps> = ({
   name,
+  options,
   formValues,
   id = name.toLowerCase(),
   className,
-  inputType = 'text',
   defaultValue,
   validationRuleNames,
   onValueChanged,
@@ -41,6 +41,9 @@ const TextInputComponent: React.FC<TextInputProps> = ({
       }
     }
   }
+
+  options.push("");
+  options = [...new Set(options)];
 
   function validate(ToValidate: any) {
     setErrorMessages([]);
@@ -71,18 +74,24 @@ const TextInputComponent: React.FC<TextInputProps> = ({
     <>
       <div className={`flex items-center justify-between ${className}`}>
         <label htmlFor={id} className="block text-sm font-medium leading-4">
-          {name + (validationRuleNames?.map(n => n.type).includes(ValidationRuleEnum.Required) ? ' *' : '')}
+          {name + ((validationRuleNames?.map(n => n.type)?.includes(ValidationRuleEnum.Required)) ? ' *' : '')}
         </label>
       </div>
       <div className="mt-1">
-        <input
-          id={id}
-          name={name.toLowerCase()}
-          type={inputType}
-          className={`pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'}`}
-          value={value}
-          onChange={handleChange}
-        />
+        <select 
+        id="countries"
+        name={name.toLowerCase()}
+        className={`pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'}`}
+        onChange={handleChange}
+        >
+          {options.map((option) => 
+            defaultValue === option? (
+              <option key={option} selected value={option}>{option}</option>
+            ) : (
+              <option key={option} value={option}>{option}</option>
+            )
+          )}
+        </select>
       </div>
       <div>
         <ErrorMessageComponent messages={errorMessages} />
@@ -91,4 +100,4 @@ const TextInputComponent: React.FC<TextInputProps> = ({
   );
 };
 
-export default TextInputComponent;
+export default DropDownInputComponent;

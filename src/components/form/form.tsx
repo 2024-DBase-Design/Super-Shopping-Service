@@ -4,6 +4,9 @@ import React from 'react';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TextInputComponent from '../input/textInput';
 import { formIsValidName, FormValues } from '@/helpers/formValues';
+import DropDownInputComponent from '../input/dropdownInput';
+import AddressInputComponent from '../input/addressInput';
+import { ValidationRuleType } from '../input/validationRules';
 
 export type FormInput = {
     name: string;
@@ -11,15 +14,17 @@ export type FormInput = {
     className?: string;
     inputType?: string;
     defaultValue?: any;
-    validationRuleNames?: string[];
+    validationRuleNames?: ValidationRuleType[];
     manualValidate?: ClientEventEmitter;
 }
 
-export const enum InputType {
+export const enum InputTypeEnum {
     Text = 'text',
     Password = 'password',
     Date = 'date',
-    DropDown = 'dropDown'
+    Number = 'number',
+    DropDown = 'dropDown',
+    Address = 'address'
 }
 
 const FormComponent: React.FC<{inputs: FormInput[], submitAction: (formValues: FormValues)=> any, submitName?: string, className?: string, buttonClassName?: string}> = ({
@@ -61,30 +66,48 @@ const FormComponent: React.FC<{inputs: FormInput[], submitAction: (formValues: F
     }
 
     return (
-        <>
-        <div className={className}>
-            <form onSubmit={handleSubmit}>
-            {inputs.map((input) => 
-                <div>
-                    <TextInputComponent
+      <>
+      <div className={className}>
+          <form onSubmit={handleSubmit}>
+          {inputs.map((input) =>
+            <div key={input.name}>
+              {input.inputType === InputTypeEnum.DropDown? (
+                <DropDownInputComponent
+                  name={input.name}
+                  options={[]}
+                  formValues={formValues}
+                  validationRuleNames={input.validationRuleNames}
+                  onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
+                  manualValidate={manualValidate}
+                />
+              ) : input.inputType === InputTypeEnum.Address? (
+                <AddressInputComponent
                     name={input.name}
                     validationRuleNames={input.validationRuleNames}
                     onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
+                    manualValidate={manualValidate}                />
+              ) : (
+                <TextInputComponent
+                    name={input.name}
+                    formValues={formValues}
+                    validationRuleNames={input.validationRuleNames}
+                    onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
                     manualValidate={manualValidate}
-                    inputType = {input.inputType}
-                    ></TextInputComponent>
-                </div>)}
-            
-                <button
-                  type="submit"
-                  className={`${buttonClassName} flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600`}
-                  style={{ opacity: formValues.getValidity(formIsValidName) ? 1 : 0.5 }}
-                >
-                  {submitName}
-                </button>
-            </form>
-        </div>
-        </>
+                    inputType={input.inputType}
+                />
+              )}
+            </div>
+          )}
+          <button
+            type="submit"
+            className={`${buttonClassName} flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600`}
+            style={{ opacity: formValues.getValidity(formIsValidName) ? 1 : 0.5 }}
+          >
+            {submitName}
+          </button>
+        </form>
+      </div>
+      </>
     );
 };
 
