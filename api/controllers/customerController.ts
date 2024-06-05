@@ -1,6 +1,12 @@
 import { prisma } from '../index';
 import { Request, Response } from 'express';
 import { registerCustomer } from './authController';
+import { Prisma, Product } from '@prisma/client';
+
+interface ShoppingCartItem {
+  product: Product;
+  quantity: number;
+}
 
 /**
  * Create a new customer.
@@ -10,7 +16,7 @@ import { registerCustomer } from './authController';
  */
 export const createCustomer = async (req: Request, res: Response) => {
   try {
-    const customer = await registerCustomer(req.body);
+    const customer = await registerCustomer(req);
     res.status(201).json(customer);
   } catch (error) {
     console.error('Error creating customer:', (error as Error).message);
@@ -224,8 +230,9 @@ export const addAddress = async (req: Request, res: Response) => {
     if (!customer) {
       return res.status(404).json({ error: 'Customer not found' });
     }
-    const newAddressData = { ...req.body, customerId: customer.id };
-    const newAddress = await prisma.address.create({ data: newAddressData });
+    const newAddress = await prisma.address.create({
+      data: { ...req.body, customerId: customer.id }
+    });
     res.status(201).json(newAddress);
   } catch (error) {
     console.error('Error adding address:', (error as Error).message);
@@ -315,102 +322,140 @@ export const deleteAddress = async (req: Request, res: Response) => {
   }
 };
 
-// /**
-//  * Add to a customer's cart items.
-//  *
-//  * @param req Express request object.
-//  * @param res Express response object.
-//  */
-// export const addToCart = async (req: Request, res: Response) => {
-//   try {
-//     const customer = await Customer.findByPk(req.params.customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
-//     const { product, quantity } = req.body;
-//     const item: ProductWithQuantity = { product, quantity };
-//     customer.cart = [...customer.cart, item];
-//     await customer.save();
-//     res.status(201).json(item);
-//   } catch (error) {
-//     console.error('Error adding to cart:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+/**
+ * Add to a customer's cart items.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const addToCart = async (req: Request, res: Response) => {
+  try {
+    const customer = await prisma.customer.findUnique({
+      where: {
+        id: Number(req.params.customerId)
+      }
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const { productId, quantity } = req.body;
+    const product = await prisma.product.findUnique({
+      where: { id: Number(productId) }
+    });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    const item = {
+      product: {
+        ...product,
+        createdAt: product.createdAt.toISOString(),
+        updatedAt: product.updatedAt.toISOString()
+      },
+      quantity
+    };
+    (customer.cart as Prisma.JsonArray).push(item);
+    res.status(201).json(item);
+  } catch (error) {
+    console.error('Error adding to cart:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// /**
-//  * Get a customer's cart items.
-//  *
-//  * @param req Express request object.
-//  * @param res Express response object.
-//  */
-// export const getCartItems = async (req: Request, res: Response) => {
-//   try {
-//     const customer = await Customer.findByPk(req.params.customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
-//     res.json(customer.cart);
-//   } catch (error) {
-//     console.error('Error fetching cart items:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+/**
+ * Get a customer's cart items.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getCartItems = async (req: Request, res: Response) => {
+  try {
+    const customer = await prisma.customer.findUnique({
+      where: { id: Number(req.params.customerId) }
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    res.json(customer.cart);
+  } catch (error) {
+    console.error('Error fetching cart items:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// /**
-//  * Update a customer's cart item.
-//  *
-//  * @param req Express request object.
-//  * @param res Express response object.
-//  */
-// export const updateCartItem = async (req: Request, res: Response) => {
-//   try {
-//     const { customerId, itemId } = req.params;
-//     const customer = await Customer.findByPk(customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
-//     const { quantity } = req.body;
-//     const itemIndex = customer.cart.findIndex((item) => item.product.id === Number(itemId));
-//     if (itemIndex === -1) {
-//       return res.status(404).json({ error: 'Item not found' });
-//     }
-//     customer.cart[itemIndex].quantity = quantity;
-//     customer.changed('cart', true);
-//     await customer.save();
-//     res.json(customer.cart[itemIndex]);
-//   } catch (error) {
-//     console.error('Error updating cart item:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+/**
+ * Update a customer's cart item.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const updateCartItem = async (req: Request, res: Response) => {
+  try {
+    const { customerId, itemId } = req.params;
+    const customer = await prisma.customer.findUnique({
+      where: { id: Number(customerId) }
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const { quantity } = req.body;
+    const cartItems = customer.cart as unknown as ShoppingCartItem[];
+    if (Array.isArray(cartItems)) {
+      const itemIndex = cartItems.findIndex((item) => item.product.id === Number(itemId));
+      if (itemIndex !== -1) {
+        cartItems[itemIndex].quantity = quantity;
+      } else {
+        console.error('Item not found in cart');
+      }
+    } else {
+      console.error('Cart is not a valid array of ShoppingCartItems');
+    }
+    const updatedCustomer = await prisma.customer.update({
+      where: { id: Number(customerId) },
+      data: { cart: cartItems as unknown as Prisma.JsonArray }
+    });
+    res.json(updatedCustomer.cart);
+  } catch (error) {
+    console.error('Error updating cart item:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
-// /**
-//  * Remove a customer's cart item.
-//  *
-//  * @param req Express request object.
-//  * @param res Express response object.
-//  */
-// export const removeCartItem = async (req: Request, res: Response) => {
-//   try {
-//     const { customerId, itemId } = req.params;
-//     const customer = await Customer.findByPk(customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
-//     const itemIndex = customer.cart.findIndex((item) => item.product.id === Number(itemId));
-//     if (itemIndex === -1) {
-//       return res.status(404).json({ error: 'Item not found' });
-//     }
-//     customer.cart.splice(itemIndex, 1);
-//     customer.changed('cart', true);
-//     await customer.save();
-//     res.status(204).send();
-//   } catch (error) {
-//     console.error('Error removing cart item:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+/**
+ * Remove a customer's cart item.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const removeCartItem = async (req: Request, res: Response) => {
+  try {
+    const { customerId, itemId } = req.params;
+    const customer = await prisma.customer.findUnique({
+      where: { id: Number(customerId) }
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+    const cartItems = customer.cart as unknown as ShoppingCartItem[];
+    if (Array.isArray(cartItems)) {
+      const itemIndex = cartItems.findIndex((item) => item.product.id === Number(itemId));
+      if (itemIndex !== -1) {
+        cartItems.splice(itemIndex, 1);
+      } else {
+        console.error('Item not found in cart');
+      }
+    } else {
+      console.error('Cart is not a valid array of ShoppingCartItems');
+    }
+    await prisma.customer.update({
+      where: { id: Number(customerId) },
+      data: { cart: cartItems as unknown as Prisma.JsonArray }
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error removing cart item:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
 // /**
 //  * Submit an order for a customer.

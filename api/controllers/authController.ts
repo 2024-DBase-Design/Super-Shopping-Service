@@ -1,39 +1,39 @@
 import { prisma } from '../index';
 import { Request, Response } from 'express';
-import { Customer, Staff } from '@prisma/client';
 import { hashPassword, comparePassword } from '../utils/auth';
 
 /**
  * Register a new customer.
  *
- * @param data
+ * @param data Request object.
  * @returns
  */
-export async function registerCustomer(data: any): Promise<Customer> {
+export const registerCustomer = async (data: Request) => {
   const customer = await prisma.customer.create({
     data: {
-      ...data,
-      password: await hashPassword(data.password)
+      ...data.body,
+      password: await hashPassword(data.body.password),
+      cart: {}
     }
   });
   return customer;
-}
+};
 
 /**
  * Register a new staff.
  *
- * @param data
+ * @param data Request object.
  * @returns
  */
-export async function registerStaff(data: any): Promise<Staff> {
+export const registerStaff = async (data: Request) => {
   const staff = await prisma.staff.create({
     data: {
-      ...data,
-      password: await hashPassword(data.password)
+      ...data.body,
+      password: await hashPassword(data.body.password)
     }
   });
   return staff;
-}
+};
 
 /**
  * Login a customer.
@@ -80,4 +80,4 @@ export const loginStaff = async (req: Request, res: Response) => {
     console.error('Error logging in staff:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
   }
-}
+};
