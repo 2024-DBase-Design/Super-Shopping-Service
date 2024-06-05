@@ -12,17 +12,14 @@ import DropDownInputComponent from './dropdownInput';
 type AddressInputProps = {
   name: string;
   id?: string;
-  className?: string;
   defaultValue?: Address;
-  validationRuleNames?: ValidationRuleType[];
   onValueChanged?: (value: any, isValid: boolean) => void;
-  manualValidate?: ClientEventEmitter;
+  forceValidate?: ClientEventEmitter;
 };
 
 const AddressInputComponent: React.FC<AddressInputProps> = ({
   name,
   id = name.toLowerCase(),
-  className,
   defaultValue = {
     addressLineOne: '',
     addressLineTwo: '',
@@ -31,9 +28,8 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
     zipCode: null,
     type: AddressTypeEnum.Billing
   },
-  validationRuleNames,
   onValueChanged,
-  manualValidate
+  forceValidate
 }) => {
   const inputs: FormInput[] = [
     {
@@ -94,7 +90,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
           formValues={formValues}
           validationRuleNames={inputs[0].validationRuleNames}
           onValueChanged={(value, isValid) => handleInputChange(inputs[0].name, value, isValid)}
-          manualValidate={manualValidate}
+          forceValidate={forceValidate}
           inputType="text"
           defaultValue={defaultValue.addressLineOne}
         />
@@ -105,7 +101,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
           formValues={formValues}
           validationRuleNames={[]}
           onValueChanged={(value, isValid) => handleInputChange(inputs[1].name, value, isValid)}
-          manualValidate={manualValidate}
+          forceValidate={forceValidate}
           inputType="text"
           defaultValue={defaultValue.addressLineTwo}
         />
@@ -117,7 +113,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             formValues={formValues}
             validationRuleNames={inputs[2].validationRuleNames}
             onValueChanged={(value, isValid) => handleInputChange(inputs[2].name, value, isValid)}
-            manualValidate={manualValidate}
+            forceValidate={forceValidate}
             inputType="text"
             defaultValue={defaultValue.city}
           />
@@ -128,7 +124,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             validationRuleNames={inputs[3].validationRuleNames}
             formValues={formValues}
             onValueChanged={(value, isValid) => handleInputChange(inputs[3].name, value, isValid)}
-            manualValidate={manualValidate}
+            forceValidate={forceValidate}
             defaultValue={defaultValue.state}
             options={States}
           />
@@ -139,7 +135,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             formValues={formValues}
             validationRuleNames={inputs[4].validationRuleNames}
             onValueChanged={(value, isValid) => handleInputChange(inputs[4].name, value, isValid)}
-            manualValidate={manualValidate}
+            forceValidate={forceValidate}
             inputType="text"
             defaultValue={defaultValue.zipCode}
           />

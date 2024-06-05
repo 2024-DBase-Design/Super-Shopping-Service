@@ -31,7 +31,10 @@ const SignUpPage = () => {
       name: 'Password',
       inputType: InputTypeEnum.Password,
       defaultValue: '',
-      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Password' }]
+      validationRuleNames: [
+        { type: ValidationRuleEnum.Required, args: 'Password' },
+        { type: ValidationRuleEnum.TwoWayBinding, args: 'Confirm Password' }
+      ]
     },
     {
       name: 'Confirm Password',
@@ -39,34 +42,23 @@ const SignUpPage = () => {
       defaultValue: '',
       validationRuleNames: [
         { type: ValidationRuleEnum.Required, args: 'Password' },
-        { type: ValidationRuleEnum.ConfirmMatch, args: 'password' }
+        {
+          type: ValidationRuleEnum.ConfirmMatch,
+          args: 'Password'
+        }
       ]
-    },
-    {
-      name: 'Credit Card Number',
-      inputType: InputTypeEnum.Number,
-      defaultValue: '',
-      validationRuleNames: [
-        { type: ValidationRuleEnum.Required, args: 'Credit card number' },
-        { type: ValidationRuleEnum.CreditCard }
-      ]
-    },
-    {
-      name: 'Address',
-      inputType: InputTypeEnum.Address,
-      defaultValue: '',
-      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Address' }]
     }
   ];
 
   const attemptSignup = async (formValues: FormValues) => {
     try {
       const response = await fetch('YOUR_API_ENDPOINT', {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          name: formValues.getValue('name'),
           email: formValues.getValue('email'),
           password: formValues.getValue('password')
         })

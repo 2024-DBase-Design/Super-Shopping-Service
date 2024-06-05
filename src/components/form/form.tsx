@@ -9,95 +9,93 @@ import AddressInputComponent from '../input/addressInput';
 import { ValidationRuleType } from '../input/validationRules';
 
 export type FormInput = {
-    name: string;
-    id?: string;
-    className?: string;
-    inputType?: string;
-    defaultValue?: any;
-    validationRuleNames?: ValidationRuleType[];
-    manualValidate?: ClientEventEmitter;
-}
+  name: string;
+  id?: string;
+  className?: string;
+  inputType?: string;
+  defaultValue?: any;
+  validationRuleNames?: ValidationRuleType[];
+  manualValidate?: ClientEventEmitter;
+};
 
 export const enum InputTypeEnum {
-    Text = 'text',
-    Password = 'password',
-    Date = 'date',
-    Number = 'number',
-    DropDown = 'dropDown',
-    Address = 'address'
+  Text = 'text',
+  Password = 'password',
+  Date = 'date',
+  Number = 'number',
+  DropDown = 'dropDown',
+  Address = 'address'
 }
 
-const FormComponent: React.FC<{inputs: FormInput[], submitAction: (formValues: FormValues)=> any, submitName?: string, className?: string, buttonClassName?: string}> = ({
-  inputs,
-  submitName,
-  submitAction,
-  className,
-  buttonClassName
-}) => {
-    const formValues: FormValues = new FormValues([]);
-    const manualValidate = new ClientEventEmitter();
+const FormComponent: React.FC<{
+  inputs: FormInput[];
+  submitAction: (formValues: FormValues) => any;
+  submitName?: string;
+  className?: string;
+  buttonClassName?: string;
+}> = ({ inputs, submitName, submitAction, className, buttonClassName }) => {
+  const formValues: FormValues = new FormValues([]);
 
-    for(const input of inputs){
-        formValues.addNewValue({name: input.name, defaultValue: input.defaultValue});
+  for (const input of inputs) {
+    formValues.addNewValue({ name: input.name, defaultValue: input.defaultValue });
+  }
+
+  const handleInputChange = (name: string, value: string, isValid: boolean) => {
+    formValues.updateValue(name, value);
+    formValues.updateValidity(name, isValid);
+    if (isValid) {
+      formValues.checkFormValidity(name);
+    } else {
+      formValues.updateValidity(formIsValidName, false);
     }
-    
-      const handleInputChange = (name:string, value: string, isValid: boolean) => {
-        formValues.updateValue(name, value);
-        formValues.updateValidity(name, isValid);
-        if(isValid){
-            formValues.checkFormValidity(name);
-        }
-        else{
-            formValues.updateValidity(formIsValidName, false);
-        }
-      };
-    
-      const handleSubmit = async (event: any) => {
-        event.preventDefault(); // Prevent default form submission behavior
-    
-         // if form is not valid, force validation on all inputs
-         // and don't execute submitAction
-        if (!formValues.checkFormValidity()) {
-            manualValidate.emit('validate');
-          return;
-        }
+  };
 
-        submitAction(formValues);
+  const handleSubmit = async (event: any) => {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    // if form is not valid, force validation on all inputs
+    // and don't execute submitAction
+    if (!formValues.checkFormValidity()) {
+      formValues.forceValidate.emit('validate');
+      return;
     }
 
-    return (
-      <>
+    submitAction(formValues);
+  };
+
+  return (
+    <>
       <div className={className}>
-          <form onSubmit={handleSubmit}>
-          {inputs.map((input) =>
+        <form onSubmit={handleSubmit}>
+          {inputs.map((input) => (
             <div key={input.name}>
-              {input.inputType === InputTypeEnum.DropDown? (
+              {input.inputType === InputTypeEnum.DropDown ? (
                 <DropDownInputComponent
                   name={input.name}
                   options={[]}
                   formValues={formValues}
                   validationRuleNames={input.validationRuleNames}
                   onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
-                  manualValidate={manualValidate}
+                  forceValidate={formValues.forceValidate}
                 />
-              ) : input.inputType === InputTypeEnum.Address? (
+              ) : input.inputType === InputTypeEnum.Address ? (
                 <AddressInputComponent
-                    name={input.name}
-                    validationRuleNames={input.validationRuleNames}
-                    onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
-                    manualValidate={manualValidate}                />
+                  name={input.name}
+                  onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
+                  forceValidate={formValues.forceValidate}
+                />
               ) : (
                 <TextInputComponent
-                    name={input.name}
-                    formValues={formValues}
-                    validationRuleNames={input.validationRuleNames}
-                    onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
-                    manualValidate={manualValidate}
-                    inputType={input.inputType}
+                  name={input.name}
+                  formValues={formValues}
+                  validationRuleNames={input.validationRuleNames}
+                  onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
+                  forceValidate={formValues.forceValidate}
+                  inputType={input.inputType}
                 />
               )}
             </div>
-          )}
+          ))}
           <button
             type="submit"
             className={`${buttonClassName} flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600`}
@@ -107,8 +105,8 @@ const FormComponent: React.FC<{inputs: FormInput[], submitAction: (formValues: F
           </button>
         </form>
       </div>
-      </>
-    );
+    </>
+  );
 };
 
 export default FormComponent;

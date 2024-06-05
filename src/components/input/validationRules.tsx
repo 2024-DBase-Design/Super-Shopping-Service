@@ -76,6 +76,16 @@ function ZipCode(formValues: FormValues, value: string): string {
   }
 }
 
+function TwoWayBindingClosure(nameToBind: string): (formValues: FormValues, value: any) => string {
+  return (formValues: FormValues, value: any): string => {
+    // Don't validate bind if it hasn't been touched yet
+    if (formValues.getValue(nameToBind) && formValues.getValue(nameToBind) !== '') {
+      formValues.forceValidate.emit(nameToBind);
+    }
+    return '';
+  };
+}
+
 function Error(formValues: FormValues, value: any): string {
   return `ERROR!! Invalid rule value:${value}`;
 }
@@ -85,7 +95,8 @@ export const enum ValidationRuleEnum {
   Email = 'email',
   ConfirmMatch = 'confirm match',
   CreditCard = 'credit card',
-  ZipCode = 'zip code'
+  ZipCode = 'zip code',
+  TwoWayBinding = 'two way binding'
 }
 
 export type ValidationRuleType = {
@@ -107,6 +118,8 @@ export function getValidationTest(
       return CreditCard;
     case ValidationRuleEnum.ZipCode:
       return ZipCode;
+    case ValidationRuleEnum.TwoWayBinding:
+      return TwoWayBindingClosure(validationRule.args);
     default:
       return Error;
   }

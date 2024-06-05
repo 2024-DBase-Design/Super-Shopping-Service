@@ -20,7 +20,7 @@ type DropDownInputProps = {
   defaultValue?: any;
   validationRuleNames?: ValidationRuleType[];
   onValueChanged?: (value: any, isValid: boolean) => void;
-  manualValidate?: ClientEventEmitter;
+  forceValidate?: ClientEventEmitter;
 };
 
 const DropDownInputComponent: React.FC<DropDownInputProps> = ({
@@ -32,7 +32,7 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
   defaultValue,
   validationRuleNames,
   onValueChanged,
-  manualValidate
+  forceValidate
 }) => {
   const [value, setValue] = useState<any>(defaultValue);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
@@ -72,7 +72,11 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
     validate(newValue);
   };
 
-  manualValidate?.on('validate', () => {
+  forceValidate?.on('validate', () => {
+    validate(value);
+  });
+
+  forceValidate?.on(name, () => {
     validate(value);
   });
 

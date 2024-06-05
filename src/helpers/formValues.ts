@@ -1,4 +1,5 @@
 import { Dispatch, useState } from 'react';
+import { ClientEventEmitter } from './clientEventEmitter';
 
 type UseState = {
   value: any;
@@ -13,6 +14,7 @@ export type NewValue = {
 export const formIsValidName: string = 'formIsValid';
 
 export class FormValues {
+  readonly forceValidate: ClientEventEmitter = new ClientEventEmitter();
   private valueDictionary: Map<string, UseState> = new Map<string, UseState>();
   private validDictionary: Map<string, UseState> = new Map<string, UseState>();
 

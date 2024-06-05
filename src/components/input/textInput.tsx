@@ -20,7 +20,7 @@ type TextInputProps = {
   defaultValue?: any;
   validationRuleNames?: ValidationRuleType[];
   onValueChanged?: (value: any, isValid: boolean) => void;
-  manualValidate?: ClientEventEmitter;
+  forceValidate?: ClientEventEmitter;
 };
 
 const TextInputComponent: React.FC<TextInputProps> = ({
@@ -32,7 +32,7 @@ const TextInputComponent: React.FC<TextInputProps> = ({
   defaultValue,
   validationRuleNames,
   onValueChanged,
-  manualValidate
+  forceValidate: forceValidate
 }) => {
   const [value, setValue] = useState<any>(defaultValue);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
@@ -48,7 +48,7 @@ const TextInputComponent: React.FC<TextInputProps> = ({
     }
   }
 
-  function validate(ToValidate: any) {
+  async function validate(ToValidate: any) {
     setErrorMessages([]);
     if (!validationRules || validationRules.length === 0) return;
 
@@ -69,7 +69,11 @@ const TextInputComponent: React.FC<TextInputProps> = ({
     validate(newValue);
   };
 
-  manualValidate?.on('validate', () => {
+  forceValidate?.on('validate', () => {
+    validate(value);
+  });
+
+  forceValidate?.on(name, () => {
     validate(value);
   });
 
