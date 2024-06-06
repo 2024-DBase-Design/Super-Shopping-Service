@@ -1,0 +1,15 @@
+
+.formContainer {
+    position: relative;
+    width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.mainContainer{
+    position: absolute;
+    min-height: 100vh;
+    min-width: 100vw;
+    background-image: url('/fun-background.png');
+    background-size: auto;
+}

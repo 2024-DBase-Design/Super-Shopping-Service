@@ -37,3 +37,6 @@ next-env.d.ts
 
 # IDE
 .vscode
+/client/.next/cache
+/client/node_modules
+/client/.next

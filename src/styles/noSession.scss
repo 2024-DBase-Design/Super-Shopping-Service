@@ -1,0 +1,51 @@
+h1 {
+    color: white;
+    filter: drop-shadow(3px 2px 1px var(--blue));
+}
+  
+h2 {
+    color: var(--blue);
+}
+
+a {
+    color: var(--blue);
+    transition: 1s;
+}
+
+a:hover {
+    color: var(--dark-blue);
+    transition: 1s;
+}
+
+label {
+    color: white;
+}
+
+.submit-button {
+    background-color: var(--blue);
+    transition: 1s;
+}
+
+.submit-button:hover {
+    background-color: var(--dark-blue);
+    transition: 1s;
+}
+
+.main-container {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    background-image: url('/fun-background.png');
+    background-size: auto;
+    overflow: hidden;
+}
+
+.form-container {
+    background-image: linear-gradient(
+        to bottom,
+        rgba(var(--rgb-orange), 0.9),
+        rgba(var(--rgb-dark-orange), 0.9)
+    );
+    border-radius: 10px;
+}
+  

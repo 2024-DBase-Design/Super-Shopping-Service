@@ -33,11 +33,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
     rgb(var(--background-start-rgb));
 }
 
@@ -45,4 +41,23 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.error {
+  color: var(--red);
+  display: flex;
+  font-size: 0.75rem;
+}
+
+.error svg {
+  margin-right: 0.25em;
+  height: 1.1rem;
+}
+
+.error-outline {
+  border: 2px, solid, var(--red);
+}
+
+.transparent-outline {
+  border: 2px, solid, transparent;
 }

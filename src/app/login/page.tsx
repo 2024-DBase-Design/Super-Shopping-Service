@@ -1,14 +1,65 @@
+'use client';
+
 import React from 'react';
-import { LogoComponent } from '@/components/logo';
-import '@/styles/login.scss';
+import { LogoComponent } from '@/components/svgs/logo';
+import '@/styles/noSession.scss';
+import styles from './login.module.scss';
 import { shrikhand } from '../fonts';
+import { ValidationRuleEnum } from '@/components/input/validationRules';
+import Link from 'next/link';
+import { FormValues } from '@/helpers/formValues';
+import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 
 const LoginPage = () => {
+  const inputs: FormInput[] = [
+    {
+      name: 'Email Address',
+      inputType: InputTypeEnum.Text,
+      defaultValue: '',
+      validationRuleNames: [
+        { type: ValidationRuleEnum.Required, args: 'Email address' },
+        { type: ValidationRuleEnum.Email }
+      ]
+    },
+    {
+      name: 'Password',
+      inputType: InputTypeEnum.Password,
+      defaultValue: '',
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Password' }]
+    }
+  ];
+
+  const attemptLogin = async (formValues: FormValues) => {
+    try {
+      const response = await fetch('YOUR_API_ENDPOINT', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formValues.getValue('email'),
+          password: formValues.getValue('password')
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Handle successful API call, like storing cookies
+      console.log('API call successful');
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  };
+
   return (
-    <div className="main-container">
-      <h1 className={shrikhand.className}>Silly Stuffs</h1>
-      <LogoComponent className="mx-auto h-11 w-auto logo" />
-      <div className="form-container">
+    <div className={'main-container ' + styles.mainContainer}>
+      <div className={styles.brandLogo}>
+        <h1 className={shrikhand.className + ' ' + styles.header}>Silly Stuffs</h1>
+        <LogoComponent className={'mx-auto h-11 w-auto logo ' + styles.logo} />
+      </div>
+      <div className={'form-container ' + styles.formContainer}>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2
@@ -17,63 +68,23 @@ const LoginPage = () => {
               Login
             </h2>
           </div>
-
           <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6" action="#" method="POST">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium leading-6">
-                  Email address
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium leading-6">
-                    Password
-                  </label>
-                </div>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  className="flex mt-10 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Login
-                </button>
-              </div>
-            </form>
-
-            <p className="mt-5 text-center text-sm text-white">
+            <FormComponent
+              inputs={inputs}
+              submitAction={attemptLogin}
+              submitName="Login"
+              buttonClassName="submit-button"
+            ></FormComponent>
+            <p className="mt-3 text-center text-xs text-white">
               Don&apos;t have an account?{' '}
-              <a href="#" className="font-semibold leading-6">
+              <Link href="/signup" className="font-semibold leading-6">
                 Create a new account
-              </a>
+              </Link>
             </p>
-            <p className="mt-2 text-center text-sm text-white">
-              <a href="#" className="font-semibold leading-6">
-                Create a new account
-              </a>
+            <p className="mt-2 text-center text-xs text-white">
+              <Link href="/supplier" className="font-semibold">
+                Go to Supplier Portal
+              </Link>
             </p>
           </div>
         </div>
