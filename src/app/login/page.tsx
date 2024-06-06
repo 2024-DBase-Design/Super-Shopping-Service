@@ -9,7 +9,7 @@ import { ValidationRuleEnum } from '@/components/input/validationRules';
 import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import AUTH_CUSTOMER from '@/helpers/api';
+import { AUTH_CUSTOMER } from '@/helpers/api';
 
 const LoginPage = () => {
   const inputs: FormInput[] = [
@@ -34,7 +34,7 @@ const LoginPage = () => {
     try {
       const response = await fetch(AUTH_CUSTOMER, {
         // Modify the below stuff to match the postman API call
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
