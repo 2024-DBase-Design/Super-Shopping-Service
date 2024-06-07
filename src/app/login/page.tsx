@@ -9,7 +9,7 @@ import { ValidationRuleEnum } from '@/components/input/validationRules';
 import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { HttpMethod, EntityType, buildLoginUrl} from '@/helpers/api';
+import { HttpMethod, EntityType, buildLoginUrl } from '@/helpers/api';
 
 const LoginPage = () => {
   const inputs: FormInput[] = [

@@ -68,7 +68,7 @@ export function buildTwoEntityUrl(
   entity2: EntityType,
   id2?: number
 ): string {
-  let baseUrl: string = buildOneEntityUrl(method, entity1, id1);
+  const baseUrl: string = buildOneEntityUrl(method, entity1, id1);
   switch (method) {
     case HttpMethod.GET:
       if (!id2) {
