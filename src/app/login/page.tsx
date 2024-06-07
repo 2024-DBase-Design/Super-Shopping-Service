@@ -9,7 +9,7 @@ import { ValidationRuleEnum } from '@/components/input/validationRules';
 import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { AUTH_CUSTOMER } from '@/helpers/api';
+import { HttpMethod, EntityType, buildLoginUrl} from '@/helpers/api';
 
 const LoginPage = () => {
   const inputs: FormInput[] = [
@@ -32,7 +32,7 @@ const LoginPage = () => {
 
   const attemptLogin = async (formValues: FormValues) => {
     try {
-      const response = await fetch(AUTH_CUSTOMER, {
+      const response = await fetch(buildLoginUrl(EntityType.CUSTOMER), {
         // Modify the below stuff to match the postman API call
         method: 'POST',
         headers: {
