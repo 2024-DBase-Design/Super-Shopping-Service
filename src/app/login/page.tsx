@@ -39,8 +39,8 @@ const LoginPage = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: formValues.getValue('email'),
-          password: formValues.getValue('password')
+          email: formValues.getValue('Email Address'),
+          password: formValues.getValue('Password')
         })
       });
 

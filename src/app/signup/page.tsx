@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 import { FormValues } from '@/helpers/formValues';
+import { EntityType, HttpMethod, buildOneEntityUrl } from '@/helpers/api';
 
 const SignUpPage = () => {
   const inputs: FormInput[] = [
@@ -52,15 +53,21 @@ const SignUpPage = () => {
 
   const attemptSignup = async (formValues: FormValues) => {
     try {
-      const response = await fetch('YOUR_API_ENDPOINT', {
+      const fullName = formValues.getValue('Name');
+      const nameParts = fullName.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' '); // In case of multiple parts for last name
+
+      const response = await fetch(buildOneEntityUrl(HttpMethod.POST, EntityType.CUSTOMER), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: formValues.getValue('name'),
-          email: formValues.getValue('email'),
-          password: formValues.getValue('password')
+          firstName: firstName,
+          lastName: lastName,
+          email: formValues.getValue('Email Address'),
+          password: formValues.getValue('Password')
         })
       });
 
