@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
+
 import authRoutes from './routes/authRoutes';
 import customerRoutes from './routes/customerRoutes';
 import staffRoutes from './routes/staffRoutes';
@@ -22,4 +23,4 @@ app.use('/staff', staffRoutes);
 // app.use('/suppliers', supplierRoutes);
 // app.use('/stock', stockRoutes);
 
-app.listen(port, () => console.log('REST API server ready at: http://localhost:' + port));
+app.listen(port, () => console.log(`REST API server ready at: http://localhost:${port}`));

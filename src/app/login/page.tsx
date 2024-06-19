@@ -10,7 +10,23 @@ import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import useClientSide from '@/hooks/useClientSide';
+
 const LoginPage = () => {
+  const router = useRouter();
+  const isClient = useClientSide();
+
+  useEffect(() => {
+    if (isClient) {
+      const token = window.localStorage.getItem('token');
+      if (token) {
+        router.push('/dashboard'); // or any authenticated route
+      }
+    }
+  }, [router, isClient]);
+
   const inputs: FormInput[] = [
     {
       name: 'Email Address',
