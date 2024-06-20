@@ -29,12 +29,10 @@ const SignUpPage = () => {
           if (decoded.role === 'customer') {
             // TODO: Change push to customer home page once it is written
             router.push('/home');
-          }
-          else if (decoded.role === 'staff') {
+          } else if (decoded.role === 'staff') {
             // TODO: Change push to staff home page once it is written
             router.push('/home');
-          }
-          else {
+          } else {
             throw new Error('Invalid role');
           }
         } catch (error) {
@@ -44,7 +42,7 @@ const SignUpPage = () => {
       }
     }
   }, [router, isClient]);
-  
+
   const inputs: FormInput[] = [
     {
       name: 'Name',
@@ -110,30 +108,26 @@ const SignUpPage = () => {
       }
 
       // Handle successful API call, push to correct home page (same as useEffect code above)
-      useEffect(() => {
-        if (isClient) {
-          const token = window.localStorage.getItem('token');
-          if (token) {
-            try {
-              const decoded = jwtDecode<DecodedToken>(token);
-              if (decoded.role === 'customer') {
-                // TODO: Change push to customer home page once it is written
-                router.push('/home');
-              }
-              else if (decoded.role === 'staff') {
-                // TODO: Change push to staff home page once it is written
-                router.push('/home');
-              }
-              else {
-                throw new Error('Invalid role');
-              }
-            } catch (error) {
-              window.localStorage.removeItem('token');
-              router.push('/login');
+      if (isClient) {
+        const token = window.localStorage.getItem('token');
+        if (token) {
+          try {
+            const decoded = jwtDecode<DecodedToken>(token);
+            if (decoded.role === 'customer') {
+              // TODO: Change push to customer home page once it is written
+              router.push('/home');
+            } else if (decoded.role === 'staff') {
+              // TODO: Change push to staff home page once it is written
+              router.push('/home');
+            } else {
+              throw new Error('Invalid role');
             }
+          } catch (error) {
+            window.localStorage.removeItem('token');
+            router.push('/login');
           }
         }
-      }, [router, isClient]);
+      }
 
       console.log('API call successful');
     } catch (error) {
