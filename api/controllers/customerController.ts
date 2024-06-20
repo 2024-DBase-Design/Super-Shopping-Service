@@ -16,8 +16,8 @@ interface ShoppingCartItem {
  */
 export const createCustomer = async (req: Request, res: Response) => {
   try {
-    const customer = await registerCustomer(req);
-    res.status(201).json(customer);
+    const customer_token = await registerCustomer(req);
+    res.status(201).json(customer_token);
   } catch (error) {
     console.error('Error creating customer:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -463,59 +463,60 @@ export const removeCartItem = async (req: Request, res: Response) => {
 //  * @param req Express request object.
 //  * @param res Express response object.
 //  */
-// export const submitOrder = async (req: Request, res: Response) => {
-//   try {
-//     const { customerId } = req.params;
-//     const { cardId, deliveryPlan } = req.body;
+export const submitOrder = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.params;
+    const { cardId, deliveryPlan } = req.body;
 
-//     const customer = await Customer.findByPk(customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
+    const customer = await prisma.customer.findUnique({
+      where: { id: Number(customerId) }
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
 
-//     // Validate the card used
-//     const cardUsed = await CreditCard.findOne({
-//       where: { id: cardId, customerId: customerId }
-//     });
-//     if (!cardUsed) {
-//       return res.status(400).json({ error: 'Invalid card used' });
-//     }
+    // Validate the card used
+    const cardUsed = await prisma.creditCard.findUnique({
+      where: { id: cardId, customerId: customer.id }
+    });
+    if (!cardUsed) {
+      return res.status(400).json({ error: 'Invalid card used' });
+    }
 
-//     const items: ShoppingCartItem[] = customer.cart.map((item) => {
-//       const { product, quantity } = item;
-//       const newItem: ShoppingCartItem = { productId: product.id, quantity };
-//       return newItem;
-//     });
+    const items: ShoppingCartItem[] = customer.cart as unknown as ShoppingCartItem[];
 
-//     items.forEach(async (item) => {
-//       const product = await Product.findByPk(item.productId);
-//       if (!product) {
-//         return res.status(404).json({ error: 'Cart product not found' });
-//       }
+    items.forEach(async (item) => {
+      const product = await prisma.product.findUnique({
+        where: { id: item.product.id }
+      });
+      if (!product) {
+        return res.status(404).json({ error: 'Cart product not found' });
+      }
 
-//       customer.balance += item.quantity * product.price;
-//     });
+      customer.balance += item.quantity * product.price;
+    });
 
-//     customer.changed('balance', true);
+    const order = await prisma.order.create({
+      data: {
+        customerId: customer.id,
+        status: 'ISSUED',
+        items: customer.cart as unknown as Prisma.JsonArray,
+        cardUsed: cardUsed.id,
+        deliveryPlan
+      }
+    });
 
-//     const order = await Order.create({
-//       id: generateUniqueId(),
-//       customerId,
-//       items,
-//       status: OrderStatus.ISSUED,
-//       cardUsed,
-//       deliveryPlan
-//     });
+    await prisma.customer.update({
+      where: { id: customer.id },
+      data: { cart: [], balance: customer.balance }
+    });
 
-//     customer.cart = [];
-//     customer.changed('cart', true);
-//     await customer.save();
-//     res.status(201).json(order);
-//   } catch (error) {
-//     console.error('Error submitting order:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+    res.status(201).json(order);
+  } catch (error) {
+    console.error('Error submitting order:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
 // /**
 //  * Generate a unique order ID.
