@@ -17,7 +17,13 @@ export const registerCustomer = async (data: Request) => {
       cart: {}
     }
   });
-  return customer;
+  const token = jwt.sign(
+    { id: customer.id, email: customer.email, role: 'customer' },
+    process.env.ACCESS_TOKEN_SECRET as string,
+    { expiresIn: '1h' }
+  );
+
+  return token;
 };
 
 /**
@@ -33,7 +39,13 @@ export const registerStaff = async (data: Request) => {
       password: await hashPassword(data.body.password)
     }
   });
-  return staff;
+  const token = jwt.sign(
+    { id: staff.id, email: staff.email, role: 'staff' },
+    process.env.ACCESS_TOKEN_SECRET as string,
+    { expiresIn: '1h' }
+  );
+
+  return token;
 };
 
 /**
