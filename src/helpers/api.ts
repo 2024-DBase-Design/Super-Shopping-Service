@@ -21,17 +21,7 @@ export enum EntityType {
 
 // API URL
 export const API_URL: string = 'http://localhost:3000/api/';
-
-export function buildLoginUrl(entity: EntityType): string {
-  if (
-    entity !== EntityType.CUSTOMER &&
-    entity !== EntityType.STAFF &&
-    entity !== EntityType.SUPPLIER
-  ) {
-    throw new Error('Invalid entity for login');
-  }
-  return `${API_URL}auth/${entity}`;
-}
+export const LOGIN_URL: string = `${API_URL}auth/login`;
 
 // Build URL for API calls
 // Can build URLs of form: API_URL/entity, API_URL/entity/id

@@ -9,21 +9,40 @@ import { ValidationRuleEnum } from '@/components/input/validationRules';
 import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { HttpMethod, EntityType, buildLoginUrl } from '@/helpers/api';
+import { HttpMethod, EntityType, LOGIN_URL } from '@/helpers/api';
+import { jwtDecode } from 'jwt-decode';
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import useClientSide from '@/hooks/useClientSide';
+import { DecodedToken } from '@/hooks/useRoleAuth';
 
 const LoginPage = () => {
   const router = useRouter();
   const isClient = useClientSide();
 
+  // Route Guarding for logged in users (on page load, check if user is already logged in and redirect to correct home page if so)
   useEffect(() => {
     if (isClient) {
       const token = window.localStorage.getItem('token');
       if (token) {
-        router.push('/dashboard'); // or any authenticated route
+        try {
+          const decoded = jwtDecode<DecodedToken>(token);
+          if (decoded.role === 'customer') {
+            // TODO: Change push to customer home page once it is written
+            router.push('/home');
+          }
+          else if (decoded.role === 'staff') {
+            // TODO: Change push to staff home page once it is written
+            router.push('/home');
+          }
+          else {
+            throw new Error('Invalid role');
+          }
+        } catch (error) {
+          window.localStorage.removeItem('token');
+          router.push('/login');
+        }
       }
     }
   }, [router, isClient]);
@@ -48,8 +67,8 @@ const LoginPage = () => {
 
   const attemptLogin = async (formValues: FormValues) => {
     try {
-      const response = await fetch(buildLoginUrl(EntityType.CUSTOMER), {
-        // Modify the below stuff to match the postman API call
+      // Send login request to API (common Login URL now)
+      const response = await fetch(LOGIN_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -64,7 +83,32 @@ const LoginPage = () => {
         throw new Error('Network response was not ok');
       }
 
-      // Handle successful API call, like storing cookies
+      //Handle successful API call, push to correct home page (same as useEffect code above)
+      useEffect(() => {
+        if (isClient) {
+          const token = window.localStorage.getItem('token');
+          if (token) {
+            try {
+              const decoded = jwtDecode<DecodedToken>(token);
+              if (decoded.role === 'customer') {
+                // TODO: Change push to customer home page once it is written
+                router.push('/home');
+              }
+              else if (decoded.role === 'staff') {
+                // TODO: Change push to staff home page once it is written
+                router.push('/home');
+              }
+              else {
+                throw new Error('Invalid role');
+              }
+            } catch (error) {
+              window.localStorage.removeItem('token');
+              router.push('/login');
+            }
+          }
+        }
+      }, [router, isClient]);
+
       console.log('API call successful');
     } catch (error) {
       console.error('There has been a problem with your fetch operation:', error);

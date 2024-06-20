@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import useClientSide from './useClientSide';
 
-interface DecodedToken {
+export interface DecodedToken {
   id: number;
   email: string;
   role: string;

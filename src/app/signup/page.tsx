@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import '@/styles/noSession.scss';
 import styles from './signup.module.scss';
 import { shrikhand } from '../fonts';
@@ -10,8 +10,41 @@ import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 import { FormValues } from '@/helpers/formValues';
 import { EntityType, HttpMethod, buildOneEntityUrl } from '@/helpers/api';
+import { useRouter } from 'next/router';
+import useClientSide from '@/hooks/useClientSide';
+import { jwtDecode } from 'jwt-decode';
+import { DecodedToken } from '@/hooks/useRoleAuth';
 
 const SignUpPage = () => {
+  const router = useRouter();
+  const isClient = useClientSide();
+
+  // Route Guarding for logged in users (on page load, check if user is already logged in and redirect to correct home page if so)
+  useEffect(() => {
+    if (isClient) {
+      const token = window.localStorage.getItem('token');
+      if (token) {
+        try {
+          const decoded = jwtDecode<DecodedToken>(token);
+          if (decoded.role === 'customer') {
+            // TODO: Change push to customer home page once it is written
+            router.push('/home');
+          }
+          else if (decoded.role === 'staff') {
+            // TODO: Change push to staff home page once it is written
+            router.push('/home');
+          }
+          else {
+            throw new Error('Invalid role');
+          }
+        } catch (error) {
+          window.localStorage.removeItem('token');
+          router.push('/login');
+        }
+      }
+    }
+  }, [router, isClient]);
+  
   const inputs: FormInput[] = [
     {
       name: 'Name',
@@ -58,6 +91,7 @@ const SignUpPage = () => {
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' '); // In case of multiple parts for last name
 
+      // Send create request to API (customer specific URL)
       const response = await fetch(buildOneEntityUrl(HttpMethod.POST, EntityType.CUSTOMER), {
         method: 'POST',
         headers: {
@@ -75,7 +109,32 @@ const SignUpPage = () => {
         throw new Error('Network response was not ok');
       }
 
-      // Handle successful API call, like storing cookies
+      // Handle successful API call, push to correct home page (same as useEffect code above)
+      useEffect(() => {
+        if (isClient) {
+          const token = window.localStorage.getItem('token');
+          if (token) {
+            try {
+              const decoded = jwtDecode<DecodedToken>(token);
+              if (decoded.role === 'customer') {
+                // TODO: Change push to customer home page once it is written
+                router.push('/home');
+              }
+              else if (decoded.role === 'staff') {
+                // TODO: Change push to staff home page once it is written
+                router.push('/home');
+              }
+              else {
+                throw new Error('Invalid role');
+              }
+            } catch (error) {
+              window.localStorage.removeItem('token');
+              router.push('/login');
+            }
+          }
+        }
+      }, [router, isClient]);
+
       console.log('API call successful');
     } catch (error) {
       console.error('There has been a problem with your fetch operation:', error);
