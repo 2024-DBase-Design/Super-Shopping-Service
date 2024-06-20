@@ -519,27 +519,84 @@ export const submitOrder = async (req: Request, res: Response) => {
 };
 
 // /**
-//  * Generate a unique order ID.
-//  *
-//  * @returns A unique order ID.
-//  */
-// const generateUniqueId = (): string => {
-//   return randomUUID();
-// };
-
-// /**
 //  * Get a customer's orders.
 //  *
 //  * @param req Express request object.
 //  * @param res Express response object.
 //  */
-// export const getOrders = async (req: Request, res: Response) => {
-//   try {
-//     const { customerId } = req.params;
-//     const orders = await Order.findAll({ where: { customerId } });
-//     res.json(orders);
-//   } catch (error) {
-//     console.error('Error fetching orders:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+export const getOrders = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.params;
+    const orders = await prisma.order.findMany({
+      where: { customerId: Number(customerId) }
+    });
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Get a customer's order details.
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+export const getOrderDetails = async (req: Request, res: Response) => {
+  try {
+    const { customerId, orderId } = req.params;
+    const order = await prisma.order.findUnique({
+      where: { id: String(orderId), customerId: Number(customerId) }
+    });
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    res.json(order);
+  } catch (error) {
+    console.error('Error fetching order:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Update a customer's order status.
+ *
+ * @param req
+ * @param res
+ */
+export const updateOrderStatus = async (req: Request, res: Response) => {
+  try {
+    const { customerId, orderId } = req.params;
+    const { status } = req.body;
+
+    const order = await prisma.order.update({
+      where: { id: String(orderId), customerId: Number(customerId) },
+      data: { status }
+    });
+    res.json(order);
+  } catch (error) {
+    console.error('Error updating order status:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Delete a customer's order.
+ *
+ * @param req
+ * @param res
+ */
+export const cancelOrder = async (req: Request, res: Response) => {
+  try {
+    const { customerId, orderId } = req.params;
+    await prisma.order.delete({
+      where: { id: String(orderId), customerId: Number(customerId) }
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting order:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
