@@ -10,7 +10,7 @@ import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 import { FormValues } from '@/helpers/formValues';
 import { EntityType, HttpMethod, buildOneEntityUrl } from '@/helpers/api';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import useClientSide from '@/hooks/useClientSide';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
