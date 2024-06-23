@@ -18,12 +18,15 @@ router.get('/:customerId/addresses', customerController.getAddresses);
 router.put('/:customerId/addresses/:addressId', customerController.updateAddress);
 router.delete('/:customerId/addresses/:addressId', customerController.deleteAddress);
 
-// router.post('/:customerId/cart', customerController.addToCart);
-// router.get('/:customerId/cart', customerController.getCartItems);
-// router.put('/:customerId/cart/:itemId', customerController.updateCartItem);
-// router.delete('/:customerId/cart/:itemId', customerController.removeCartItem);
+router.post('/:customerId/cart', customerController.addToCart);
+router.get('/:customerId/cart', customerController.getCartItems);
+router.put('/:customerId/cart/:itemId', customerController.updateCartItem);
+router.delete('/:customerId/cart/:itemId', customerController.removeCartItem);
 
-// router.post('/:customerId/orders', customerController.submitOrder);
-// router.get('/:customerId/orders', customerController.getOrders);
+router.post('/:customerId/orders', customerController.submitOrder);
+router.get('/:customerId/orders', customerController.getOrders);
+router.get('/:customerId/orders/:orderId', customerController.getOrderDetails);
+router.post('/:customerId/orders/:orderId', customerController.updateOrderStatus);
+router.delete('/:customerId/orders/:orderId', customerController.cancelOrder);
 
 export default router;
