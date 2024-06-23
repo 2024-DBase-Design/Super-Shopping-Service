@@ -109,6 +109,8 @@ const SignUpPage = () => {
 
       // Handle successful API call, push to correct home page (same as useEffect code above)
       if (isClient) {
+        window.localStorage.setItem('token', await response.text());
+
         const token = window.localStorage.getItem('token');
         if (token) {
           try {
