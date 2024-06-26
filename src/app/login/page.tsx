@@ -82,7 +82,7 @@ const LoginPage = () => {
               </Link>
             </p>
             <p className="mt-2 text-center text-xs text-white">
-              <Link href="/supplier" className="font-semibold">
+              <Link href="/supplier/login" className="font-semibold">
                 Go to Supplier Portal
               </Link>
             </p>
