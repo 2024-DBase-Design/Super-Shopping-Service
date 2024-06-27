@@ -67,12 +67,6 @@ Before you begin, ensure you have met the following requirements:
 
    - To access the API, use the following URL: http://localhost:3000/api/:path.
 
-3. **Start the electron app**:
-
-   ```bash
-   npm run electron
-   ```
-
 ## Postman Collection
 
 For easy testing and integration, we have created a Postman collection that includes all the API endpoints available in this service. You can access the collection using the following public link:
