@@ -29,13 +29,21 @@ Before you begin, ensure you have met the following requirements:
    ```
 
 2. **Set up environment variables**:
-   - Create a .env file in the root of the project and add the following environment variables:
+
+   - Create a .env file in the root of the project and add the following:
      ```dotenv
-     DB_HOST=db
-     DB_USER=sssadmin
-     DB_PASSWORD=ssspassword
-     DB_NAME=supershoppingservice
+     # Environment variables declared in this file are automatically made available to Prisma.
+     # See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema
+
+     # Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
+     # See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+     DATABASE_URL="postgresql://sssadmin:ssspassword@postgres:5432/supershoppingservice?schema=public"
+
+     # DATABASE_URL="postgresql://sssadmin:ssspassword@localhost:5432/supershoppingservice?schema=public" # DATABASE_URL_DEV
+
+     ACCESS_TOKEN_SECRET="supersecret"
      ```
+
    - Install Node Packages:
      ```bash
      npm install
@@ -50,6 +58,7 @@ Before you begin, ensure you have met the following requirements:
    ```
 
    - To develop NEXT.js, only run the following command:
+
      ```bash
      npm run dev
      ```
@@ -57,11 +66,6 @@ Before you begin, ensure you have met the following requirements:
 2. **The application should now be running at http://localhost:3000.**
 
    - To access the API, use the following URL: http://localhost:3000/api/:path.
-
-3. **Start the electron app**:
-   ```bash
-   npm run electron
-   ```
 
 ## Postman Collection
 
@@ -93,9 +97,11 @@ For easy testing and integration, we have created a Postman collection that incl
 
    - Change the prisma schema db url from DATABASE_URL to DATABASE_URL_DEV.
    - Run the following command to create a new migration:
+
      ```bash
      npx prisma migrate dev --name <migration-name>
      ```
+     
    - Change the prisma schema db url back from DATABASE_URL_DEV to DATABASE_URL.
 
 ## Scripts
