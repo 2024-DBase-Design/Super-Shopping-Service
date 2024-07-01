@@ -1,6 +1,5 @@
 import { prisma } from '../index';
 import { Request, Response } from 'express';
-import { registerCustomer } from './authController';
 import { Prisma, Product } from '@prisma/client';
 
 /**

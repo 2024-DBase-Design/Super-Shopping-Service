@@ -36,7 +36,8 @@ export const getCustomerDetails = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     res.json(customer);
   } catch (error) {
@@ -58,7 +59,8 @@ export const updateCustomerDetails = async (req: Request, res: Response) => {
       data: req.body
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     res.json(customer);
   } catch (error) {
@@ -79,7 +81,8 @@ export const deleteCustomerAccount = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     res.status(204).send();
   } catch (error) {
@@ -100,18 +103,21 @@ export const addCreditCard = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
 
     const { cardNumber, expiryDate, cvv, billingAddress } = req.body;
     let { billingAddressId } = req.body;
 
     if (!billingAddressId && !billingAddress) {
-      return res.status(400).json({ error: 'Billing address ID or details required' });
+      res.status(400).json({ error: 'Billing address ID or details required' });
+      return;
     }
 
     if (billingAddressId && billingAddress) {
-      return res.status(400).json({ error: 'Provide either billing address ID or details' });
+      res.status(400).json({ error: 'Provide either billing address ID or details' });
+      return;
     }
 
     if (!billingAddressId) {
@@ -149,7 +155,8 @@ export const getCreditCards = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const creditCards = await prisma.creditCard.findMany({
       where: { customerId: customer.id }
@@ -173,14 +180,16 @@ export const updateCreditCard = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const creditCard = await prisma.creditCard.update({
       where: { id: Number(req.params.cardId), customerId: customer.id },
       data: req.body
     });
     if (!creditCard) {
-      return res.status(404).json({ error: 'Credit card not found' });
+      res.status(404).json({ error: 'Credit card not found' });
+      return;
     }
     res.json(creditCard);
   } catch (error) {
@@ -201,13 +210,15 @@ export const deleteCreditCard = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const creditCard = await prisma.creditCard.delete({
       where: { id: Number(req.params.cardId), customerId: customer.id }
     });
     if (!creditCard) {
-      return res.status(404).json({ error: 'Credit card not found' });
+      res.status(404).json({ error: 'Credit card not found' });
+      return;
     }
     res.status(204).send();
   } catch (error) {
@@ -228,7 +239,8 @@ export const addAddress = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const newAddress = await prisma.address.create({
       data: { ...req.body, customerId: customer.id }
@@ -252,13 +264,15 @@ export const getAddresses = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const addresses = await prisma.address.findMany({
       where: { customerId: customer.id }
     });
     if (!addresses) {
-      return res.status(404).json({ error: 'Addresses not found' });
+      res.status(404).json({ error: 'Addresses not found' });
+      return;
     }
     res.json(addresses);
   } catch (error) {
@@ -279,14 +293,16 @@ export const updateAddress = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const address = await prisma.address.update({
       where: { id: Number(req.params.addressId), customerId: customer.id },
       data: req.body
     });
     if (!address) {
-      return res.status(404).json({ error: 'Address not found' });
+      res.status(404).json({ error: 'Address not found' });
+      return;
     }
     res.json(address);
   } catch (error) {
