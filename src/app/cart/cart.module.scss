@@ -1,0 +1,14 @@
+.cartItems{
+    padding: 1em;
+    padding-top: 0;
+}
+
+.cartItem{
+    display: flex;
+    padding: 1em;
+    padding-left: 0;
+    img{
+        border-radius: 1em;
+        border: solid var(--blue);
+    }
+}

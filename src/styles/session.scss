@@ -1,0 +1,19 @@
+h1{
+    color: var(--blue);
+    font-family: Roboto;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.money{
+    color: var(--blue);
+}
+.money::before{
+    content: '$';
+}
+
+.main-body{
+    padding: 2em;
+    background-color: white;
+}
+
