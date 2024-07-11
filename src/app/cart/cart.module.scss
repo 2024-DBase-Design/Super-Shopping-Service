@@ -4,11 +4,36 @@
 }
 
 .cartItem{
+    position: relative;
     display: flex;
     padding: 1em;
     padding-left: 0;
     img{
         border-radius: 1em;
-        border: solid var(--blue);
+        border: .25em solid var(--blue);
     }
+    div{
+        padding-top: .5em;
+        padding-left: 1em;
+    }
+    .overlayText{
+        display: table;
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
+        text-align: center;
+        color: white;
+        width: 100%;
+        padding: 0;
+        height: 100%;
+        font-size: 2em;
+        span{
+            display: table-cell;
+            vertical-align: middle;
+        }
+    }
+}
+
+.darkFilter img{
+    filter: brightness(75%);
 }

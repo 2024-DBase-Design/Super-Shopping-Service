@@ -10,7 +10,7 @@ export const BrandHeaderComponent: React.FC<object> = () => {
         &#x200B;
         <LogoComponent className={'mx-auto h-11 w-auto ' + styles.brandHeaderLogo} />
       </div>
-      <h1 className={shrikhand.className + ' ' + styles.brandHeaderH1}>Silly Stuffs</h1>
+      <h1 className={shrikhand.className + ' ' + styles.brandHeaderH1 + ' ' + styles.name}>Silly Stuffs</h1>
     </div>
   );
 };

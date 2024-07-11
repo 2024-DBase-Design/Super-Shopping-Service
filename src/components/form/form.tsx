@@ -5,7 +5,7 @@ import React from 'react';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TextInputComponent from '../input/textInput';
 import { formIsValidName, FormValues } from '@/helpers/formValues';
-import DropDownInputComponent from '../input/dropdownInput';
+import DropDownInputComponent, { FormHydration } from '../input/dropdownInput';
 import AddressInputComponent from '../input/addressInput';
 import { ValidationRuleType } from '../input/validationRules';
 
@@ -15,6 +15,7 @@ export type FormInput = {
   className?: string;
   inputType?: string;
   defaultValue?: any;
+  options?: FormHydration[];
   validationRuleNames?: ValidationRuleType[];
   manualValidate?: ClientEventEmitter;
 };
@@ -73,7 +74,7 @@ const FormComponent: React.FC<{
               {input.inputType === InputTypeEnum.DropDown ? (
                 <DropDownInputComponent
                   name={input.name}
-                  options={[]}
+                  options={input.options ?? [{label:'', value:''}]}
                   formValues={formValues}
                   validationRuleNames={input.validationRuleNames}
                   onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
@@ -99,7 +100,7 @@ const FormComponent: React.FC<{
           ))}
           <button
             type="submit"
-            className={`${buttonClassName} flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600`}
+            className={`${buttonClassName} flex mt-8 center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600`}
             style={{ opacity: formValues.getValidity(formIsValidName) ? 1 : 0.5 }}
           >
             {submitName}
