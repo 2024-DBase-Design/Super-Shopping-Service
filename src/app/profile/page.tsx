@@ -116,7 +116,7 @@ export default function Page() {
     let tempCreditCards: EditableListItem[] = []
     let tempAddresses: EditableListItem[] = []
     res.creditCards.forEach(c => {
-      tempCreditCards.push({displayName: c.cardNumber, 
+      tempCreditCards.push({displayName: c.cardNumber.replace(/\d(?=(?:\D*\d){4})/g, "•"), 
         editFormInputs: GeneratePrefilledCreditCardForm(c)})
     })
     res.addresses.forEach(a => {
@@ -128,6 +128,21 @@ export default function Page() {
     setCreditCards(tempCreditCards);
     setAddresses(tempAddresses);
   });
+
+  // make appropriate api calls here
+  creditCardEmitter.on("addNew", (formData: FormData)=>{
+
+  })
+  creditCardEmitter.on("edit", (formData: FormData)=>{
+
+  })
+  
+  addressEmitter.on("addNew", (formData: FormData)=>{
+
+  })
+  addressEmitter.on("edit", (formData: FormData)=>{
+
+  })
 
   return (
     <div className={styles.profile}>
@@ -141,10 +156,14 @@ export default function Page() {
         <h4 className={styles.money + " money"}>{values.customer.balance}</h4>
         <br></br>
         <h1>Credit Cards</h1>
-        <EditableListComponent list={creditCards} eventEmitter={creditCardEmitter}></EditableListComponent>
+        <div className='ml-4'>
+          <EditableListComponent list={creditCards} name="Credit Card" eventEmitter={creditCardEmitter}></EditableListComponent>
+        </div>
         <br></br>
-        <h1>Addresses</h1>
-        <EditableListComponent list={addresses} eventEmitter={addressEmitter}></EditableListComponent>
+        <h1>Delivery Addresses</h1>
+        <div className='ml-4'>
+          <EditableListComponent list={addresses} name="Delivery Address" eventEmitter={addressEmitter}></EditableListComponent>
+        </div>
       </div>
       <p style={{position: "fixed", bottom: "0"}}>Imagine a footer is here</p>
     </div>
