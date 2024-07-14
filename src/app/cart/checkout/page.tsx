@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { getCart, CartItem } from '../page';
 import styles from '../cart.module.scss'
 import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
@@ -38,13 +38,19 @@ function getDeliveryAddressOptions(): FormHydration[]{
 }
 
 export default function Page() {
-  const cart: CartItem[] = getCart()
+  const tsBs: CartItem[] = [];
+  const [cart, setCart] = useState(tsBs);
   const payments: FormHydration[] = getPaymentOptions();
   const testAddresses: FormHydration[] = getDeliveryAddressOptions();
-  const total: number = calculateCost(cart);
-  const miniCart = cart.length >= 3 ? cart.slice(0, 3) : cart.slice(cart.length);
+  let total: number = 0;
+  let miniCart: CartItem[] = [];
   let i = 0;
-  if(cart.length > 3) i++;
+  
+  getCart().then(res => {setCart(res)
+    total = calculateCost(res);
+    miniCart = cart.length >= 3 ? cart.slice(0, 3) : cart.slice(cart.length);
+    if(cart.length > 3) i++;
+  });
 
   
   const inputs: FormInput[] = [

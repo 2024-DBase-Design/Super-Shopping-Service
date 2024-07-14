@@ -1,4 +1,6 @@
-import React from 'react';
+'use client'
+
+import React, { useState } from 'react';
 import '@/styles/session.scss';
 import styles from './cart.module.scss'
 import { CartIconComponent } from '@/components/svgs/cart';
@@ -33,14 +35,17 @@ const testCart: CartItem[] = [
   }
 ]
 
-export function getCart(): CartItem[]{
+export async function getCart(): Promise<CartItem[]>{
   // make an api call that gets the customer's current cart
   //should append data:image/png;base64, to base64url
   return testCart;
 }
 
 export default function Page() {
-  const cart = getCart();
+  const tsBs: CartItem[] = [];
+  const [cart, setCart] = useState(tsBs);
+  getCart().then(res => setCart(res));
+  
   return <><div style={{backgroundColor: "grey"}}>Imagine the header is here</div>
   <div className='main-body'>
     <h1>In Cart</h1>
