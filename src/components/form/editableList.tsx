@@ -25,16 +25,24 @@ export const EditableListComponent: React.FC<{
   const EditItem = () => {
     currentAction = "Edit"
     setShowPopup(true)
+    console.log(currentAction);
   }
 
   const DeleteItem = () => {
     currentAction = "Delete"
-    setShowPopup(true)
+    //setShowPopup(true)
+    console.log(currentAction);
+  }
+
+  const AddNew = () => {
+    currentAction = "Add New"
+    //setShowPopup(true)
+    console.log(currentAction);
   }
 
   return(
       <div>
-        {list.map((listItem) => (<div className="flex justify-end min-h-8 mb-2 items-center" key={listItem.displayName}>
+        {list.map((listItem) => (<div className="flex justify-end min-h-8 mb-2 items-center">
           <p className="flex-auto whitespace-pre">{listItem.displayName}</p>
           <div onClick={EditItem}>
             <EditIconComponent fillColor="#00acbb" className="ml-4"></EditIconComponent>
@@ -43,9 +51,10 @@ export const EditableListComponent: React.FC<{
             <DeleteIconComponent fillColor="#c76e77" className="ml-4"></DeleteIconComponent>
           </div>
           </div>))}
-        <button className="p-2 pl-4 pr-4 text-base mt-2">+ Add New {name}</button>
-        {//showPopup && <PopUpComponent header={`${currentAction} ${name}`} content={undefined} buttons={["Save"]} eventEmitter={eventEmitter} />
-        }
+        <button onClick={AddNew} className="p-2 pl-4 pr-4 text-base mt-2">+ Add New {name}</button>
+        <div>{ 
+          showPopup && <PopUpComponent header={`${currentAction} ${name}`} content={undefined} buttons={["save"]} eventEmitter={eventEmitter}></PopUpComponent>  
+        }</div>
       </div>
   )
 }
