@@ -10,8 +10,41 @@ import { FormValues } from '@/helpers/formValues';
 import { shrikhand, sintony } from '@/app/fonts';
 import { SupplierLogoComponent } from '@/components/svgs/supplier-logo';
 import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import useClientSide from '@/hooks/useClientSide';
+import { DecodedToken } from '@/hooks/useRoleAuth';
+import { jwtDecode } from 'jwt-decode';
+import { LOGIN_URL } from '@/helpers/api';
 
 export default function SupplierLoginPage() {
+  const router = useRouter();
+  const isClient = useClientSide();
+
+  // Route Guarding for logged in users (on page load, check if user is already logged in and redirect to correct home page if so)
+  useEffect(() => {
+    if (isClient) {
+      const token = window.localStorage.getItem('token');
+      if (token) {
+        try {
+          const decoded = jwtDecode<DecodedToken>(token);
+          if (decoded.role === 'customer') {
+            // TODO: Change push to customer home page once it is written
+            router.push('/home');
+          } else if (decoded.role === 'staff') {
+            // TODO: Change push to staff home page once it is written
+            router.push('/home');
+          } else {
+            throw new Error('Invalid role');
+          }
+        } catch (error) {
+          window.localStorage.removeItem('token');
+          router.push('/login');
+        }
+      }
+    }
+  }, [router, isClient]);
+
   const inputs: FormInput[] = [
     {
       name: 'Name',
@@ -30,7 +63,50 @@ export default function SupplierLoginPage() {
   ];
 
   const attemptLogin = async (formValues: FormValues) => {
-    // not implemented
+    try {
+      // Send login request to API (common Login URL now)
+      const response = await fetch(LOGIN_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formValues.getValue('Email Address'),
+          password: formValues.getValue('Password')
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Handle successful API call, push to correct home page (same as useEffect code above)
+      if (isClient) {
+        const token = await response.text();
+        if (token) {
+          window.localStorage.setItem('token', token);
+          try {
+            const decoded = jwtDecode<DecodedToken>(token);
+            if (decoded.role === 'customer') {
+              // TODO: Change push to customer home page once it is written
+              router.push('/home');
+            } else if (decoded.role === 'staff') {
+              // TODO: Change push to staff home page once it is written
+              router.push('/home');
+            } else {
+              throw new Error('Invalid role');
+            }
+          } catch (error) {
+            window.localStorage.removeItem('token');
+            router.push('/login');
+          }
+        }
+      }
+
+      console.log('API call successful');
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
   };
   
   return (<div className={'main-container ' + styles.mainContainer}>
