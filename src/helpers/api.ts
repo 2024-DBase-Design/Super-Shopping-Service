@@ -1,3 +1,7 @@
+import { FormHydration } from "@/components/input/dropdownInput";
+
+export let lastCreditCardNumber: string = '';
+
 export enum HttpMethod {
   GET = 'GET',
   PUT = 'PUT',
@@ -80,4 +84,43 @@ export function buildTwoEntityUrl(
     default:
       throw new Error('Invalid method');
   }
+}
+
+
+const testPayments: FormHydration[] = [
+  {label: "•••••••••••1234", value:"0"},
+  {label: "•••••••••••4567", value:"1"},
+  {label: "•••••••••••1580", value:"2"}
+]
+
+async function getPaymentOptions(id: number): Promise<FormHydration[]>{
+  // build URL
+  const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CREDIT_CARD);
+  // Send GET request to API
+  const response = await fetch(LOGIN_URL, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  // Extract payments from response
+  const data = await response.json();
+  const options: FormHydration[] = data.map((payment: any) => {
+    return {label: payment.cardNumber, value: payment.id.toString()};
+  });
+
+  return options;
+}
+
+const testAddresses: FormHydration[] = [
+  {label: "123 Street Street, Cincinnati OH 12345", value:"0"},
+  {label: "456 Beep Boop, Cincinnati OH 67890", value:"1"}
+]
+function getDeliveryAddressOptions(): FormHydration[]{
+  return testAddresses;
 }

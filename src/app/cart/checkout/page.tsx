@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getCart, CartItem } from '../page';
 import styles from '../cart.module.scss'
 import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
@@ -8,6 +8,10 @@ import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form'
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
 import { FormHydration } from '@/components/input/dropdownInput';
+import { useRouter } from 'next/navigation';
+import useClientSide from '@/hooks/useClientSide';
+import { jwtDecode } from 'jwt-decode';
+import { DecodedToken } from '@/hooks/useRoleAuth';
 
 const checkout = async (formValues: FormValues) => {
   //api call that clears cart, creates an order, and changes balance
@@ -38,9 +42,31 @@ function getDeliveryAddressOptions(): FormHydration[]{
 }
 
 export default function Page() {
+  const router = useRouter();
+  const isClient = useClientSide();
+  const token = window.localStorage.getItem('token');
+
+  // Route Guarding for logged in users (on page load, check if user is logged in. If not, redirect to login page)
+  // Only allows customers to access this page
+  useEffect(() => {
+    if (isClient) {
+      if (token) {
+        try {
+          const decoded = jwtDecode<DecodedToken>(token);
+          if (decoded.role != 'customer') {
+            throw new Error('Invalid role');
+          }
+        } catch (error) {
+          window.localStorage.removeItem('token');
+          router.push('/login');
+        }
+      }
+    }
+  }, [router, isClient]);
+
   const tsBs: CartItem[] = [];
   const [cart, setCart] = useState(tsBs);
-  const payments: FormHydration[] = getPaymentOptions();
+  const payments: FormHydration[] = getPaymentOptions(decoded.id);
   const testAddresses: FormHydration[] = getDeliveryAddressOptions();
   let total: number = 0;
   let miniCart: CartItem[] = [];
@@ -51,7 +77,6 @@ export default function Page() {
     miniCart = cart.length >= 3 ? cart.slice(0, 3) : cart.slice(cart.length);
     if(cart.length > 3) i++;
   });
-
   
   const inputs: FormInput[] = [
     {
