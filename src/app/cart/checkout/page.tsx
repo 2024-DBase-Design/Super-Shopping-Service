@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getCart, CartItem } from '../page';
+import { CartItem } from '../page';
 import styles from '../cart.module.scss'
 import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import useClientSide from '@/hooks/useClientSide';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
+import { getCart, getDeliveryAddressOptions, getPaymentOptions } from '@/helpers/api';
 
 const checkout = async (formValues: FormValues) => {
   //api call that clears cart, creates an order, and changes balance
@@ -21,30 +22,11 @@ function calculateCost(cartItems: CartItem[]){
   return cartItems.reduce((total, item) => total += item.price, 0);
 }
 
-// TODO: extract the type and common api call functions below
-// to a .ts file in the helper/ directory
-const testPayments: FormHydration[] = [
-  {label: "•••••••••••1234", value:"0"},
-  {label: "•••••••••••4567", value:"1"},
-  {label: "•••••••••••1580", value:"2"}
-]
-function getPaymentOptions(): FormHydration[]{
-  // api call to make user payments
-  return testPayments;
-}
-
-const testAddresses: FormHydration[] = [
-  {label: "123 Street Street, Cincinnati OH 12345", value:"0"},
-  {label: "456 Beep Boop, Cincinnati OH 67890", value:"1"}
-]
-function getDeliveryAddressOptions(): FormHydration[]{
-  return testAddresses;
-}
-
 export default function Page() {
   const router = useRouter();
   const isClient = useClientSide();
   const token = window.localStorage.getItem('token');
+  let customerID: number = -1;
 
   // Route Guarding for logged in users (on page load, check if user is logged in. If not, redirect to login page)
   // Only allows customers to access this page
@@ -56,27 +38,36 @@ export default function Page() {
           if (decoded.role != 'customer') {
             throw new Error('Invalid role');
           }
+          customerID = decoded.id;
         } catch (error) {
           window.localStorage.removeItem('token');
           router.push('/login');
         }
       }
+      else {
+        router.push('/login');
+      }
     }
   }, [router, isClient]);
 
-  const tsBs: CartItem[] = [];
-  const [cart, setCart] = useState(tsBs);
-  const payments: FormHydration[] = getPaymentOptions(decoded.id);
-  const testAddresses: FormHydration[] = getDeliveryAddressOptions();
+  const tempItem: CartItem[] = [];
+  const [cart, setCart] = useState(tempItem);
+  const tempPayment: FormHydration[] = [];
+  const [payments, setPayments] = useState(tempPayment);
+  const tempAddr: FormHydration[] = [];
+  const [addresses, setAddresses] = useState(tempAddr);
+
   let total: number = 0;
   let miniCart: CartItem[] = [];
   let i = 0;
   
-  getCart().then(res => {setCart(res)
+  getCart(customerID).then(res => {setCart(res)
     total = calculateCost(res);
     miniCart = cart.length >= 3 ? cart.slice(0, 3) : cart.slice(cart.length);
     if(cart.length > 3) i++;
   });
+  getPaymentOptions(customerID).then(res => setPayments(res));
+  getDeliveryAddressOptions(customerID).then(res => setAddresses(res));
   
   const inputs: FormInput[] = [
     {
@@ -89,8 +80,8 @@ export default function Page() {
     {
       name: 'Delivery Address',
       inputType: InputTypeEnum.DropDown,
-      defaultValue: testAddresses[0].label,
-      options: testAddresses,
+      defaultValue: addresses[0].label,
+      options: addresses,
       validationRuleNames: [
         { type: ValidationRuleEnum.Required, args: 'Delivery address' }
       ]

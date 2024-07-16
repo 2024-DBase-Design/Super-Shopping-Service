@@ -1,3 +1,4 @@
+import { CartItem } from "@/app/cart/page";
 import { FormHydration } from "@/components/input/dropdownInput";
 
 export let lastCreditCardNumber: string = '';
@@ -86,14 +87,9 @@ export function buildTwoEntityUrl(
   }
 }
 
+// Customer API calls
 
-const testPayments: FormHydration[] = [
-  {label: "•••••••••••1234", value:"0"},
-  {label: "•••••••••••4567", value:"1"},
-  {label: "•••••••••••1580", value:"2"}
-]
-
-async function getPaymentOptions(id: number): Promise<FormHydration[]>{
+export async function getPaymentOptions(id: number): Promise<FormHydration[]>{
   // build URL
   const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CREDIT_CARD);
   // Send GET request to API
@@ -108,19 +104,68 @@ async function getPaymentOptions(id: number): Promise<FormHydration[]>{
   }
 
   // Handle successful API call
-  // Extract payments from response
   const data = await response.json();
   const options: FormHydration[] = data.map((payment: any) => {
-    return {label: payment.cardNumber, value: payment.id.toString()};
+    return { label: '••••••••••••' + payment.cardNumber.slice(-4), value: payment.id.toString() };
   });
 
   return options;
 }
 
-const testAddresses: FormHydration[] = [
-  {label: "123 Street Street, Cincinnati OH 12345", value:"0"},
-  {label: "456 Beep Boop, Cincinnati OH 67890", value:"1"}
-]
-function getDeliveryAddressOptions(): FormHydration[]{
-  return testAddresses;
+export async function getDeliveryAddressOptions(id: number): Promise<FormHydration[]> {
+  // Build URL
+  const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.ADDRESS);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const options: FormHydration[] = data.map((address: any) => {
+    return {
+      label: `${address.street}, ${address.city} ${address.state} ${address.zip}`,
+      value: address.id.toString()
+    };
+  });
+
+  return options;
+}
+
+export async function getCart(id: number): Promise<CartItem[]> {
+  // Build URL
+  const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CART);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const cart: CartItem[] = data.map((item: any) => {
+    return {
+      id: item.id,
+      name: item.name,
+      url: "data:image/png;base64," + item.url,
+      price: item.price,
+      quantity: item.quantity
+  }});
+
+  return cart;
 }
