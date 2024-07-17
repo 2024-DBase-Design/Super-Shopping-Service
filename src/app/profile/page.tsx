@@ -7,8 +7,7 @@ import '@/styles/session.scss';
 import { Address, CreditCard, Customer } from '@prisma/client';
 import { AddressTypeEnum } from '@/helpers/address';
 import { EditableListComponent, EditableListItem } from '@/components/form/editableList';
-import { creditCardFormDefault, GeneratePrefilledAddressForm, GeneratePrefilledCreditCardForm } from '@/components/form/defaultForms';
-import { FormInput } from '@/components/form/form';
+import { GeneratePrefilledAddressForm, GeneratePrefilledCreditCardForm } from '@/components/form/defaultForms';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 
 type CreditCardAndAddress = {
@@ -140,6 +139,7 @@ var testValues: ProfileValues = {
 
 async function getProfileValues(): Promise<ProfileValues>{
   //make api calls for a customer, their creditcards, and their delivery addresses
+  // add billing address information to the credit card object (see CreditCardAndAddress)
 
   return testValues;
 }
@@ -176,18 +176,25 @@ export default function Page() {
   }, [])
 
   // make appropriate api calls here
-  creditCardEmitter.on("addNew", (formData: FormData)=>{
-
-  })
   creditCardEmitter.on("edit", (formData: FormData)=>{
-
+    console.log(formData);
+  })
+  creditCardEmitter.on("delete", (id: number)=>{
+    // delete the credit card and its billing address!
+    console.log(id);
+  })
+  creditCardEmitter.on("addNew", (formData: FormData)=>{
+    console.log(formData);
   })
   
-  addressEmitter.on("addNew", (formData: FormData)=>{
-
-  })
   addressEmitter.on("edit", (formData: FormData)=>{
-
+    console.log(formData);
+  })
+  addressEmitter.on("delete", (id: number)=>{
+    console.log(id);
+  })
+  addressEmitter.on("addNew", (formData: FormData)=>{
+    console.log(formData);
   })
 
   return (

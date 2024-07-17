@@ -38,8 +38,10 @@ export const EditableListComponent: React.FC<{
 
   const DeleteItem = (item: EditableListItem) => {
     setCurrentAction("Delete " + name);
-    setContent(<div>You are about to delete the following:<br></br>{item.displayName}</div>)
-    setButtons(["Confirm"]);
+    setContent(<div><div>You are about to delete the following:<br></br>{item.displayName}</div><div className={"flex justify-center " + (buttons?.length === 0 ? "" : "mt-5")}>
+    <button onSubmit={() => eventEmitter.emit("delete", item.id)}>Confirm</button>
+  </div></div>)
+    setButtons([]);
     setShowPopup(true);
   }
 
