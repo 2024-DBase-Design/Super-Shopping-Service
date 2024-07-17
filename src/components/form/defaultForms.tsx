@@ -60,12 +60,12 @@ export const creditCardFormDefault: FormInput[] = [
     }
 ];
 
-export function GeneratePrefilledCreditCardForm(creditCard: CreditCard): FormInput[]{
+export function GeneratePrefilledCreditCardForm(creditCard: CreditCard, billingAddress: Address): FormInput[]{
     const prefilledForm: FormInput[] = creditCardFormDefault;
     prefilledForm[0].defaultValue = creditCard.cardNumber;
     prefilledForm[1].defaultValue = creditCard.expiryDate;
     prefilledForm[2].defaultValue = creditCard.cvv;
-    prefilledForm[3].defaultValue = creditCard.billingAddressId;
+    prefilledForm[3].defaultValue = billingAddress;
 
     return prefilledForm;
 }

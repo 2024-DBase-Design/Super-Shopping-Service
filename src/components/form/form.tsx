@@ -73,6 +73,7 @@ const FormComponent: React.FC<{
               {input.inputType === InputTypeEnum.DropDown ? (
                 <DropDownInputComponent
                   name={input.name}
+                  defaultValue={input.defaultValue}
                   options={[]}
                   formValues={formValues}
                   validationRuleNames={input.validationRuleNames}
@@ -82,12 +83,14 @@ const FormComponent: React.FC<{
               ) : input.inputType === InputTypeEnum.Address ? (
                 <AddressInputComponent
                   name={input.name}
+                  defaultValue={input.defaultValue}
                   onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
                   forceValidate={formValues.forceValidate}
                 />
               ) : (
                 <TextInputComponent
                   name={input.name}
+                  defaultValue={input.defaultValue}
                   formValues={formValues}
                   validationRuleNames={input.validationRuleNames}
                   onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}

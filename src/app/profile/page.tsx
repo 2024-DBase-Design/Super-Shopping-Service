@@ -1,6 +1,7 @@
 'use client';
+
 import useRoleAuth from '@/hooks/useRoleAuth';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss'
 import '@/styles/session.scss';
 import { Address, CreditCard, Customer } from '@prisma/client';
@@ -10,9 +11,14 @@ import { creditCardFormDefault, GeneratePrefilledAddressForm, GeneratePrefilledC
 import { FormInput } from '@/components/form/form';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 
+type CreditCardAndAddress = {
+  creditCard: CreditCard,
+  billingAddress: Address
+}
+
 type ProfileValues = {
   customer: Customer,
-  creditCards: CreditCard[],
+  creditCards: CreditCardAndAddress[],
   addresses: Address[]
 }
 
@@ -30,23 +36,59 @@ var testValues: ProfileValues = {
     updatedAt: new Date,
   },
   creditCards: [{
-    id: 0,
-    cardNumber: "374245455400126",
-    expiryDate: "01/01",
-    cvv: "123",
-    billingAddressId: 0,
-    customerId: 0,
-    createdAt: new Date,
-    updatedAt: new Date
+    creditCard: {
+      id: 0,
+      cardNumber: "374245455400126",
+      expiryDate: "01/01",
+      cvv: "123",
+      billingAddressId: 0,
+      customerId: 0,
+      createdAt: new Date,
+      updatedAt: new Date
+    },
+    billingAddress: {
+      id: 1,
+      addressLineOne: "123 Street Street",
+      addressLineTwo: null,
+      city: "Cincinnati",
+      state: "OH",
+      zip: "12345",
+      country: "US",
+      type: AddressTypeEnum.Delivery,
+      createdAt: new Date,
+      updatedAt: new Date,
+      customerId: 0,
+      staffId: null,
+      supplierId: null,
+      warehouseId: null
+    }
   },{
-    id: 0,
-    cardNumber: "374245455400126",
-    expiryDate: "01/01",
-    cvv: "123",
-    billingAddressId: 0,
-    customerId: 0,
-    createdAt: new Date,
-    updatedAt: new Date
+    creditCard: {
+      id: 0,
+      cardNumber: "374245455400126",
+      expiryDate: "01/01",
+      cvv: "123",
+      billingAddressId: 0,
+      customerId: 0,
+      createdAt: new Date,
+      updatedAt: new Date
+    },
+    billingAddress: {
+      id: 1,
+      addressLineOne: "123 Street Street",
+      addressLineTwo: null,
+      city: "Cincinnati",
+      state: "OH",
+      zip: "12345",
+      country: "US",
+      type: AddressTypeEnum.Delivery,
+      createdAt: new Date,
+      updatedAt: new Date,
+      customerId: 0,
+      staffId: null,
+      supplierId: null,
+      warehouseId: null
+    }
   }],
   addresses: [{
     id: 1,
@@ -111,23 +153,27 @@ export default function Page() {
   const [addresses, setAddresses] = useState(tsBs);
   const addressEmitter: ClientEventEmitter = new ClientEventEmitter;
 
-  getProfileValues().then(res => {
-    setValues(res)
-    let tempCreditCards: EditableListItem[] = []
-    let tempAddresses: EditableListItem[] = []
-    res.creditCards.forEach(c => {
-      tempCreditCards.push({displayName: c.cardNumber.replace(/\d(?=(?:\D*\d){4})/g, "•"), 
-        editFormInputs: GeneratePrefilledCreditCardForm(c)})
-    })
-    res.addresses.forEach(a => {
-      tempAddresses.push({displayName: a.addressLineOne + "\r\n" + 
-        (a.addressLineTwo ? a.addressLineTwo + "\r\n" : "") +
-        a.city + ", " + a.state + " " + a.zip, 
-        editFormInputs: GeneratePrefilledAddressForm(a)})
-    })
-    setCreditCards(tempCreditCards);
-    setAddresses(tempAddresses);
-  });
+  useEffect(() => {
+    getProfileValues().then(res => {
+      setValues(res)
+      let tempCreditCards: EditableListItem[] = []
+      let tempAddresses: EditableListItem[] = []
+      res.creditCards.forEach(c => {
+        tempCreditCards.push({displayName: c.creditCard.cardNumber.replace(/\d(?=(?:\D*\d){4})/g, "•"),
+          id: c.creditCard.id,
+          editFormInputs: GeneratePrefilledCreditCardForm(c.creditCard, c.billingAddress)})
+      })
+      res.addresses.forEach(a => {
+        tempAddresses.push({displayName: a.addressLineOne + "\r\n" + 
+          (a.addressLineTwo ? a.addressLineTwo + "\r\n" : "") +
+          a.city + ", " + a.state + " " + a.zip,
+          id: a.id,
+          editFormInputs: GeneratePrefilledAddressForm(a)})
+      })
+      setCreditCards(tempCreditCards);
+      setAddresses(tempAddresses);
+    });
+  }, [])
 
   // make appropriate api calls here
   creditCardEmitter.on("addNew", (formData: FormData)=>{

@@ -5,7 +5,8 @@ import React from 'react';
 import { ValidationRuleEnum, ValidationRuleType } from './validationRules';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TextInputComponent from './textInput';
-import { Address, AddressTypeEnum, States } from '@/helpers/address';
+import { Address } from '@prisma/client';
+import { AddressTypeEnum, States } from '@/helpers/address';
 import { formIsValidName, FormValues } from '@/helpers/formValues';
 import { FormInput, InputTypeEnum } from '../form/form';
 import DropDownInputComponent from './dropdownInput';
@@ -26,7 +27,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
     addressLineTwo: '',
     city: '',
     state: '',
-    zipCode: null,
+    zip: null,
     type: AddressTypeEnum.Billing
   },
   onValueChanged,
@@ -108,7 +109,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
         />
       </div>
       <div style={{ display: 'flex' }}>
-        <div id="city-container" style={{ marginRight: '1em', width: '35vw' }}>
+        <div id="city-container" style={{ marginRight: '.5em', width: '35vw' }}>
           <TextInputComponent
             name="City"
             formValues={formValues}
@@ -119,7 +120,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             defaultValue={defaultValue.city}
           />
         </div>
-        <div id="state-container" style={{ marginRight: '1em', width: '15vw' }}>
+        <div id="state-container" style={{ marginRight: '.5em', width: '15vw' }}>
           <DropDownInputComponent
             name="State"
             validationRuleNames={inputs[3].validationRuleNames}
@@ -128,6 +129,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             forceValidate={forceValidate}
             defaultValue={defaultValue.state}
             options={States}
+            inputClassName="pl-0"
           />
         </div>
         <div id="zip-code-container" style={{ width: '25vw' }}>
@@ -138,7 +140,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             onValueChanged={(value, isValid) => handleInputChange(inputs[4].name, value, isValid)}
             forceValidate={forceValidate}
             inputType="text"
-            defaultValue={defaultValue.zipCode}
+            defaultValue={defaultValue.zip}
           />
         </div>
       </div>

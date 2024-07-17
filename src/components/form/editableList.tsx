@@ -1,12 +1,16 @@
+'use client';
+
 import { ClientEventEmitter } from "@/helpers/clientEventEmitter"
-import { FormInput } from "./form";
+import FormComponent, { FormInput } from "./form";
 import { EditIconComponent } from "../svgs/edit";
 import { DeleteIconComponent } from "../svgs/delete";
 import { useState } from "react";
 import { PopUpComponent } from "../popUp/popUp";
+import { FormValues } from "@/helpers/formValues";
 
 export type EditableListItem = {
   displayName: string,
+  id: number,
   editFormInputs: FormInput[]
 }
 
@@ -16,44 +20,51 @@ export const EditableListComponent: React.FC<{
   eventEmitter: ClientEventEmitter
 }> = ({ list, name, eventEmitter }) => {
   const [showPopup, setShowPopup] = useState(false);
-  let currentAction: string = "nothing";
+  const [content, setContent] = useState(<div>loading...</div>);
+  const [buttons, setButtons] = useState([""]);
+  const [currentAction, setCurrentAction] = useState(name);
+  let i = 0;
 
   eventEmitter.on("popUpClosed", ()=>{
     setShowPopup(false)
   })
 
-  const EditItem = () => {
-    currentAction = "Edit"
-    setShowPopup(true)
-    console.log(currentAction);
+  const EditItem = (item: EditableListItem) => {
+    setCurrentAction("Edit " + name);
+    setContent(<FormComponent inputs={item.editFormInputs} submitName="Save" submitAction={() => eventEmitter.emit("edit", item.id)}></FormComponent>)
+    setButtons([]);
+    setShowPopup(true);
   }
 
-  const DeleteItem = () => {
-    currentAction = "Delete"
-    //setShowPopup(true)
-    console.log(currentAction);
+  const DeleteItem = (item: EditableListItem) => {
+    setCurrentAction("Delete " + name);
+    setContent(<div>You are about to delete the following:<br></br>{item.displayName}</div>)
+    setButtons(["Confirm"]);
+    setShowPopup(true);
   }
 
   const AddNew = () => {
-    currentAction = "Add New"
-    //setShowPopup(true)
-    console.log(currentAction);
+    setCurrentAction("Add New");
+    const EmptyForm: FormInput[] = list[0].editFormInputs.map(i => {i.defaultValue=null; return i})
+    setContent(<FormComponent inputs={EmptyForm} submitName="Create" submitAction={() => eventEmitter.emit("addNew")}></FormComponent>)
+    setButtons([]);
+    setShowPopup(true);
   }
 
   return(
       <div>
-        {list.map((listItem) => (<div className="flex justify-end min-h-8 mb-2 items-center">
+        {list.map((listItem) => (<div className="flex justify-end min-h-8 mb-2 items-center" key={i++}>
           <p className="flex-auto whitespace-pre">{listItem.displayName}</p>
-          <div onClick={EditItem}>
+          <button onClick={() => EditItem(listItem)} className="bg-none p-0">
             <EditIconComponent fillColor="#00acbb" className="ml-4"></EditIconComponent>
-          </div>
-          <div onClick={DeleteItem}>
+          </button>
+          <button onClick={() => DeleteItem(listItem)} className="bg-none p-0">
             <DeleteIconComponent fillColor="#c76e77" className="ml-4"></DeleteIconComponent>
-          </div>
+          </button>
           </div>))}
         <button onClick={AddNew} className="p-2 pl-4 pr-4 text-base mt-2">+ Add New {name}</button>
         <div>{ 
-          showPopup && <PopUpComponent header={`${currentAction} ${name}`} content={undefined} buttons={["save"]} eventEmitter={eventEmitter}></PopUpComponent>  
+          showPopup && <PopUpComponent header={currentAction} content={content} buttons={buttons} eventEmitter={eventEmitter}></PopUpComponent>  
         }</div>
       </div>
   )

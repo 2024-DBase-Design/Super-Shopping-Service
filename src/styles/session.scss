@@ -93,7 +93,23 @@ form button{
         background-color: #FAFAFA;
     }
 }
+
 .focusedBorder {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+}
+
+.close-button{
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: var(--red);
+    background: none;
+    padding: 0.5em;
+    line-height: 50%;
+    font-size: 3em;
+}
+
+.close-button::after{
+    content: "\00D7";
 }
