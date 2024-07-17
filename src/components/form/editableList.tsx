@@ -6,7 +6,6 @@ import { EditIconComponent } from "../svgs/edit";
 import { DeleteIconComponent } from "../svgs/delete";
 import { useState } from "react";
 import { PopUpComponent } from "../popUp/popUp";
-import { FormValues } from "@/helpers/formValues";
 
 export type EditableListItem = {
   displayName: string,
@@ -31,7 +30,7 @@ export const EditableListComponent: React.FC<{
 
   const EditItem = (item: EditableListItem) => {
     setCurrentAction("Edit " + name);
-    setContent(<FormComponent inputs={item.editFormInputs} submitName="Save" submitAction={() => eventEmitter.emit("edit", item.id)}></FormComponent>)
+    setContent(<FormComponent inputs={item.editFormInputs} submitName="Save" submitAction={(formData) => eventEmitter.emit("edit", [formData, item.id])}></FormComponent>)
     setButtons([]);
     setShowPopup(true);
   }
@@ -48,7 +47,7 @@ export const EditableListComponent: React.FC<{
   const AddNew = () => {
     setCurrentAction("Add New");
     const EmptyForm: FormInput[] = list[0].editFormInputs.map(i => {i.defaultValue=null; return i})
-    setContent(<FormComponent inputs={EmptyForm} submitName="Create" submitAction={() => eventEmitter.emit("addNew")}></FormComponent>)
+    setContent(<FormComponent inputs={EmptyForm} submitName="Create" submitAction={(formData) => eventEmitter.emit("addNew", formData)}></FormComponent>)
     setButtons([]);
     setShowPopup(true);
   }

@@ -94,7 +94,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
           onValueChanged={(value, isValid) => handleInputChange(inputs[0].name, value, isValid)}
           forceValidate={forceValidate}
           inputType="text"
-          defaultValue={defaultValue.addressLineOne}
+          defaultValue={defaultValue?.addressLineOne}
         />
       </div>
       <div>
@@ -105,7 +105,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
           onValueChanged={(value, isValid) => handleInputChange(inputs[1].name, value, isValid)}
           forceValidate={forceValidate}
           inputType="text"
-          defaultValue={defaultValue.addressLineTwo}
+          defaultValue={defaultValue?.addressLineTwo}
         />
       </div>
       <div style={{ display: 'flex' }}>
@@ -117,7 +117,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             onValueChanged={(value, isValid) => handleInputChange(inputs[2].name, value, isValid)}
             forceValidate={forceValidate}
             inputType="text"
-            defaultValue={defaultValue.city}
+            defaultValue={defaultValue?.city}
           />
         </div>
         <div id="state-container" style={{ marginRight: '.5em', width: '15vw' }}>
@@ -127,7 +127,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             formValues={formValues}
             onValueChanged={(value, isValid) => handleInputChange(inputs[3].name, value, isValid)}
             forceValidate={forceValidate}
-            defaultValue={defaultValue.state}
+            defaultValue={defaultValue?.state}
             options={States}
             inputClassName="pl-0"
           />
@@ -140,7 +140,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
             onValueChanged={(value, isValid) => handleInputChange(inputs[4].name, value, isValid)}
             forceValidate={forceValidate}
             inputType="text"
-            defaultValue={defaultValue.zip}
+            defaultValue={defaultValue?.zip}
           />
         </div>
       </div>

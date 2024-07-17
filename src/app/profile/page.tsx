@@ -176,8 +176,9 @@ export default function Page() {
   }, [])
 
   // make appropriate api calls here
-  creditCardEmitter.on("edit", (formData: FormData)=>{
+  creditCardEmitter.on("edit", (formData: FormData, id: number)=>{
     console.log(formData);
+    console.log(id);
   })
   creditCardEmitter.on("delete", (id: number)=>{
     // delete the credit card and its billing address!
@@ -187,8 +188,9 @@ export default function Page() {
     console.log(formData);
   })
   
-  addressEmitter.on("edit", (formData: FormData)=>{
+  addressEmitter.on("edit", (formData: FormData, id: number)=>{
     console.log(formData);
+    console.log(id);
   })
   addressEmitter.on("delete", (id: number)=>{
     console.log(id);
