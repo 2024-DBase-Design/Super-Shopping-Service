@@ -30,7 +30,7 @@ export const EditableListComponent: React.FC<{
 
   const EditItem = (item: EditableListItem) => {
     setCurrentAction("Edit " + name);
-    setContent(<FormComponent inputs={item.editFormInputs} submitName="Save" submitAction={(formData) => eventEmitter.emit("edit", [formData, item.id])}></FormComponent>)
+    setContent(<FormComponent id={item.id} inputs={item.editFormInputs} submitName="Save" submitAction={(formData) => eventEmitter.emit("edit", [formData, item.id])}></FormComponent>)
     setButtons([]);
     setShowPopup(true);
   }

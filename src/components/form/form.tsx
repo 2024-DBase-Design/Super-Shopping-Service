@@ -34,8 +34,13 @@ const FormComponent: React.FC<{
   submitName?: string;
   className?: string;
   buttonClassName?: string;
-}> = ({ inputs, submitName, submitAction, className, buttonClassName }) => {
+  id?: number;
+}> = ({ inputs, submitName, submitAction, className, buttonClassName, id }) => {
   const formValues: FormValues = new FormValues([]);
+
+  if(id){
+    formValues.addNewValue({ name: "id", defaultValue: id });
+  }
 
   for (const input of inputs) {
     formValues.addNewValue({ name: input.name, defaultValue: input.defaultValue });
