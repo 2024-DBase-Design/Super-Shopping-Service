@@ -6,6 +6,8 @@ import '@/styles/staffSession.scss';
 import SearchComponent from '@/components/search/search';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
+import Link from 'next/link';
+import styles from './customers.module.scss';
 
 type CustomerFilter = {
   name: string;
@@ -91,7 +93,10 @@ export default function Page() {
       temp.values.push([
         customer.profilePicture,
         customer.firstName + ' ' + customer.lastName,
-        customer.balance
+        customer.balance,
+        <Link className={styles.link} href={'/supplier/customers/' + customer.id}>
+          Details
+        </Link>
       ]);
     }
 
