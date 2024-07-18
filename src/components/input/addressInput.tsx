@@ -15,7 +15,7 @@ type AddressInputProps = {
   name: string;
   id?: string;
   defaultValue?: Address;
-  onValueChanged?: (value: any, isValid: boolean) => void;
+  onValueChanged: (value: any, isValid: boolean) => void;
   forceValidate?: ClientEventEmitter;
 };
 
@@ -73,8 +73,11 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
   for (const input of inputs) {
     formValues.addNewValue({ name: input.name, defaultValue: input.defaultValue });
   }
+  // address line two should be blank
+  //formValues.updateValidity("Address Line Two", true);
 
   const handleInputChange = (name: string, value: string, isValid: boolean) => {
+    formValues.updateValidity("Address Line Two", true);
     formValues.updateValue(name, value);
     formValues.updateValidity(name, isValid);
     if (isValid) {
@@ -82,6 +85,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
     } else {
       formValues.updateValidity(formIsValidName, false);
     }
+    onValueChanged(formValues, formValues.checkFormValidity(name));
   };
 
   return (
