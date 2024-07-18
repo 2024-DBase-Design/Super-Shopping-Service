@@ -5,7 +5,7 @@ import useRoleAuth from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss';
 import '@/styles/staffSession.scss';
-import { Address, CreditCard, Customer } from '@prisma/client';
+import { Address, CreditCard, Customer, Order } from '@prisma/client';
 import { AddressTypeEnum } from '@/helpers/address';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -15,13 +15,14 @@ type CreditCardAndAddress = {
   billingAddress: Address;
 };
 
-type ProfileValues = {
+type ProfileDetailValues = {
   customer: Customer;
+  orders: Order[];
   creditCards: CreditCardAndAddress[];
   addresses: Address[];
 };
 
-var testValues: ProfileValues = {
+var testValues: ProfileDetailValues = {
   customer: {
     id: 0,
     firstName: 'John',
@@ -35,6 +36,18 @@ var testValues: ProfileValues = {
     createdAt: new Date(),
     updatedAt: new Date()
   },
+  orders: [
+    {
+      id: '0',
+      customerId: 0,
+      status: 'ISSUED',
+      items: [{}],
+      cardUsed: 0,
+      deliveryPlan: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ],
   creditCards: [
     {
       creditCard: {
@@ -145,7 +158,7 @@ var testValues: ProfileValues = {
   ]
 };
 
-async function getProfileValues(id: number): Promise<ProfileValues> {
+async function getProfileValues(id: number): Promise<ProfileDetailValues> {
   //make api calls for a customer, their creditcards, and their delivery addresses
   // add billing address information to the credit card object (see CreditCardAndAddress)
 
@@ -173,7 +186,7 @@ function formatAddress(address: Address) {
 
 export default function CustomerDetail() {
   //useRoleAuth(['staff'], '/login');
-  const tsBs: ProfileValues = {
+  const tsBs: ProfileDetailValues = {
     customer: {
       id: 0,
       firstName: '',
