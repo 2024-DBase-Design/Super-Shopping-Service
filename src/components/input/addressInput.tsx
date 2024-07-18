@@ -73,8 +73,6 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
   for (const input of inputs) {
     formValues.addNewValue({ name: input.name, defaultValue: input.defaultValue });
   }
-  // address line two should be blank
-  //formValues.updateValidity("Address Line Two", true);
 
   const handleInputChange = (name: string, value: string, isValid: boolean) => {
     formValues.updateValidity("Address Line Two", true);

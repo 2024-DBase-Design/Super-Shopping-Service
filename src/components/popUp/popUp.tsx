@@ -19,7 +19,7 @@ export const PopUpComponent: React.FC<{
                 <br></br><br></br>
                 {content}
                 <div className={"flex justify-center " + (buttons?.length === 0 ? "" : "mt-5")}>
-                  {buttons?.map((button) => (<button onSubmit={()=>eventEmitter.emit(button)}>{button}</button>))}
+                  {buttons?.map((button) => (<button onClick={()=>eventEmitter.emit(button)}>{button}</button>))}
                 </div>
               </div>
             </div>
