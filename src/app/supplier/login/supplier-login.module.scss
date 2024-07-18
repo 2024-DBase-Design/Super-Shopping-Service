@@ -1,0 +1,35 @@
+.header {
+  font-size: 12vw;
+  width: 100%;
+  text-align: center;
+  padding: 25px;
+  padding-bottom: 0;
+}
+
+.formContainer {
+  background-image: unset;
+  background-color: #4d4c4ca9;
+  border-radius: 10px;
+  margin: auto;
+  margin-bottom: 25px;
+  width: 85vw;
+  flex: 1;
+
+  h2, button, a{
+    color:white
+  }
+  button{
+    background-color: black;
+  }
+  a{
+    text-decoration: underline;
+  }
+}
+
+.mainContainer{
+  background-image: url('/supplier-background.png');
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
