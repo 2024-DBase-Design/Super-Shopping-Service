@@ -2,8 +2,9 @@
 .formContainer {
     position: relative;
     width: 100%;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    margin-bottom: 0;
 }
 
 .mainContainer{
@@ -12,4 +13,7 @@
     min-width: 100vw;
     background-image: url('/fun-background.png');
     background-size: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
