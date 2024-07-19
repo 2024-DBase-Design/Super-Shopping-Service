@@ -40,7 +40,7 @@ const TableComponent: React.FC<{
             {table.values.map((row) => (
               <tr key={keyer++}>
                 {table.cols.map((col: TableCol) => (
-                  <td key={keyer++}>
+                  <td key={keyer++} className="py-2">
                     {(() => {
                       switch (col.type) {
                         case ColType.Basic:
@@ -48,7 +48,7 @@ const TableComponent: React.FC<{
                         case ColType.Money:
                           return <div className="money">{row[col.id]}</div>;
                         case ColType.Image:
-                          return <img className="rounded-full" src={row[col.id]} alt="" />;
+                          return <img className="rounded-full" src={row[col.id] + ''} alt="" />;
                         default:
                           return ''; // Fallback in case of unexpected types
                       }

@@ -22,7 +22,7 @@ type ProfileDetailValues = {
   addresses: Address[];
 };
 
-var testValues: ProfileDetailValues = {
+const testValues: ProfileDetailValues = {
   customer: {
     id: 0,
     firstName: 'John',
@@ -199,6 +199,18 @@ export default function CustomerDetail() {
       createdAt: new Date(),
       updatedAt: new Date()
     },
+    orders: [
+      {
+        id: '0',
+        customerId: 0,
+        status: 'ISSUED',
+        items: [{}],
+        cardUsed: 0,
+        deliveryPlan: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ],
     creditCards: [],
     addresses: []
   };
@@ -224,10 +236,10 @@ export default function CustomerDetail() {
       <div className="main-body">
         <h1>ORDERS</h1>
         <div className="ml-4">
-          {values.creditCards.map((c) => (
-            <div>
-              <p>{censorCC(c.creditCard)}</p>
-              <p className="pb-2">{formatAddress(c.billingAddress)}</p>
+          {values.orders.map((o) => (
+            <div key={o.id}>
+              <p>{o.createdAt.toDateString()}</p>
+              <p className="pb-2">{o.items?.toString()}</p>
             </div>
           ))}
         </div>
@@ -238,7 +250,7 @@ export default function CustomerDetail() {
         <h1>CREDIT CARDS</h1>
         <div className="ml-4">
           {values.creditCards.map((c) => (
-            <div>
+            <div key={c.creditCard.id}>
               <p>{censorCC(c.creditCard)}</p>
               <p className="pb-2">{formatAddress(c.billingAddress)}</p>
             </div>
@@ -248,7 +260,9 @@ export default function CustomerDetail() {
         <h1>DELIVERY ADDRESSES</h1>
         <div className="ml-4">
           {values.addresses.map((a) => (
-            <p className="pb-2">{formatAddress(a)}</p>
+            <div key={a.id}>
+              <p className="pb-2">{formatAddress(a)}</p>
+            </div>
           ))}
         </div>
       </div>

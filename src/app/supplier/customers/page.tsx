@@ -88,13 +88,13 @@ export default function Page() {
   const searchEmitter: ClientEventEmitter = new ClientEventEmitter();
 
   function updateTable(customers: Customer[]) {
-    let temp: Table = new Table(cols);
-    for (let customer of customers) {
+    const temp: Table = new Table(cols);
+    for (const customer of customers) {
       temp.values.push([
         customer.profilePicture,
         customer.firstName + ' ' + customer.lastName,
         customer.balance,
-        <Link className={styles.link} href={'/supplier/customers/' + customer.id}>
+        <Link key={customer.id} className={styles.link} href={'/supplier/customers/' + customer.id}>
           Details
         </Link>
       ]);
