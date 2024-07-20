@@ -9,6 +9,13 @@ import { Address, CreditCard, Customer, Order } from '@prisma/client';
 import { AddressTypeEnum } from '@/helpers/address';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import {
+  ButtonOptions,
+  EditableListComponent,
+  EditableListItem
+} from '@/components/form/editableList';
+import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
+import { FormInput } from '@/components/form/form';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
@@ -186,7 +193,7 @@ function formatAddress(address: Address) {
 
 export default function CustomerDetail() {
   //useRoleAuth(['staff'], '/login');
-  const tsBs: ProfileDetailValues = {
+  const defaultValue: ProfileDetailValues = {
     customer: {
       id: 0,
       firstName: '',
@@ -214,12 +221,28 @@ export default function CustomerDetail() {
     creditCards: [],
     addresses: []
   };
+  const editableOrderFormInputs: FormInput[] = [];
+  const defaultEditableOrders: EditableListItem[] = [
+    { displayName: '', id: 0, editFormInputs: editableOrderFormInputs }
+  ];
   const { id } = useParams();
-  const [values, setValues] = useState(tsBs);
+  const [values, setValues] = useState(defaultValue);
+  const [editableOrders, setEditableOrders] = useState(defaultEditableOrders);
+  const orderEventEmitter = new ClientEventEmitter();
+  const orderButtonOptions: ButtonOptions = { edit: true, delete: false, addNew: false };
 
   useEffect(() => {
     getProfileValues(Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')).then((res) => {
       setValues(res);
+      const tempEditableOrders: EditableListItem[] = [];
+      for (const order of res.orders) {
+        tempEditableOrders.push({
+          displayName: order.createdAt.toUTCString(),
+          id: parseInt(order.id),
+          editFormInputs: editableOrderFormInputs
+        });
+      }
+      setEditableOrders(tempEditableOrders);
     });
   }, []);
 
@@ -236,12 +259,12 @@ export default function CustomerDetail() {
       <div className="main-body">
         <h1>ORDERS</h1>
         <div className="ml-4">
-          {values.orders.map((o) => (
-            <div key={o.id}>
-              <p>{o.createdAt.toDateString()}</p>
-              <p className="pb-2">{o.items?.toString()}</p>
-            </div>
-          ))}
+          <EditableListComponent
+            list={editableOrders}
+            name="Order"
+            eventEmitter={orderEventEmitter}
+            buttonOptions={orderButtonOptions}
+          ></EditableListComponent>
         </div>
         <br></br>
         <h1>BALANCE</h1>
