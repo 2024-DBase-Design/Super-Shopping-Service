@@ -1,0 +1,24 @@
+.product_preview {
+    display: flex;
+    flex-direction: column;
+    img {
+        border: 5px solid lightblue;
+    }
+}
+
+.price_stock {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    color: blue;
+    font-weight: 800;
+}
+
+.stock {
+    color: gray;
+    font-size: .8rem;
+}
