@@ -4,19 +4,23 @@ import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import FormComponent, { FormInput } from './form';
 import { EditIconComponent } from '../svgs/edit';
 import { DeleteIconComponent } from '../svgs/delete';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { PopUpComponent } from '../popUp/popUp';
 
 export type EditableListItem = {
   displayName: string;
   id: number;
   editFormInputs: FormInput[];
+  customHeader?: string;
+  customContent?: JSX.Element;
+  customIcon?: JSX.Element;
 };
 
 export type ButtonOptions = {
   edit: boolean;
   delete: boolean;
   addNew: boolean;
+  custom: boolean;
 };
 
 export const EditableListComponent: React.FC<{
@@ -31,7 +35,8 @@ export const EditableListComponent: React.FC<{
   buttonOptions = {
     edit: true,
     delete: true,
-    addNew: true
+    addNew: true,
+    custom: false
   }
 }) => {
   const [showPopup, setShowPopup] = useState(false);
@@ -77,6 +82,13 @@ export const EditableListComponent: React.FC<{
     setShowPopup(true);
   };
 
+  const CustomContent = (item: EditableListItem) => {
+    setCurrentAction(item.customHeader ?? 'NO_CUSTOM_HEADER');
+    setContent(item.customContent ?? <div></div>);
+    setButtons([]);
+    setShowPopup(true);
+  };
+
   const AddNew = () => {
     setCurrentAction('Add New');
     const EmptyForm: FormInput[] = list[0].editFormInputs.map((i) => {
@@ -107,6 +119,13 @@ export const EditableListComponent: React.FC<{
           {buttonOptions.delete && (
             <button onClick={() => DeleteItem(listItem)} className="bg-none p-0">
               <DeleteIconComponent fillColor="#c76e77" className="ml-4"></DeleteIconComponent>
+            </button>
+          )}
+          {buttonOptions.custom && (
+            <button onClick={() => CustomContent(listItem)} className="bg-none p-0">
+              {listItem.customIcon ?? (
+                <EditIconComponent fillColor="#00acbb" className="ml-4"></EditIconComponent>
+              )}
             </button>
           )}
         </div>

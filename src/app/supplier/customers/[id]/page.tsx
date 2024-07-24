@@ -5,7 +5,7 @@ import useRoleAuth from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss';
 import '@/styles/staffSession.scss';
-import { Address, CreditCard, Customer, Order } from '@prisma/client';
+import { Address, CreditCard, Customer, Order, OrderStatus, Product } from '@prisma/client';
 import { AddressTypeEnum } from '@/helpers/address';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +16,8 @@ import {
 } from '@/components/form/editableList';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import { FormInput } from '@/components/form/form';
+import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
+import { JsonValue } from '@prisma/client/runtime/library';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
@@ -27,6 +29,25 @@ type ProfileDetailValues = {
   orders: Order[];
   creditCards: CreditCardAndAddress[];
   addresses: Address[];
+};
+
+type OrderItem = {
+  product: Product;
+  quantity: number;
+};
+
+const testProduct: Product = {
+  id: 0,
+  image: null,
+  name: 'squeaky shoes',
+  price: 0,
+  category: '',
+  brand: '',
+  size: '',
+  description: '',
+  supplierId: 0,
+  createdAt: new Date(),
+  updatedAt: new Date()
 };
 
 const testValues: ProfileDetailValues = {
@@ -48,8 +69,8 @@ const testValues: ProfileDetailValues = {
       id: '0',
       customerId: 0,
       status: 'ISSUED',
-      items: [{}],
-      cardUsed: 0,
+      items: [{ product: testProduct, quantity: 2 } as OrderItem as unknown as JsonValue],
+      cardUsed: 374245455400126,
       deliveryPlan: null,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -86,7 +107,7 @@ const testValues: ProfileDetailValues = {
     },
     {
       creditCard: {
-        id: 0,
+        id: 1,
         cardNumber: '374245455400126',
         expiryDate: '01/01',
         cvv: '123',
@@ -96,7 +117,7 @@ const testValues: ProfileDetailValues = {
         updatedAt: new Date()
       },
       billingAddress: {
-        id: 1,
+        id: 2,
         addressLineOne: '123 Street Street',
         addressLineTwo: null,
         city: 'Cincinnati',
@@ -131,7 +152,7 @@ const testValues: ProfileDetailValues = {
       warehouseId: null
     },
     {
-      id: 1,
+      id: 2,
       addressLineOne: '123 Street Street',
       addressLineTwo: null,
       city: 'Cincinnati',
@@ -147,7 +168,7 @@ const testValues: ProfileDetailValues = {
       warehouseId: null
     },
     {
-      id: 1,
+      id: 3,
       addressLineOne: '123 Street Street',
       addressLineTwo: null,
       city: 'Cincinnati',
@@ -169,11 +190,24 @@ async function getProfileValues(id: number): Promise<ProfileDetailValues> {
   //make api calls for a customer, their creditcards, and their delivery addresses
   // add billing address information to the credit card object (see CreditCardAndAddress)
 
+  // This might not work for the item table if I bungled the OrderItem type.
+  // Message Jasmine if this is the case and you can't figure out how to cast/convert it.
   return testValues;
+}
+
+function updateOrder(id: string, currentStatus: OrderStatus) {
+  // Should update the current order status to the next
+  // issued => sent
+  // sent => received
+  // Assume received will never be passed (only issued or sent)
+  // (I'm removing the button that calls this in that case)
 }
 
 function censorCC(creditCard: CreditCard) {
   return creditCard.cardNumber.replace(/\d(?=(?:\D*\d){4})/g, '•');
+}
+function censorCCString(creditCard: string) {
+  return creditCard.replace(/\d(?=(?:\D*\d){4})/g, '•');
 }
 
 function formatAddress(address: Address) {
@@ -229,17 +263,61 @@ export default function CustomerDetail() {
   const [values, setValues] = useState(defaultValue);
   const [editableOrders, setEditableOrders] = useState(defaultEditableOrders);
   const orderEventEmitter = new ClientEventEmitter();
-  const orderButtonOptions: ButtonOptions = { edit: true, delete: false, addNew: false };
+  const orderButtonOptions: ButtonOptions = {
+    edit: false,
+    delete: false,
+    addNew: false,
+    custom: true
+  };
+  const itemTableCols: TableCol[] = [
+    {
+      id: 0,
+      name: 'Name',
+      type: ColType.Basic
+    },
+    {
+      id: 1,
+      name: 'Quantity',
+      type: ColType.Basic
+    }
+  ];
 
   useEffect(() => {
     getProfileValues(Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')).then((res) => {
       setValues(res);
       const tempEditableOrders: EditableListItem[] = [];
       for (const order of res.orders) {
+        const itemsTable = new Table(itemTableCols);
+        const convertedItems = order.items as unknown as OrderItem[];
+        convertedItems.forEach((i) => itemsTable.values.push([i.product.name, i.quantity]));
         tempEditableOrders.push({
           displayName: order.createdAt.toUTCString(),
           id: parseInt(order.id),
-          editFormInputs: editableOrderFormInputs
+          editFormInputs: editableOrderFormInputs,
+          customHeader: 'Update Order',
+          customContent: (
+            <>
+              <div className="mb-5">
+                <h2>ISSUED</h2>
+                <p>{order.createdAt.toUTCString()}</p>
+              </div>
+              <div className="mb-5">
+                <h2>CREDIT CARD</h2>
+                <p>{censorCCString(order.cardUsed.toString())}</p>
+              </div>
+              <div className="mb-5">
+                <h2>ITEMS</h2>
+                <TableComponent table={itemsTable}></TableComponent>
+              </div>
+              <div className="mb-5">
+                <h2>CURRENT STATUS</h2>
+                <p>{order.status}</p>
+              </div>
+              {order.status !== OrderStatus.DELIVERED && (
+                <button onClick={() => updateOrder(order.id, order.status)}>Update</button>
+              )}
+            </>
+          )
         });
       }
       setEditableOrders(tempEditableOrders);
@@ -273,7 +351,7 @@ export default function CustomerDetail() {
         <h1>CREDIT CARDS</h1>
         <div className="ml-4">
           {values.creditCards.map((c) => (
-            <div key={c.creditCard.id}>
+            <div key={'c-' + c.creditCard.id}>
               <p>{censorCC(c.creditCard)}</p>
               <p className="pb-2">{formatAddress(c.billingAddress)}</p>
             </div>
@@ -283,7 +361,7 @@ export default function CustomerDetail() {
         <h1>DELIVERY ADDRESSES</h1>
         <div className="ml-4">
           {values.addresses.map((a) => (
-            <div key={a.id}>
+            <div key={'a-' + a.id}>
               <p className="pb-2">{formatAddress(a)}</p>
             </div>
           ))}
