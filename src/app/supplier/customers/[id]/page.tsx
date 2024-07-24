@@ -5,7 +5,6 @@ import useRoleAuth from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss';
 import '@/styles/staffSession.scss';
-import { Address, CreditCard, Customer, Order, OrderStatus, Product } from '@prisma/client';
 import { AddressTypeEnum } from '@/helpers/address';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -18,6 +17,7 @@ import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import { FormInput } from '@/components/form/form';
 import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
 import { JsonValue } from '@prisma/client/runtime/library';
+import { CreditCard, Customer, Order, Product, OrderStatus, Address } from '@prisma/client';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
@@ -313,7 +313,7 @@ export default function CustomerDetail() {
                 <h2>CURRENT STATUS</h2>
                 <p>{order.status}</p>
               </div>
-              {order.status !== OrderStatus.DELIVERED && (
+              {order.status !== OrderStatus.RECEIVED && (
                 <button onClick={() => updateOrder(order.id, order.status)}>Update</button>
               )}
             </>
