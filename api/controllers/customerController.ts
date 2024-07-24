@@ -16,8 +16,8 @@ interface ShoppingCartItem {
  */
 export const createCustomer = async (req: Request, res: Response) => {
   try {
-    const customer = await registerCustomer(req);
-    res.status(201).json(customer);
+    const customer_token = await registerCustomer(req);
+    res.status(201).json(customer_token);
   } catch (error) {
     console.error('Error creating customer:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
@@ -36,7 +36,8 @@ export const getCustomerDetails = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     res.json(customer);
   } catch (error) {
@@ -58,7 +59,8 @@ export const updateCustomerDetails = async (req: Request, res: Response) => {
       data: req.body
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     res.json(customer);
   } catch (error) {
@@ -79,7 +81,8 @@ export const deleteCustomerAccount = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     res.status(204).send();
   } catch (error) {
@@ -100,18 +103,21 @@ export const addCreditCard = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
 
     const { cardNumber, expiryDate, cvv, billingAddress } = req.body;
     let { billingAddressId } = req.body;
 
     if (!billingAddressId && !billingAddress) {
-      return res.status(400).json({ error: 'Billing address ID or details required' });
+      res.status(400).json({ error: 'Billing address ID or details required' });
+      return;
     }
 
     if (billingAddressId && billingAddress) {
-      return res.status(400).json({ error: 'Provide either billing address ID or details' });
+      res.status(400).json({ error: 'Provide either billing address ID or details' });
+      return;
     }
 
     if (!billingAddressId) {
@@ -149,7 +155,8 @@ export const getCreditCards = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const creditCards = await prisma.creditCard.findMany({
       where: { customerId: customer.id }
@@ -173,14 +180,16 @@ export const updateCreditCard = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const creditCard = await prisma.creditCard.update({
       where: { id: Number(req.params.cardId), customerId: customer.id },
       data: req.body
     });
     if (!creditCard) {
-      return res.status(404).json({ error: 'Credit card not found' });
+      res.status(404).json({ error: 'Credit card not found' });
+      return;
     }
     res.json(creditCard);
   } catch (error) {
@@ -201,13 +210,15 @@ export const deleteCreditCard = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const creditCard = await prisma.creditCard.delete({
       where: { id: Number(req.params.cardId), customerId: customer.id }
     });
     if (!creditCard) {
-      return res.status(404).json({ error: 'Credit card not found' });
+      res.status(404).json({ error: 'Credit card not found' });
+      return;
     }
     res.status(204).send();
   } catch (error) {
@@ -228,7 +239,8 @@ export const addAddress = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const newAddress = await prisma.address.create({
       data: { ...req.body, customerId: customer.id }
@@ -252,13 +264,15 @@ export const getAddresses = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const addresses = await prisma.address.findMany({
       where: { customerId: customer.id }
     });
     if (!addresses) {
-      return res.status(404).json({ error: 'Addresses not found' });
+      res.status(404).json({ error: 'Addresses not found' });
+      return;
     }
     res.json(addresses);
   } catch (error) {
@@ -279,14 +293,16 @@ export const updateAddress = async (req: Request, res: Response) => {
       where: { id: Number(req.params.customerId) }
     });
     if (!customer) {
-      return res.status(404).json({ error: 'Customer not found' });
+      res.status(404).json({ error: 'Customer not found' });
+      return;
     }
     const address = await prisma.address.update({
       where: { id: Number(req.params.addressId), customerId: customer.id },
       data: req.body
     });
     if (!address) {
-      return res.status(404).json({ error: 'Address not found' });
+      res.status(404).json({ error: 'Address not found' });
+      return;
     }
     res.json(address);
   } catch (error) {
@@ -463,68 +479,60 @@ export const removeCartItem = async (req: Request, res: Response) => {
 //  * @param req Express request object.
 //  * @param res Express response object.
 //  */
-// export const submitOrder = async (req: Request, res: Response) => {
-//   try {
-//     const { customerId } = req.params;
-//     const { cardId, deliveryPlan } = req.body;
+export const submitOrder = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.params;
+    const { cardId, deliveryPlan } = req.body;
 
-//     const customer = await Customer.findByPk(customerId);
-//     if (!customer) {
-//       return res.status(404).json({ error: 'Customer not found' });
-//     }
+    const customer = await prisma.customer.findUnique({
+      where: { id: Number(customerId) }
+    });
+    if (!customer) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
 
-//     // Validate the card used
-//     const cardUsed = await CreditCard.findOne({
-//       where: { id: cardId, customerId: customerId }
-//     });
-//     if (!cardUsed) {
-//       return res.status(400).json({ error: 'Invalid card used' });
-//     }
+    // Validate the card used
+    const cardUsed = await prisma.creditCard.findUnique({
+      where: { id: cardId, customerId: customer.id }
+    });
+    if (!cardUsed) {
+      return res.status(400).json({ error: 'Invalid card used' });
+    }
 
-//     const items: ShoppingCartItem[] = customer.cart.map((item) => {
-//       const { product, quantity } = item;
-//       const newItem: ShoppingCartItem = { productId: product.id, quantity };
-//       return newItem;
-//     });
+    const items: ShoppingCartItem[] = customer.cart as unknown as ShoppingCartItem[];
 
-//     items.forEach(async (item) => {
-//       const product = await Product.findByPk(item.productId);
-//       if (!product) {
-//         return res.status(404).json({ error: 'Cart product not found' });
-//       }
+    items.forEach(async (item) => {
+      const product = await prisma.product.findUnique({
+        where: { id: item.product.id }
+      });
+      if (!product) {
+        return res.status(404).json({ error: 'Cart product not found' });
+      }
 
-//       customer.balance += item.quantity * product.price;
-//     });
+      customer.balance += item.quantity * product.price;
+    });
 
-//     customer.changed('balance', true);
+    const order = await prisma.order.create({
+      data: {
+        customerId: customer.id,
+        status: 'ISSUED',
+        items: customer.cart as unknown as Prisma.JsonArray,
+        cardUsed: cardUsed.id,
+        deliveryPlan
+      }
+    });
 
-//     const order = await Order.create({
-//       id: generateUniqueId(),
-//       customerId,
-//       items,
-//       status: OrderStatus.ISSUED,
-//       cardUsed,
-//       deliveryPlan
-//     });
+    await prisma.customer.update({
+      where: { id: customer.id },
+      data: { cart: [], balance: customer.balance }
+    });
 
-//     customer.cart = [];
-//     customer.changed('cart', true);
-//     await customer.save();
-//     res.status(201).json(order);
-//   } catch (error) {
-//     console.error('Error submitting order:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
-
-// /**
-//  * Generate a unique order ID.
-//  *
-//  * @returns A unique order ID.
-//  */
-// const generateUniqueId = (): string => {
-//   return randomUUID();
-// };
+    res.status(201).json(order);
+  } catch (error) {
+    console.error('Error submitting order:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
 
 // /**
 //  * Get a customer's orders.
@@ -532,13 +540,79 @@ export const removeCartItem = async (req: Request, res: Response) => {
 //  * @param req Express request object.
 //  * @param res Express response object.
 //  */
-// export const getOrders = async (req: Request, res: Response) => {
-//   try {
-//     const { customerId } = req.params;
-//     const orders = await Order.findAll({ where: { customerId } });
-//     res.json(orders);
-//   } catch (error) {
-//     console.error('Error fetching orders:', (error as Error).message);
-//     res.status(500).json({ error: (error as Error).message });
-//   }
-// };
+export const getOrders = async (req: Request, res: Response) => {
+  try {
+    const { customerId } = req.params;
+    const orders = await prisma.order.findMany({
+      where: { customerId: Number(customerId) }
+    });
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching orders:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Get a customer's order details.
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+export const getOrderDetails = async (req: Request, res: Response) => {
+  try {
+    const { customerId, orderId } = req.params;
+    const order = await prisma.order.findUnique({
+      where: { id: String(orderId), customerId: Number(customerId) }
+    });
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    res.json(order);
+  } catch (error) {
+    console.error('Error fetching order:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Update a customer's order status.
+ *
+ * @param req
+ * @param res
+ */
+export const updateOrderStatus = async (req: Request, res: Response) => {
+  try {
+    const { customerId, orderId } = req.params;
+    const { status } = req.body;
+
+    const order = await prisma.order.update({
+      where: { id: String(orderId), customerId: Number(customerId) },
+      data: { status }
+    });
+    res.json(order);
+  } catch (error) {
+    console.error('Error updating order status:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Delete a customer's order.
+ *
+ * @param req
+ * @param res
+ */
+export const cancelOrder = async (req: Request, res: Response) => {
+  try {
+    const { customerId, orderId } = req.params;
+    await prisma.order.delete({
+      where: { id: String(orderId), customerId: Number(customerId) }
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting order:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};

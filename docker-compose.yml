@@ -29,6 +29,7 @@ services:
     networks:
       - sss-network
 
+  # Comment out client for local build (npm run dev)
   client:
     build:
       context: .
