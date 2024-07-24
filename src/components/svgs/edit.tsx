@@ -18,10 +18,7 @@ export const EditIconComponent: React.FC<{ className?: string; fillColor?: strin
           <path d="M136.71 336H152v15.379h-15.29V336z" />
         </clipPath>
       </defs>
-      <g
-        clipPath="url(#a)"
-        transform="matrix(3.24958 0 0 3.24958 -364.078 -795.728)"
-      >
+      <g clipPath="url(#a)" transform="matrix(3.24958 0 0 3.24958 -364.078 -795.728)">
         <path
           fill={fillColor}
           d="M150.258 349.805H137.94v-12.317h7.391v-1.23h-7.39c-.68 0-1.231.55-1.231 1.23v12.317c0 .68.55 1.234 1.23 1.234h12.317c.68 0 1.234-.555 1.234-1.234v-7.387h-1.234v7.387z"
