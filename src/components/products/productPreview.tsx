@@ -18,14 +18,16 @@ const ProductPreviewComponent: React.FC<ProductPreviewProps> = ({
     stock = 0
 }) => {
   return (
-    <div className={`${styles.product_preview}`}>
-        <img src={image} />
-        <p>{name}</p>
-        <div className={`${styles.price_stock}`}>
-            <p className={`${styles.price}`}>${price}</p>
-            <p className={`${styles.stock}`}>{stock} in stock</p>
+    <a href=''>
+        <div className={`${styles.product_preview}`}>
+            <img src={image} />
+            <p>{name}</p>
+            <div className={`${styles.price_stock}`}>
+                <p className={`${styles.price}`}>${price}</p>
+                <p className={`${styles.stock}`}>{stock} in stock</p>
+            </div>
         </div>
-    </div>
+    </a>
   );
 };
 
