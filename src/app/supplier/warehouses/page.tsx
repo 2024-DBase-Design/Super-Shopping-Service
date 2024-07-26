@@ -1,13 +1,13 @@
 'use client';
 
-import { Customer, Warehouse } from '@prisma/client';
+import { Warehouse } from '@prisma/client';
 import React, { useEffect, useState } from 'react';
 import '@/styles/staffSession.scss';
 import SearchComponent from '@/components/search/search';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
 import Link from 'next/link';
-import styles from './customers.module.scss';
+import styles from './warehouses.module.scss';
 
 type WarehouseFilter = {
   name: string;
@@ -22,11 +22,47 @@ const testValue: WarehouseWithName[] = [
   {
     warehouse: {
       id: 0,
-      capacity: 0,
+      capacity: 10,
       createdAt: new Date(),
       updatedAt: new Date()
     },
-    name: "Bobo's Factory"
+    name: "Bobo's Emporium"
+  },
+  {
+    warehouse: {
+      id: 0,
+      capacity: 5902,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    name: "Charlie's Child Labor Factory"
+  },
+  {
+    warehouse: {
+      id: 0,
+      capacity: 12,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    name: "Tooth Fairy's Knick Knacks"
+  },
+  {
+    warehouse: {
+      id: 0,
+      capacity: 100,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    name: 'Warehouse A'
+  },
+  {
+    warehouse: {
+      id: 0,
+      capacity: 999,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    name: 'Warehouse B'
   }
 ];
 
@@ -45,6 +81,11 @@ export default function Page() {
     {
       id: 1,
       name: 'CAPACITY',
+      type: ColType.Basic
+    },
+    {
+      id: 2,
+      name: '', //details link
       type: ColType.Basic
     }
   ];
