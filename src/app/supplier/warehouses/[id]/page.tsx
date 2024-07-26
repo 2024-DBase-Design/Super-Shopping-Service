@@ -146,7 +146,6 @@ export default function CustomerDetail() {
         EDIT WAREHOUSE
       </div>
       <Link className={styles.link + ' close-button white'} href="/supplier/warehouses"></Link>
-
       <div className="main-body">
         <h1>STOCK</h1>
         <div className="ml-4">

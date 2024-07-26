@@ -127,6 +127,7 @@ export default function Page() {
       <p>Imagine a header is here</p>
       <SearchComponent eventEmitter={searchEmitter}></SearchComponent>
       <div className="main-body">
+        <h2>WAREHOUSES</h2>
         <TableComponent table={table}></TableComponent>
       </div>
       <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
