@@ -3,19 +3,16 @@
 import { useRouter } from 'next/router';
 import useRoleAuth from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
-import styles from './detail.module.scss';
+import styles from '../detail.module.scss';
 import '@/styles/staffSession.scss';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import {
-  ButtonOptions,
-  EditableListComponent,
-  EditableListItem
-} from '@/components/form/editableList';
+import { EditableListComponent, EditableListItem } from '@/components/form/editableList';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
-import FormComponent, { FormInput } from '@/components/form/form';
+import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 import { Address, Warehouse, Stock, AddressType } from '@prisma/client';
-import { updateWarehouse } from '../../../../../api/controllers/warehouseController';
+import { ValidationRuleEnum } from '@/components/input/validationRules';
+import { FormValues } from '@/helpers/formValues';
 
 type StockWithName = {
   stock: Stock;
@@ -53,91 +50,137 @@ const testValues: WarehouseDetailValues = {
     supplierId: null,
     warehouseId: null
   },
-  stock: []
+  stock: [
+    {
+      stock: {
+        id: 0,
+        productId: 0,
+        warehouseId: 0,
+        quantity: 10,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      itemName: 'Half Eaten Gummy Worms'
+    },
+    {
+      stock: {
+        id: 0,
+        productId: 0,
+        warehouseId: 0,
+        quantity: 2,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      itemName: 'Legal IRL Lootbox'
+    }
+  ]
 };
 
-async function getWarehouseValues(id: number): Promise<WarehouseDetailValues> {
+const getWarehouseValues = async (id: number): Promise<WarehouseDetailValues> => {
   //make api calls for a warehouse, its address, its stock and the names of those stock items
   // add billing address information to the credit card object (see CreditCardAndAddress)
 
   return testValues;
-}
+};
 
-async function updateWarehouseValues(formValues: FormData) {}
+async function updateWarehouseValues(formValues: FormValues) {}
 
-function updateStock(id: number, newValue: FormData) {}
+function updateStock(id: number, newValue: FormValues) {}
 
 function deleteStock(id: number) {}
 
-function addNewStock(newValue: FormData) {}
-
-function formatAddress(address: Address) {
-  if (address.addressLineOne === '') return '';
-
-  return (
-    address.addressLineOne +
-    '\r\n' +
-    (address.addressLineTwo ? address.addressLineTwo + '\r\n' : '') +
-    address.city +
-    ', ' +
-    address.state +
-    ' ' +
-    address.zip
-  );
-}
+function addNewStock(newValue: FormValues) {}
 
 export default function CustomerDetail() {
   //useRoleAuth(['staff'], '/login');
-  const defaultValue: WarehouseDetailValues = {
-    warehouse: {
-      id: 0,
-      capacity: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
+  const defaultEditableStock: EditableListItem[] = [];
+  const defaultGeneralFormInputs: FormInput[] = [
+    {
+      name: 'Name',
+      inputType: InputTypeEnum.Text,
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
     },
-    name: '',
-    address: {
-      id: 0,
-      addressLineOne: '',
-      addressLineTwo: null,
-      city: '',
-      state: '',
-      zip: '',
-      country: '',
-      type: 'DELIVERY',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      customerId: null,
-      staffId: null,
-      supplierId: null,
-      warehouseId: null
+    {
+      name: 'Capacity',
+      inputType: InputTypeEnum.Text,
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
     },
-    stock: []
-  };
-  const editableStockFormInputs: FormInput[] = [];
-  const defaultEditableStock: EditableListItem[] = [
-    { displayName: '', id: 0, editFormInputs: editableStockFormInputs }
+    {
+      name: 'Address',
+      inputType: InputTypeEnum.Address,
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Address' }]
+    }
+  ];
+  const defaultStockFormInputs: FormInput[] = [
+    {
+      name: 'Name',
+      inputType: InputTypeEnum.Text,
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
+    },
+    {
+      name: 'Quantity',
+      inputType: InputTypeEnum.Text,
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
+    }
   ];
   const { id } = useParams();
-  const [values, setValues] = useState(defaultValue);
   const [editableStock, setEditableStock] = useState(defaultEditableStock);
-  const orderEventEmitter = new ClientEventEmitter();
-  const orderButtonOptions: ButtonOptions = {
-    edit: false,
-    delete: false,
-    addNew: false,
-    custom: true
-  };
-  const stockFormInputs: FormInput[] = [];
-  const generalFormInputs: FormInput[] = [];
+  const [generalFormInputs, setGeneralFormInputs] = useState(defaultGeneralFormInputs);
+  const stockEventEmitter = new ClientEventEmitter();
 
   useEffect(() => {
     getWarehouseValues(Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')).then(
       (res) => {
-        setValues(res);
+        const tempEditableStock: EditableListItem[] = [];
+        for (const s of res.stock) {
+          tempEditableStock.push({
+            displayName: s.itemName,
+            id: s.stock.id,
+            editFormInputs: [
+              {
+                name: 'Name',
+                defaultValue: s.itemName,
+                inputType: InputTypeEnum.Text,
+                validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
+              },
+              {
+                name: 'Quantity',
+                defaultValue: s.stock.quantity,
+                inputType: InputTypeEnum.Text,
+                validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
+              }
+            ]
+          });
+        }
+        setEditableStock(tempEditableStock);
+
+        setGeneralFormInputs([
+          {
+            name: 'Name',
+            defaultValue: res.name,
+            inputType: InputTypeEnum.Text,
+            validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
+          },
+          {
+            name: 'Capacity',
+            defaultValue: res.warehouse.capacity,
+            inputType: InputTypeEnum.Text,
+            validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
+          },
+          {
+            name: 'Address',
+            defaultValue: res.address,
+            inputType: InputTypeEnum.Address,
+            validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Address' }]
+          }
+        ]);
       }
     );
   }, []);
+
+  stockEventEmitter.on('edit', ([formValues, id]) => updateStock(id, formValues));
+  stockEventEmitter.on('delete', (id) => deleteStock(id));
+  stockEventEmitter.on('addNew', (formValues) => addNewStock(formValues));
 
   return (
     <div className={styles.profile}>
@@ -152,16 +195,17 @@ export default function CustomerDetail() {
           <EditableListComponent
             list={editableStock}
             name="Stock"
-            eventEmitter={orderEventEmitter}
-            buttonOptions={orderButtonOptions}
+            eventEmitter={stockEventEmitter}
+            addNewFormInputs={defaultStockFormInputs}
           ></EditableListComponent>
         </div>
         <br></br>
-        {/*
         <FormComponent
+          id={id}
           inputs={generalFormInputs}
-          submitAction={() => updateWarehouse}
-        ></FormComponent>*/}
+          submitAction={updateWarehouseValues}
+          submitName="Save Changes"
+        ></FormComponent>
       </div>
       <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>

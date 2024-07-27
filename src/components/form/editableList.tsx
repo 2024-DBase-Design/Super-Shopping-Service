@@ -28,6 +28,8 @@ export const EditableListComponent: React.FC<{
   name: string;
   eventEmitter: ClientEventEmitter;
   buttonOptions?: ButtonOptions;
+  showText?: boolean;
+  addNewFormInputs?: FormInput[];
 }> = ({
   list,
   name,
@@ -37,7 +39,14 @@ export const EditableListComponent: React.FC<{
     delete: true,
     addNew: true,
     custom: false
-  }
+  },
+  showText = true,
+  addNewFormInputs = list.length > 0
+    ? list[0].editFormInputs.map((i) => {
+        i.defaultValue = null;
+        return i;
+      })
+    : []
 }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [content, setContent] = useState(<div>loading...</div>);
@@ -91,13 +100,9 @@ export const EditableListComponent: React.FC<{
 
   const AddNew = () => {
     setCurrentAction('Add New');
-    const EmptyForm: FormInput[] = list[0].editFormInputs.map((i) => {
-      i.defaultValue = null;
-      return i;
-    });
     setContent(
       <FormComponent
-        inputs={EmptyForm}
+        inputs={addNewFormInputs}
         submitName="Create"
         submitAction={(formData) => eventEmitter.emit('addNew', formData)}
       ></FormComponent>
@@ -110,7 +115,7 @@ export const EditableListComponent: React.FC<{
     <div>
       {list.map((listItem) => (
         <div className="flex justify-end min-h-8 mb-2 items-center" key={i++}>
-          <p className="flex-auto whitespace-pre">{listItem.displayName}</p>
+          {showText && <p className="flex-auto whitespace-pre">{listItem.displayName}</p>}
           {buttonOptions.edit && (
             <button onClick={() => EditItem(listItem)} className="bg-none p-0">
               <EditIconComponent fillColor="#00acbb" className="ml-4"></EditIconComponent>

@@ -30,7 +30,7 @@ const TextInputComponent: React.FC<TextInputProps> = ({
   id = name.toLowerCase(),
   className,
   inputType = 'text',
-  defaultValue,
+  defaultValue = '',
   validationRuleNames,
   onValueChanged,
   forceValidate: forceValidate
@@ -47,6 +47,11 @@ const TextInputComponent: React.FC<TextInputProps> = ({
         validationRules.push(new ValidationRule(formValues, rule));
       }
     }
+  }
+
+  //jank that actually sets value to default value if it fails
+  if (defaultValue !== '') {
+    setTimeout(() => setValue(defaultValue)); //async to get around rerender error
   }
 
   async function validate(ToValidate: any) {

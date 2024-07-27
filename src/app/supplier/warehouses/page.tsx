@@ -8,6 +8,8 @@ import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
 import Link from 'next/link';
 import styles from './warehouses.module.scss';
+import { EditIconComponent } from '@/components/svgs/edit';
+import { ButtonOptions, EditableListComponent } from '@/components/form/editableList';
 
 type WarehouseFilter = {
   name: string;
@@ -30,7 +32,7 @@ const testValue: WarehouseWithName[] = [
   },
   {
     warehouse: {
-      id: 0,
+      id: 1,
       capacity: 5902,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -39,7 +41,7 @@ const testValue: WarehouseWithName[] = [
   },
   {
     warehouse: {
-      id: 0,
+      id: 2,
       capacity: 12,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -48,7 +50,7 @@ const testValue: WarehouseWithName[] = [
   },
   {
     warehouse: {
-      id: 0,
+      id: 3,
       capacity: 100,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -57,7 +59,7 @@ const testValue: WarehouseWithName[] = [
   },
   {
     warehouse: {
-      id: 0,
+      id: 4,
       capacity: 999,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -66,10 +68,14 @@ const testValue: WarehouseWithName[] = [
   }
 ];
 
+//API Connection TODO
 async function GetWarehouses(filter: WarehouseFilter): Promise<WarehouseWithName[]> {
   //warehouses do not have their name attached.
   return testValue;
 }
+
+//API Connection TODO
+function DeleteWarehouse(id: number) {}
 
 export default function Page() {
   const cols: TableCol[] = [
@@ -85,7 +91,12 @@ export default function Page() {
     },
     {
       id: 2,
-      name: '', //details link
+      name: '', //edit link
+      type: ColType.Basic
+    },
+    {
+      id: 3,
+      name: '', //delete button
       type: ColType.Basic
     }
   ];
@@ -93,6 +104,13 @@ export default function Page() {
   const [table, setTable] = useState(tsBs);
   const [search, setSearch] = useState('');
   const searchEmitter: ClientEventEmitter = new ClientEventEmitter();
+  const deleteEmitter: ClientEventEmitter = new ClientEventEmitter();
+  const deleteButtonOptions: ButtonOptions = {
+    edit: false,
+    delete: true,
+    addNew: false,
+    custom: false
+  };
 
   function updateTable(warehouses: WarehouseWithName[]) {
     const temp: Table = new Table(cols);
@@ -101,12 +119,26 @@ export default function Page() {
         warehouse.name,
         warehouse.warehouse.capacity,
         <Link
-          key={warehouse.warehouse.id}
+          key={'e-' + warehouse.warehouse.id}
           className={styles.link}
           href={'/supplier/warehouses/' + warehouse.warehouse.id}
         >
-          Details
-        </Link>
+          <EditIconComponent fillColor="#00acbb"></EditIconComponent>
+        </Link>,
+        <EditableListComponent
+          key={'d-' + warehouse.warehouse.id}
+          name={'Warehouse'}
+          eventEmitter={deleteEmitter}
+          list={[
+            {
+              displayName: warehouse.name,
+              id: warehouse.warehouse.id,
+              editFormInputs: []
+            }
+          ]}
+          buttonOptions={deleteButtonOptions}
+          showText={false}
+        ></EditableListComponent>
       ]);
     }
 
@@ -121,13 +153,19 @@ export default function Page() {
   }, [search]);
 
   searchEmitter.on('searched', (searchValue) => setSearch(searchValue));
+  deleteEmitter.on('delete', (id) => DeleteWarehouse(id));
 
   return (
     <div>
       <p>Imagine a header is here</p>
       <SearchComponent eventEmitter={searchEmitter}></SearchComponent>
       <div className="main-body">
-        <h2>WAREHOUSES</h2>
+        <div className="flex justify-between mb-5">
+          <h2>WAREHOUSES</h2>
+          <Link href={'/supplier/warehouses/new'}>
+            <h3>+ ADD NEW</h3>
+          </Link>
+        </div>
         <TableComponent table={table}></TableComponent>
       </div>
       <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
