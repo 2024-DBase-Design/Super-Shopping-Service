@@ -1,24 +1,23 @@
 'use client';
 
-import React from 'react';
-import { LogoComponent } from '@/components/svgs/logo';
-import '@/styles/noSession.scss';
-import styles from './login.module.scss';
-import { shrikhand } from '../fonts';
-import { ValidationRuleEnum } from '@/components/input/validationRules';
-import Link from 'next/link';
-import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { HttpMethod, EntityType, LOGIN_URL } from '@/helpers/api';
-import { jwtDecode } from 'jwt-decode';
-
+import Link from 'next/link';
+import React from 'react';
+import '@/styles/noSession.scss';
+import styles from './supplier-login.module.scss';
+import { ValidationRuleEnum } from '@/components/input/validationRules';
+import { FormValues } from '@/helpers/formValues';
+import { shrikhand, sintony } from '@/app/fonts';
+import { SupplierLogoComponent } from '@/components/svgs/supplier-logo';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import useClientSide from '@/hooks/useClientSide';
 import { DecodedToken } from '@/hooks/useRoleAuth';
-import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import { jwtDecode } from 'jwt-decode';
+import { LOGIN_URL } from '@/helpers/api';
 
-const LoginPage = () => {
+export default function SupplierLoginPage() {
   const router = useRouter();
   const isClient = useClientSide();
 
@@ -48,12 +47,11 @@ const LoginPage = () => {
 
   const inputs: FormInput[] = [
     {
-      name: 'Email Address',
+      name: 'Name',
       inputType: InputTypeEnum.Text,
       defaultValue: '',
       validationRuleNames: [
-        { type: ValidationRuleEnum.Required, args: 'Email address' },
-        { type: ValidationRuleEnum.Email }
+        { type: ValidationRuleEnum.Required, args: 'Name' }
       ]
     },
     {
@@ -110,42 +108,32 @@ const LoginPage = () => {
       console.error('There has been a problem with your fetch operation:', error);
     }
   };
-
-  return (
-    <div className={'main-container ' + styles.mainContainer}>
-    <BrandHeaderComponent></BrandHeaderComponent>
-      <div className={'form-container ' + styles.formContainer}>
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-            <h2
-              className={`${shrikhand.className} text-center text-4xl font-bold leading-9 tracking-tight`}
-            >
-              Login
-            </h2>
-          </div>
-          <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            <FormComponent
-              inputs={inputs}
-              submitAction={attemptLogin}
-              submitName="Login"
-              buttonClassName="submit-button"
-            ></FormComponent>
-            <p className="mt-3 text-center text-xs text-white">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="font-semibold leading-6">
-                Create a new account
-              </Link>
-            </p>
-            <p className="mt-2 text-center text-xs text-white">
-              <Link href="/supplier/login" className="font-semibold">
-                Go to Supplier Portal
-              </Link>
-            </p>
-          </div>
+  
+  return (<div className={'main-container ' + styles.mainContainer}>
+    <BrandHeaderComponent supplier={true}></BrandHeaderComponent>
+    <div className={'form-container ' + styles.formContainer}>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2
+            className={`${sintony.className} text-center text-4xl font-bold leading-9 tracking-tight`}
+          >
+            <b>LOGIN</b>
+          </h2>
+        </div>
+        <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+          <FormComponent
+            inputs={inputs}
+            submitAction={attemptLogin}
+            submitName="Login"
+            buttonClassName="submit-button"
+          ></FormComponent>
+          <p className="mt-2 text-center text-xs text-white">
+            <Link href="/login" className="font-semibold">
+              Go to Customer Portal
+            </Link>
+          </p>
         </div>
       </div>
     </div>
-  );
-};
-
-export default LoginPage;
+  </div>)
+}
