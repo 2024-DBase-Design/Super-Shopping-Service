@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Select, { ControlProps, StylesConfig } from 'react-select';
 import { ErrorMessageComponent } from './errorMessage';
 import {
   getValidationTest,
@@ -13,18 +12,13 @@ import {
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import { FormValues } from '@/helpers/formValues';
 
-export type FormHydration = {
-  label: string;
-  value: string;
-};
-
 type DropDownInputProps = {
   name: string;
-  options: FormHydration[];
+  options: string[];
   formValues: FormValues;
   id?: string;
   className?: string;
-  defaultValue?: FormHydration;
+  defaultValue?: any;
   validationRuleNames?: ValidationRuleType[];
   onValueChanged?: (value: any, isValid: boolean) => void;
   forceValidate?: ClientEventEmitter;
@@ -36,14 +30,13 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
   formValues,
   id = name.toLowerCase(),
   className,
-  defaultValue = options[0],
+  defaultValue,
   validationRuleNames,
   onValueChanged,
   forceValidate
 }) => {
-  const [value, setValue] = useState<any>(defaultValue.value);
+  const [value, setValue] = useState<any>(defaultValue);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
-  const [focusedBorder, setFocusedBorder] = useState<string>('');
   const validationRules: ValidationRule[] = [];
 
   if (validationRuleNames) {
@@ -55,6 +48,9 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
       }
     }
   }
+
+  options.push('');
+  options = [...new Set(options)];
 
   function validate(ToValidate: any) {
     setErrorMessages([]);
@@ -72,7 +68,7 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
   }
 
   const handleChange = (event: any) => {
-    const newValue = event.value;
+    const newValue = event.target?.value;
     setValue(newValue);
     validate(newValue);
   };
@@ -85,13 +81,6 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
     validate(value);
   });
 
-  function onControlFocus() {
-    setFocusedBorder('focusedBorder');
-  }
-  function onControlBlur() {
-    setFocusedBorder('');
-  }
-
   return (
     <>
       <div className={`flex items-center justify-between ${className}`}>
@@ -103,18 +92,24 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
         </label>
       </div>
       <div className="mt-1">
-        <Select
-          options={options}
-          unstyled
-          placeholder={defaultValue?.label ?? 'Select...'}
-          defaultValue={defaultValue}
-          id={id}
+        <select
+          id={name.toLowerCase()}
           name={name.toLowerCase()}
-          className={`${focusedBorder} complex-select pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'}`}
+          className={`pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'}`}
           onChange={handleChange}
-          onFocus={onControlFocus}
-          onBlur={onControlBlur}
-        />
+        >
+          {options.map((option) =>
+            defaultValue === option ? (
+              <option key={option} selected value={option}>
+                {option}
+              </option>
+            ) : (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            )
+          )}
+        </select>
       </div>
       <div>
         <ErrorMessageComponent messages={errorMessages} />

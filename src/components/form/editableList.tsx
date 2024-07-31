@@ -43,8 +43,9 @@ export const EditableListComponent: React.FC<{
   showText = true,
   addNewFormInputs = list.length > 0
     ? list[0].editFormInputs.map((i) => {
-        i.defaultValue = null;
-        return i;
+        const newInput = JSON.parse(JSON.stringify(i));
+        newInput.defaultValue = null;
+        return newInput;
       })
     : []
 }) => {
