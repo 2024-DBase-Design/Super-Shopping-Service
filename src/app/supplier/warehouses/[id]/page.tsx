@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/router';
-import useRoleAuth from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from '../detail.module.scss';
 import '@/styles/staffSession.scss';
@@ -10,7 +8,7 @@ import Link from 'next/link';
 import { EditableListComponent, EditableListItem } from '@/components/form/editableList';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { Warehouse, Stock, AddressType, Product, Address } from '@prisma/client';
+import { Warehouse, Stock, Product, Address } from '@prisma/client';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
