@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CartItem } from '@/app/cart/page';
+import { FormHydration } from '@/components/input/dropdownInput';
+
+export const lastCreditCardNumber: string = '';
+
 export enum HttpMethod {
   GET = 'GET',
   PUT = 'PUT',
@@ -11,7 +17,7 @@ export enum EntityType {
   ADDRESS = 'address',
   CREDIT_CARD = 'creditCard',
   CART = 'cart',
-  ORDER = 'order',
+  ORDER = 'orders',
   PRODUCT = 'products',
   STAFF = 'staff',
   STOCK = 'stock',
@@ -80,4 +86,88 @@ export function buildTwoEntityUrl(
     default:
       throw new Error('Invalid method');
   }
+}
+
+// Customer API calls
+
+export async function getPaymentOptions(id: number): Promise<FormHydration[]> {
+  // build URL
+  const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CREDIT_CARD);
+  // Send GET request to API
+  const response = await fetch(LOGIN_URL, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const options: FormHydration[] = data.map((payment: any) => {
+    return { label: '••••••••••••' + payment.cardNumber.slice(-4), value: payment.id.toString() };
+  });
+
+  return options;
+}
+
+export async function getDeliveryAddressOptions(id: number): Promise<FormHydration[]> {
+  // Build URL
+  const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.ADDRESS);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const options: FormHydration[] = data.map((address: any) => {
+    return {
+      label: `${address.street}, ${address.city} ${address.state} ${address.zip}`,
+      value: address.id.toString()
+    };
+  });
+
+  return options;
+}
+
+export async function getCart(id: number): Promise<CartItem[]> {
+  // Build URL
+  const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CART);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const cart: CartItem[] = data.map((item: any) => {
+    return {
+      id: item.id,
+      name: item.name,
+      url: 'data:image/png;base64,' + item.url,
+      price: item.price,
+      quantity: item.quantity
+    };
+  });
+
+  return cart;
 }
