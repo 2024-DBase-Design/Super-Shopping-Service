@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useState } from 'react';
 import { Product } from '@prisma/client';
 import ProductPreviewComponent from '@/components/products/productPreview';
 import '@/styles/noSession.scss';
@@ -73,28 +74,38 @@ const testValue: ResultProducts = {
   ]
 }
 
-const getResultItems = () => {
-  return testValue;
-}
-
 const getStockAmount = (productId: number) => {
   return 5;
 }
 
 const SearchPage = () => {
 
+  const [getSearchResults, setSearchResults] = useState( {
+    products: [] as Product[],
+  });
+
+  const conductSearch = (searchText: string) => {
+    // do stuff with search string
+    setSearchResults(testValue);
+  }
+
+  const [getSearchText, setSearchText] = useState('');
+
   return (
     <div className={'main-container ' + styles.mainContainer}>
       <div className={styles.topSection}>
         <h1 className={shrikhand.className + ' ' + styles.header}>Silly Stuffs</h1>
-        <input placeholder="Search" className={styles.searchBar} type="text" />
+        <div className={styles.searchButtonCombo}>
+          <input placeholder="Search" className={styles.searchBar} type="text" onChange={e => {setSearchText(e.currentTarget.value);}} />
+          <button onClick={() => conductSearch(getSearchText)}> GO </button>
+        </div>
       </div>
       <div className={styles.homeCard}>
         <div className={styles.homeSection}>
           <div className={styles.resultsContainer}>
             {
-              getResultItems().products.map((product) =>
-                <ProductPreviewComponent image={product.image} name={product.name} price={product.price} stock={getStockAmount(product.id)} />
+              getSearchResults.products.map((product, i) =>
+                <ProductPreviewComponent image={product.image} name={product.name} price={product.price} stock={getStockAmount(product.id)} key={i}/>
               )
             }
           </div>

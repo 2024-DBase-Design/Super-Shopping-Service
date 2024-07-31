@@ -87,6 +87,19 @@
   overflow: scroll;
 }
 
+.searchButtonCombo {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  button {
+    width: 50px;
+    background-color: #04c3d8;
+    border-radius: 50%;
+  }
+  input {
+    color: black;
+  }
+}
 
 @media (max-height: 850px) {
  .brandLogo {
