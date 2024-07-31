@@ -10,67 +10,53 @@ import Link from 'next/link';
 import styles from './warehouses.module.scss';
 import { EditIconComponent } from '@/components/svgs/edit';
 import { ButtonOptions, EditableListComponent } from '@/components/form/editableList';
+import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 
 type WarehouseFilter = {
   name: string;
 };
 
-// const testValue: WarehouseWithName[] = [
-//   {
-//     warehouse: {
-//       id: 0,
-//       capacity: 10,
-//       createdAt: new Date(),
-//       updatedAt: new Date()
-//     },
-//     name: "Bobo's Emporium"
-//   },
-//   {
-//     warehouse: {
-//       id: 1,
-//       capacity: 5902,
-//       createdAt: new Date(),
-//       updatedAt: new Date()
-//     },
-//     name: "Charlie's Child Labor Factory"
-//   },
-//   {
-//     warehouse: {
-//       id: 2,
-//       capacity: 12,
-//       createdAt: new Date(),
-//       updatedAt: new Date()
-//     },
-//     name: "Tooth Fairy's Knick Knacks"
-//   },
-//   {
-//     warehouse: {
-//       id: 3,
-//       capacity: 100,
-//       createdAt: new Date(),
-//       updatedAt: new Date()
-//     },
-//     name: 'Warehouse A'
-//   },
-//   {
-//     warehouse: {
-//       id: 4,
-//       capacity: 999,
-//       createdAt: new Date(),
-//       updatedAt: new Date()
-//     },
-//     name: 'Warehouse B'
-//   }
-// ];
+const GetWarehouses = async (filter: WarehouseFilter): Promise<Warehouse[]> => {
+  try {
+    const response = await fetch(
+      buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE) + `/filter/${filter}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-//API Connection TODO
-async function GetWarehouses(filter: WarehouseFilter): Promise<Warehouse[]> {
-  //warehouses do not have their name attached.
-  return [];
-}
+    if (!response.ok) {
+      console.error('Error fetching warehouses');
+    }
 
-//API Connection TODO
-function DeleteWarehouse(id: number) {}
+    const warehouses: Warehouse[] = await response.json();
+    return warehouses;
+  } catch (error) {
+    console.error('Error fetching warehouses:', (error as Error).message);
+    return [];
+  }
+};
+
+// Delete a warehouse by id
+const DeleteWarehouse = async (id: number) => {
+  try {
+    const response = await fetch(buildOneEntityUrl(HttpMethod.DELETE, EntityType.WAREHOUSE, id), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Error deleting warehouse');
+    }
+  } catch (error) {
+    console.error('Error deleting warehouse:', (error as Error).message);
+  }
+};
 
 export default function Page() {
   const cols: TableCol[] = [

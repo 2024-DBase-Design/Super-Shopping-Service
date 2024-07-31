@@ -18,6 +18,9 @@ COPY . .
 # Remove the api directory
 RUN rm -rf ./api
 
+# Generate Prisma client
+RUN npx prisma generate
+
 # Build Next.js app
 RUN npm run build
 

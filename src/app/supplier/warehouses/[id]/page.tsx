@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { EditableListComponent, EditableListItem } from '@/components/form/editableList';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { Address, Warehouse, Stock, AddressType, Product } from '@prisma/client';
+import { Warehouse, Stock, Product, Address } from '@prisma/client';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
@@ -24,57 +24,7 @@ type WarehouseDetailValues = {
   stock: StockWithName[];
 };
 
-// const testValues: WarehouseDetailValues = {
-//   warehouse: {
-//     id: 0,
-//     capacity: 100,
-//     createdAt: new Date(),
-//     updatedAt: new Date()
-//   },
-//   name: 'Warehouse A',
-//   address: {
-//     id: 0,
-//     addressLineOne: 'Warehouse Road',
-//     addressLineTwo: null,
-//     city: 'Ware',
-//     state: 'KY',
-//     zip: '12345',
-//     country: '',
-//     type: AddressType.WAREHOUSE,
-//     createdAt: new Date(),
-//     updatedAt: new Date(),
-//     customerId: null,
-//     staffId: null,
-//     supplierId: null,
-//     warehouseId: null
-//   },
-//   stock: [
-//     {
-//       stock: {
-//         id: 0,
-//         productId: 0,
-//         warehouseId: 0,
-//         quantity: 10,
-//         createdAt: new Date(),
-//         updatedAt: new Date()
-//       },
-//       itemName: 'Half Eaten Gummy Worms'
-//     },
-//     {
-//       stock: {
-//         id: 0,
-//         productId: 0,
-//         warehouseId: 0,
-//         quantity: 2,
-//         createdAt: new Date(),
-//         updatedAt: new Date()
-//       },
-//       itemName: 'Legal IRL Lootbox'
-//     }
-//   ]
-// };
-
-const getWarehouseValues = async (id: number): Promise<WarehouseDetailValues> => {
+const getWarehouseValues = async (id: number): Promise<WarehouseDetailValues | null> => {
   try {
     const warehouseResponse = await fetch(
       buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE, id)
@@ -134,42 +84,94 @@ const getWarehouseValues = async (id: number): Promise<WarehouseDetailValues> =>
     return warehouseInfo;
   } catch (error) {
     console.error('There has been a problem with your fetch operation:', error);
-    return {
-      warehouse: {
-        id: 0,
-        capacity: 0,
-        name: '',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      address: {
-        id: 0,
-        addressLineOne: '',
-        addressLineTwo: '',
-        city: '',
-        state: '',
-        zip: '',
-        country: '',
-        type: AddressType.WAREHOUSE,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        customerId: null,
-        staffId: null,
-        supplierId: null,
-        warehouseId: null
-      },
-      stock: []
-    };
+    return null;
   }
 };
 
-async function updateWarehouseValues(formValues: FormValues) {}
+const updateWarehouseValues = async (formValues: FormValues) => {
+  try {
+    const response = await fetch(
+      buildOneEntityUrl(HttpMethod.PUT, EntityType.WAREHOUSE, formValues.getValue('Id')),
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formValues.getValue('Name'),
+          capacity: formValues.getValue('Capacity'),
+          address: formValues.getValue('Address')
+        })
+      }
+    );
 
-function updateStock(id: number, newValue: FormValues) {}
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
+};
 
-function deleteStock(id: number) {}
+const updateStock = async (id: number, formValues: FormValues) => {
+  try {
+    const response = await fetch(buildOneEntityUrl(HttpMethod.PUT, EntityType.STOCK, id), {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        itemName: formValues.getValue('Name'),
+        quantity: formValues.getValue('Quantity')
+      })
+    });
 
-function addNewStock(newValue: FormValues) {}
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
+};
+
+const deleteStock = async (id: number) => {
+  try {
+    const response = await fetch(buildOneEntityUrl(HttpMethod.DELETE, EntityType.STOCK, id), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
+};
+
+const addNewStock = async (formValues: FormValues) => {
+  try {
+    const response = await fetch(buildOneEntityUrl(HttpMethod.POST, EntityType.STOCK), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        productId: formValues.getValue('ProductId'),
+        warehouseId: formValues.getValue('WarehouseId'),
+        quantity: formValues.getValue('Quantity')
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
+};
 
 export default function CustomerDetail() {
   //useRoleAuth(['staff'], '/login');
@@ -183,7 +185,7 @@ export default function CustomerDetail() {
     {
       name: 'Capacity',
       inputType: InputTypeEnum.Text,
-      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Capacity' }]
     },
     {
       name: 'Address',
@@ -193,9 +195,14 @@ export default function CustomerDetail() {
   ];
   const defaultStockFormInputs: FormInput[] = [
     {
-      name: 'Name',
+      name: 'ProductId',
       inputType: InputTypeEnum.Text,
-      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'ProductId' }]
+    },
+    {
+      name: 'WarehouseId',
+      inputType: InputTypeEnum.Text,
+      validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'WarehouseId' }]
     },
     {
       name: 'Quantity',
@@ -211,52 +218,54 @@ export default function CustomerDetail() {
   useEffect(() => {
     getWarehouseValues(Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')).then(
       (res) => {
-        const tempEditableStock: EditableListItem[] = [];
-        for (const s of res.stock) {
-          tempEditableStock.push({
-            displayName: s.itemName,
-            id: s.stock.id,
-            editFormInputs: [
-              {
-                name: 'Name',
-                defaultValue: s.itemName,
-                inputType: InputTypeEnum.Text,
-                validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
-              },
-              {
-                name: 'Quantity',
-                defaultValue: s.stock.quantity,
-                inputType: InputTypeEnum.Text,
-                validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
-              }
-            ]
-          });
-        }
-        setEditableStock(tempEditableStock);
-
-        setGeneralFormInputs([
-          {
-            name: 'Name',
-            defaultValue: res.warehouse.name,
-            inputType: InputTypeEnum.Text,
-            validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
-          },
-          {
-            name: 'Capacity',
-            defaultValue: res.warehouse.capacity,
-            inputType: InputTypeEnum.Text,
-            validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
-          },
-          {
-            name: 'Address',
-            defaultValue: res.address,
-            inputType: InputTypeEnum.Address,
-            validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Address' }]
+        if (res) {
+          const tempEditableStock: EditableListItem[] = [];
+          for (const s of res.stock) {
+            tempEditableStock.push({
+              displayName: s.itemName,
+              id: s.stock.id,
+              editFormInputs: [
+                {
+                  name: 'Name',
+                  defaultValue: s.itemName,
+                  inputType: InputTypeEnum.Text,
+                  validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
+                },
+                {
+                  name: 'Quantity',
+                  defaultValue: s.stock.quantity,
+                  inputType: InputTypeEnum.Text,
+                  validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
+                }
+              ]
+            });
           }
-        ]);
+          setEditableStock(tempEditableStock);
+
+          setGeneralFormInputs([
+            {
+              name: 'Name',
+              defaultValue: res.warehouse.name,
+              inputType: InputTypeEnum.Text,
+              validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
+            },
+            {
+              name: 'Capacity',
+              defaultValue: res.warehouse.capacity,
+              inputType: InputTypeEnum.Text,
+              validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Quantity' }]
+            },
+            {
+              name: 'Address',
+              defaultValue: res.address,
+              inputType: InputTypeEnum.Address,
+              validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Address' }]
+            }
+          ]);
+        }
       }
     );
-  }, []);
+  }, [id]);
 
   stockEventEmitter.on('edit', ([formValues, id]) => updateStock(id, formValues));
   stockEventEmitter.on('delete', (id) => deleteStock(id));
@@ -281,7 +290,7 @@ export default function CustomerDetail() {
         </div>
         <br></br>
         <FormComponent
-          id={Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')}
+          id={Array.isArray(id) ? parseInt(id.join('')) : parseInt(id)}
           inputs={generalFormInputs}
           submitAction={updateWarehouseValues}
           submitName="Save Changes"
