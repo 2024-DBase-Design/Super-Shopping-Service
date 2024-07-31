@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CartItem } from '@/app/cart/page';
+import { ProductFilter } from '@/app/supplier/products/page';
+import { Product, Stock } from '@prisma/client';
 
 export const lastCreditCardNumber: string = '';
 
@@ -166,4 +168,69 @@ export async function getCart(id: number): Promise<CartItem[]> {
   });
 
   return cart;
+}
+
+export async function GetProducts(filter: ProductFilter): Promise<Product[]> {
+  // Get all products
+  const url = buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const products: Product[] = data.map((item: any) => ({
+    id: item.id,
+    image: item.image,
+    name: item.name,
+    price: item.price,
+    category: item.category,
+    brand: item.brand,
+    size: item.size,
+    description: item.description,
+    supplierId: item.supplierId,
+    createdAt: new Date(item.createdAt),
+    updatedAt: new Date(item.updatedAt)
+  }));
+
+  // Filter products based on the filter (name)
+  if (filter.name) {
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(filter.name.toLowerCase())
+    );
+  }
+
+  return products;
+}
+
+export async function GetStock(pid: number, wid: number): Promise<Stock> {
+  // Get all stocks
+  const response = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.STOCK), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get stock');
+  }
+
+  const stocks: Stock[] = await response.json();
+
+  // Find the one that matches pid and wid (need the stock ID)
+  const stockOfInterest = stocks.find((s) => s.productId === pid && s.warehouseId === wid);
+  if (!stockOfInterest) {
+    throw new Error('Stock not found');
+  }
+  return stockOfInterest;
 }

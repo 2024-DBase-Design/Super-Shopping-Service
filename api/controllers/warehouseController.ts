@@ -1,6 +1,7 @@
 import { parse } from 'path';
 import { prisma } from '../index';
 import { Request, Response } from 'express';
+import { Warehouse } from '@prisma/client';
 
 /**
  * Create a new warehouse.
@@ -13,8 +14,8 @@ export const addWarehouse = async (req: Request, res: Response): Promise<void> =
     const { capacity, address, name } = req.body;
     const newWarehouse = await prisma.warehouse.create({
       data: {
-        capacity,
-        name
+        name,
+        capacity
       }
     });
     await prisma.address.create({
@@ -188,6 +189,35 @@ export const getWarehouseByName = async (req: Request, res: Response): Promise<v
     res.status(200).json(warehouse);
   } catch (error) {
     console.error('Error fetching warehouse by name:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Get all the warehouse's not full.
+ */
+export const getWarehouseNotFull = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const warehouses = await prisma.warehouse.findMany();
+
+    const warehousesWithCapacity: Warehouse[] = [];
+
+    for (const warehouse of warehouses) {
+      // Fetch all stocks associated with the warehouse
+      const stocks = await prisma.stock.findMany({
+        where: { warehouseId: warehouse.id },
+        select: { quantity: true }
+      });
+
+      // Calculate the total stock quantity
+      const totalQuantity = stocks.reduce((sum, stock) => sum + stock.quantity, 0);
+      if (totalQuantity < warehouse.capacity) {
+        warehousesWithCapacity.push(warehouse);
+      }
+    }
+    res.status(200).json(warehousesWithCapacity);
+  } catch (error) {
+    console.error('Error fetching warehouse not full:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
   }
 };

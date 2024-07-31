@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import useRoleAuth from '@/hooks/useRoleAuth';
 import React from 'react';
 import styles from '../detail.module.scss';
@@ -9,14 +9,44 @@ import Link from 'next/link';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
+import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
+import { Product } from '@prisma/client';
 
-const addNewProduct = (formValues: FormValues) => {
-  //If successful, should redirect to /supplier/Products/{newId}
-  // Stock cannot be added on a new/non-existant Product
-  // So don't worry about that here
-};
+const AddNewProduct: React.FC = () => {
+  const router = useRouter();
 
-export default function CustomerDetail() {
+  const addNewProduct = async (formValues: FormValues) => {
+    try {
+      const productResponse = await fetch(buildOneEntityUrl(HttpMethod.POST, EntityType.PRODUCT), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          image: formValues.getValue('Image'),
+          name: formValues.getValue('Name'),
+          description: formValues.getValue('Description'),
+          price: formValues.getValue('Price'),
+          category: 'Apparel', // TODO - get this from the form
+          supplierId: 1, // TODO - get this from the form
+          size: 'M', // TODO - get this from the form
+          brand: 'Nike' // TODO - get this from the form
+        })
+      });
+
+      if (!productResponse.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const productData: Product = await productResponse.json();
+
+      // Redirect to /supplier/products/{newId}
+      router.push('/supplier/products/' + productData.id);
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  };
+
   //useRoleAuth(['staff'], '/login');
   const defaultGeneralFormInputs: FormInput[] = [
     {
@@ -56,4 +86,6 @@ export default function CustomerDetail() {
       <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
-}
+};
+
+export default AddNewProduct;

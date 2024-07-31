@@ -1,6 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import useRoleAuth from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from '../detail.module.scss';
@@ -14,49 +15,21 @@ import {
 } from '@/components/form/editableList';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { Product, Warehouse } from '@prisma/client';
+import { Product, Warehouse, Stock } from '@prisma/client';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
+import build from 'next/dist/build';
+import { buildOneEntityUrl, EntityType, GetStock, HttpMethod } from '@/helpers/api';
 
-type WarehouseProductInfo = {
+export type WarehouseProductInfo = {
   name: string; //name of warehouse
   stock: number; //number of this product in its stock
   id: number; //id of warehouse
 };
 
-type ProductWithWarehouses = {
+export type ProductWithWarehouses = {
   product: Product;
   warehouses: WarehouseProductInfo[];
-};
-
-const testValue: ProductWithWarehouses = {
-  product: {
-    id: 0,
-    image:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAQdJREFUWEftlU0OwiAQhYczeCXdY+KyPZ1bE923q3oek3oCDCZYnAAzw4+NSVk1Bfq+eX0DqptmAysOtQFsDuQ6cH6cgtHtdxdRpEUhjInGFDkwbACpuIOiIFgAueIcCBKgVNxCpFyoDuDEMHgMIgkgqT4k4O9vCoA/7oTte/851C1VHPABsGBzgFT1tuLVALDdzTJAha+oDTldQJ101MVQPYSUIJ4vB9AD9PenVPezvvwk1AMopaCb5iwIMYA6jmCu+0WsNYDfy1bcDmMMwO3wVXFuGEkHfADQwyKKADhXr/goxhvebekgIgBSEJYDQRBm5KhfkwUgAfoJANOM4LIqDmwAf+3AC13y08EsneriAAAAAElFTkSuQmCC',
-    name: 'Worm on a String',
-    price: 1,
-    category: '',
-    brand: '',
-    size: '5',
-    description:
-      "According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little. Barry! Breakfast is ready! Ooming! Hang on a second. Hello? - Barry? - Adam? - Oan you believe this is happening? - I can't.",
-    supplierId: 0,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  warehouses: [
-    {
-      name: 'Warehouse A',
-      id: 2,
-      stock: 5
-    },
-    {
-      name: 'Warehouse B',
-      id: 3,
-      stock: 10
-    }
-  ]
 };
 
 const activeWarehouses: WarehouseProductInfo[] = [
@@ -68,29 +41,144 @@ const activeWarehouses: WarehouseProductInfo[] = [
 ];
 
 const getProductValues = async (id: number): Promise<ProductWithWarehouses> => {
-  return testValue;
+  const productWarehouseResponse = await fetch(
+    buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT, id) + '/warehouses'
+  );
+
+  if (!productWarehouseResponse.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const productWarehouseData: ProductWithWarehouses = await productWarehouseResponse.json();
+  return productWarehouseData;
 };
 
 // get warehouses that could have this item added to it's stock
-async function getActiveWarehouses(): Promise<WarehouseProductInfo[]> {
-  return activeWarehouses;
-}
+const getActiveWarehouses = async (): Promise<WarehouseProductInfo[]> => {
+  const availableWarehousesResponse = await fetch(
+    buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE) + '/available_space'
+  );
 
-function updateProductValues(id: number, formValues: FormValues) {}
+  if (!availableWarehousesResponse.ok) {
+    throw new Error('Network response was not ok');
+  }
 
-function deleteProduct(id: number) {
-  //should delete and redirect to supplier/products since /id no longer exists
-}
+  const availableWarehousesData: Warehouse[] = await availableWarehousesResponse.json();
+
+  return availableWarehousesData.map((w) => {
+    return {
+      name: w.name,
+      id: w.id,
+      stock: 0
+    };
+  });
+};
+
+const updateProductValues = async (id: number, formValues: FormValues) => {
+  const response = await fetch(buildOneEntityUrl(HttpMethod.PUT, EntityType.PRODUCT, id), {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: formValues.getValue('Name'),
+      description: formValues.getValue('Description'),
+      price: formValues.getValue('Price'),
+      image: formValues.getValue('Image'),
+      category: 'Apparel', // TODO - get this from the form
+      brand: 'Nike', // TODO - get this from the form
+      size: 'M' // TODO - get this from the form
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update product');
+  }
+
+  console.log('Product updated');
+};
 
 // pid == product id, wid == warehouse id
 
-function removeWarehouseFromProduct(pid: number, wid: number) {}
+async function removeWarehouseFromProduct(pid: number, wid: number) {
+  // Get the stock to delete
+  const stockToDelete = await GetStock(pid, wid);
 
-function updateWarehouseProductStock(pid: number, wid: number, newStock: number) {}
+  // Delete chosen stock
+  if (stockToDelete) {
+    const deleteResponse = await fetch(
+      buildOneEntityUrl(HttpMethod.DELETE, EntityType.STOCK, stockToDelete.id),
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-function addNewWarehouseToProduct(pid: number, wid: number, stock: number) {}
+    if (!deleteResponse.ok) {
+      throw new Error('Failed to delete stock');
+    }
+
+    // Handle success
+    console.log('Stock deleted');
+  } else {
+    throw new Error('Failed to find stock to delete');
+  }
+}
+
+async function updateWarehouseProductStock(pid: number, wid: number, newStock: number) {
+  // Get the stock to update
+  const stockToUpdate = await GetStock(pid, wid);
+
+  // Update chosen stock
+  if (stockToUpdate) {
+    const updateResponse = await fetch(
+      buildOneEntityUrl(HttpMethod.PUT, EntityType.STOCK, stockToUpdate.id),
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          quantity: newStock
+        })
+      }
+    );
+
+    if (!updateResponse.ok) {
+      throw new Error('Failed to update stock');
+    }
+
+    // Handle success
+    console.log('Stock updates');
+  } else {
+    throw new Error('Failed to find stock to update');
+  }
+}
+
+const addNewWarehouseToProduct = async (pid: number, wid: number, stock: number) => {
+  const reponse = await fetch(buildOneEntityUrl(HttpMethod.POST, EntityType.STOCK), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      productId: pid,
+      warehouseId: wid,
+      quantity: stock
+    })
+  });
+
+  if (!reponse.ok) {
+    throw new Error('Failed to add stock');
+  }
+
+  console.log('Stock added');
+};
 
 export default function ProductDetail() {
+  const router = useRouter();
   //useRoleAuth(['staff'], '/login');
   const defaultEditableList: EditableListItem[] = [];
   const defaultValue: ProductWithWarehouses = {
@@ -145,6 +233,22 @@ export default function ProductDetail() {
     custom: false
   };
   const [productStock, setProductStock] = useState(0);
+
+  async function deleteProduct(id: number) {
+    const response = await fetch(buildOneEntityUrl(HttpMethod.DELETE, EntityType.PRODUCT, id), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete product');
+    }
+
+    // Handle success
+    router.push('/supplier/products');
+  }
 
   useEffect(() => {
     getProductValues(pId)

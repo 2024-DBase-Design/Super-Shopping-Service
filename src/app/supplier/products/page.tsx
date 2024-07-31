@@ -10,8 +10,10 @@ import Link from 'next/link';
 import styles from './products.module.scss';
 import { EditIconComponent } from '@/components/svgs/edit';
 import { ButtonOptions, EditableListComponent } from '@/components/form/editableList';
+import { buildOneEntityUrl, GetProducts, HttpMethod, EntityType } from '@/helpers/api';
+import { useRouter } from 'next/navigation';
 
-type ProductFilter = {
+export type ProductFilter = {
   name: string;
 };
 
@@ -60,15 +62,8 @@ const testValue: Product[] = [
   }
 ];
 
-//API Connection TODO
-async function GetProducts(filter: ProductFilter): Promise<Product[]> {
-  return testValue;
-}
-
-//API Connection TODO
-function DeleteProduct(id: number) {}
-
 export default function Page() {
+  const router = useRouter();
   const cols: TableCol[] = [
     {
       id: 0,
@@ -140,6 +135,22 @@ export default function Page() {
     }
 
     setTable(temp);
+  }
+
+  async function DeleteProduct(id: number) {
+    const response = await fetch(buildOneEntityUrl(HttpMethod.DELETE, EntityType.PRODUCT, id), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete product');
+    }
+
+    // Handle success
+    router.refresh();
   }
 
   useEffect(() => {
