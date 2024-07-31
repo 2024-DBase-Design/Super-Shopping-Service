@@ -1,7 +1,20 @@
+'use client';
 import Image from 'next/image';
 import { getUserId, setUserId } from './_app';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import useClientSide from '@/hooks/useClientSide';
 
 export default function Home() {
+  const router = useRouter();
+  const isClient = useClientSide();
+
+  useEffect(() => {
+    if (isClient) {
+      router.push('/login');
+    }
+  }, [router, isClient]);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
