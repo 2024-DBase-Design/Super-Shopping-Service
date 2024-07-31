@@ -74,7 +74,7 @@ const FormComponent: React.FC<{
               {input.inputType === InputTypeEnum.DropDown ? (
                 <DropDownInputComponent
                   name={input.name}
-                  options={input.options ?? [{label:'', value:''}]}
+                  options={input.options ?? [{ label: '', value: '' }]}
                   formValues={formValues}
                   validationRuleNames={input.validationRuleNames}
                   onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}

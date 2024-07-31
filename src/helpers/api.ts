@@ -1,7 +1,8 @@
-import { CartItem } from "@/app/cart/page";
-import { FormHydration } from "@/components/input/dropdownInput";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CartItem } from '@/app/cart/page';
+import { FormHydration } from '@/components/input/dropdownInput';
 
-export let lastCreditCardNumber: string = '';
+export const lastCreditCardNumber: string = '';
 
 export enum HttpMethod {
   GET = 'GET',
@@ -89,7 +90,7 @@ export function buildTwoEntityUrl(
 
 // Customer API calls
 
-export async function getPaymentOptions(id: number): Promise<FormHydration[]>{
+export async function getPaymentOptions(id: number): Promise<FormHydration[]> {
   // build URL
   const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CREDIT_CARD);
   // Send GET request to API
@@ -97,7 +98,7 @@ export async function getPaymentOptions(id: number): Promise<FormHydration[]>{
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
-    },
+    }
   });
   if (!response.ok) {
     throw new Error('Network response was not ok');
@@ -162,10 +163,11 @@ export async function getCart(id: number): Promise<CartItem[]> {
     return {
       id: item.id,
       name: item.name,
-      url: "data:image/png;base64," + item.url,
+      url: 'data:image/png;base64,' + item.url,
       price: item.price,
       quantity: item.quantity
-  }});
+    };
+  });
 
   return cart;
 }

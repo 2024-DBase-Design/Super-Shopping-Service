@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import '@/styles/session.scss';
-import styles from './cart.module.scss'
+import styles from './cart.module.scss';
 import { CartIconComponent } from '@/components/svgs/cart';
 import Link from 'next/link';
 import { getCart } from '@/helpers/api';
@@ -12,11 +12,11 @@ import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
 
 export type CartItem = {
-  id: number,
-  name: string,
-  url: string,
-  price: number,
-  quantity: number
+  id: number;
+  name: string;
+  url: string;
+  price: number;
+  quantity: number;
 };
 
 export default function Page() {
@@ -40,38 +40,43 @@ export default function Page() {
           window.localStorage.removeItem('token');
           router.push('/login');
         }
-      }
-      else {
+      } else {
         router.push('/login');
       }
-
     }
   }, [router, isClient]);
-  
+
   const tempItem: CartItem[] = [];
   const [cart, setCart] = useState(tempItem);
-  getCart(customerID).then(res => setCart(res));
-  
-  return <><div style={{backgroundColor: "grey"}}>Imagine the header is here</div>
-  <div className='main-body'>
-    <h1>In Cart</h1>
-    <div className={styles.cartItems}>
-      {cart.map((item) => (
-            <div className={styles.cartItem}>
-              <img src={item.url}/>
+  getCart(customerID).then((res) => setCart(res));
+
+  return (
+    <>
+      <div style={{ backgroundColor: 'grey' }}>Imagine the header is here</div>
+      <div className="main-body">
+        <h1>In Cart</h1>
+        <div className={styles.cartItems}>
+          {cart.map((item) => (
+            <div className={styles.cartItem} key={item.id}>
+              <img src={item.url} />
               <div>
                 <h3>{item.name}</h3>
                 <p className="money">{item.price}</p>
               </div>
             </div>
           ))}
-    </div>
-    <div className='flex flex-col items-center justify-center'>
-    <Link href="/cart/checkout">
-      <button>Checkout <CartIconComponent className="inline" fillColor="#fff"></CartIconComponent></button>
-      </Link>
-    </div>
-  </div>
-  <div style={{backgroundColor: "grey", position: "fixed", bottom:"0"}}>Imagine the navbar is here</div>
-  </>
+        </div>
+        <div className="flex flex-col items-center justify-center">
+          <Link href="/cart/checkout">
+            <button>
+              Checkout <CartIconComponent className="inline" fillColor="#fff"></CartIconComponent>
+            </button>
+          </Link>
+        </div>
+      </div>
+      <div style={{ backgroundColor: 'grey', position: 'fixed', bottom: '0' }}>
+        Imagine the navbar is here
+      </div>
+    </>
+  );
 }

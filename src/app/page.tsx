@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import Image from 'next/image';
 import { getUserId, setUserId } from './_app';
 import { useEffect } from 'react';
@@ -11,8 +11,8 @@ export default function Home() {
 
   useEffect(() => {
     if (isClient) {
-        router.push('/login');
-      }
+      router.push('/login');
+    }
   }, [router, isClient]);
 
   return (

@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Select, { ControlProps, StylesConfig } from 'react-select'
+import Select, { ControlProps, StylesConfig } from 'react-select';
 import { ErrorMessageComponent } from './errorMessage';
 import {
   getValidationTest,
@@ -14,9 +14,9 @@ import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import { FormValues } from '@/helpers/formValues';
 
 export type FormHydration = {
-  label: string,
-  value: string
-}
+  label: string;
+  value: string;
+};
 
 type DropDownInputProps = {
   name: string;
@@ -85,13 +85,12 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
     validate(value);
   });
 
-  function onControlFocus(){
-    setFocusedBorder('focusedBorder')
+  function onControlFocus() {
+    setFocusedBorder('focusedBorder');
   }
-  function onControlBlur(){
-    setFocusedBorder('')
+  function onControlBlur() {
+    setFocusedBorder('');
   }
-  
 
   return (
     <>
@@ -104,16 +103,18 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
         </label>
       </div>
       <div className="mt-1">
-        <Select options={options}
-          unstyled 
+        <Select
+          options={options}
+          unstyled
           placeholder={defaultValue?.label ?? 'Select...'}
           defaultValue={defaultValue}
           id={id}
           name={name.toLowerCase()}
           className={`${focusedBorder} complex-select pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'}`}
           onChange={handleChange}
-          onFocus={onControlFocus} onBlur={onControlBlur}
-          />
+          onFocus={onControlFocus}
+          onBlur={onControlBlur}
+        />
       </div>
       <div>
         <ErrorMessageComponent messages={errorMessages} />
