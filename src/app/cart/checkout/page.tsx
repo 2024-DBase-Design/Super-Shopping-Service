@@ -15,7 +15,7 @@ import { DecodedToken } from '@/hooks/useRoleAuth';
 import { getCart, getDeliveryAddressOptions, getPaymentOptions } from '@/helpers/api';
 
 const checkout = async (formValues: FormValues) => {
-  //api call that clears cart, creates an order, and changes balance
+  //TODO api call that clears cart, creates an order, and changes balance
 }
 
 function calculateCost(cartItems: CartItem[]){
