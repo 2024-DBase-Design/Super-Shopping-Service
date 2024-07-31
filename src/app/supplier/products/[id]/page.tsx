@@ -187,9 +187,9 @@ export default function ProductDetail() {
       image: null,
       name: '',
       price: 0,
-      category: '',
-      brand: '',
-      size: '',
+      category: 'Toys',
+      brand: 'Toys R Us',
+      size: '10cm',
       description: '',
       supplierId: 0,
       createdAt: new Date(),
@@ -281,6 +281,24 @@ export default function ProductDetail() {
                 name: 'Image',
                 inputType: InputTypeEnum.File,
                 validationRuleNames: []
+              },
+              {
+                name: 'Category',
+                defaultValue: res.product.category,
+                inputType: InputTypeEnum.Text,
+                validationRuleNames: []
+              },
+              {
+                name: 'Brand',
+                defaultValue: res.product.brand,
+                inputType: InputTypeEnum.Text,
+                validationRuleNames: []
+              },
+              {
+                name: 'Size',
+                defaultValue: res.product.size,
+                inputType: InputTypeEnum.Text,
+                validationRuleNames: []
               }
             ]
           }
@@ -367,6 +385,9 @@ export default function ProductDetail() {
                 in stock
               </div>
             </div>
+            <div>brand: {value.product.brand}</div>
+            <div>category: {value.product.category}</div>
+            <div>size: {value.product.size}</div>
           </div>
           <div>
             <EditableListComponent
