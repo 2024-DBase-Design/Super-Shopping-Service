@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/router';
-import useRoleAuth from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from '../detail.module.scss';
 import '@/styles/staffSession.scss';
@@ -10,9 +8,10 @@ import Link from 'next/link';
 import { EditableListComponent, EditableListItem } from '@/components/form/editableList';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { Address, Warehouse, Stock, AddressType } from '@prisma/client';
+import { Address, Warehouse, Stock, AddressType, Product } from '@prisma/client';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
+import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 
 type StockWithName = {
   stock: Stock;
@@ -21,66 +20,147 @@ type StockWithName = {
 
 type WarehouseDetailValues = {
   warehouse: Warehouse;
-  name: string;
   address: Address;
   stock: StockWithName[];
 };
 
-const testValues: WarehouseDetailValues = {
-  warehouse: {
-    id: 0,
-    capacity: 100,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  name: 'Warehouse A',
-  address: {
-    id: 0,
-    addressLineOne: 'Warehouse Road',
-    addressLineTwo: null,
-    city: 'Ware',
-    state: 'KY',
-    zip: '12345',
-    country: '',
-    type: AddressType.WAREHOUSE,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    customerId: null,
-    staffId: null,
-    supplierId: null,
-    warehouseId: null
-  },
-  stock: [
-    {
-      stock: {
-        id: 0,
-        productId: 0,
-        warehouseId: 0,
-        quantity: 10,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      itemName: 'Half Eaten Gummy Worms'
-    },
-    {
-      stock: {
-        id: 0,
-        productId: 0,
-        warehouseId: 0,
-        quantity: 2,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      itemName: 'Legal IRL Lootbox'
-    }
-  ]
-};
+// const testValues: WarehouseDetailValues = {
+//   warehouse: {
+//     id: 0,
+//     capacity: 100,
+//     createdAt: new Date(),
+//     updatedAt: new Date()
+//   },
+//   name: 'Warehouse A',
+//   address: {
+//     id: 0,
+//     addressLineOne: 'Warehouse Road',
+//     addressLineTwo: null,
+//     city: 'Ware',
+//     state: 'KY',
+//     zip: '12345',
+//     country: '',
+//     type: AddressType.WAREHOUSE,
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//     customerId: null,
+//     staffId: null,
+//     supplierId: null,
+//     warehouseId: null
+//   },
+//   stock: [
+//     {
+//       stock: {
+//         id: 0,
+//         productId: 0,
+//         warehouseId: 0,
+//         quantity: 10,
+//         createdAt: new Date(),
+//         updatedAt: new Date()
+//       },
+//       itemName: 'Half Eaten Gummy Worms'
+//     },
+//     {
+//       stock: {
+//         id: 0,
+//         productId: 0,
+//         warehouseId: 0,
+//         quantity: 2,
+//         createdAt: new Date(),
+//         updatedAt: new Date()
+//       },
+//       itemName: 'Legal IRL Lootbox'
+//     }
+//   ]
+// };
 
 const getWarehouseValues = async (id: number): Promise<WarehouseDetailValues> => {
-  //make api calls for a warehouse, its address, its stock and the names of those stock items
-  // add billing address information to the credit card object (see CreditCardAndAddress)
+  try {
+    const warehouseResponse = await fetch(
+      buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE, id)
+    );
 
-  return testValues;
+    if (!warehouseResponse.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const warehouseData: Warehouse = await warehouseResponse.json();
+
+    const addressResponse = await fetch(
+      buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE, id) + '/addresses'
+    );
+
+    if (!addressResponse.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const addressData: Address[] = await addressResponse.json();
+
+    const stockResponse = await fetch(
+      buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE, id) + '/stock'
+    );
+
+    if (!stockResponse.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const stockData: Stock[] = await stockResponse.json();
+
+    const stockDataWithNames: StockWithName[] = await Promise.all(
+      stockData.map(async (stock: Stock) => {
+        const productResponse = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT, stock.productId)
+        );
+
+        if (!productResponse.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const product: Product = await productResponse.json();
+
+        return {
+          stock: stock,
+          itemName: product.name
+        };
+      })
+    );
+
+    const warehouseInfo: WarehouseDetailValues = {
+      warehouse: warehouseData,
+      address: addressData[0],
+      stock: stockDataWithNames
+    };
+
+    return warehouseInfo;
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+    return {
+      warehouse: {
+        id: 0,
+        capacity: 0,
+        name: '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      address: {
+        id: 0,
+        addressLineOne: '',
+        addressLineTwo: '',
+        city: '',
+        state: '',
+        zip: '',
+        country: '',
+        type: AddressType.WAREHOUSE,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        customerId: null,
+        staffId: null,
+        supplierId: null,
+        warehouseId: null
+      },
+      stock: []
+    };
+  }
 };
 
 async function updateWarehouseValues(formValues: FormValues) {}
@@ -157,7 +237,7 @@ export default function CustomerDetail() {
         setGeneralFormInputs([
           {
             name: 'Name',
-            defaultValue: res.name,
+            defaultValue: res.warehouse.name,
             inputType: InputTypeEnum.Text,
             validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Name' }]
           },
@@ -201,7 +281,7 @@ export default function CustomerDetail() {
         </div>
         <br></br>
         <FormComponent
-          id={id}
+          id={Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')}
           inputs={generalFormInputs}
           submitAction={updateWarehouseValues}
           submitName="Save Changes"

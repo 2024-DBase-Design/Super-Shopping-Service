@@ -10,5 +10,8 @@ router.put('/:warehouseId', warehouseController.updateWarehouse);
 router.delete('/:warehouseId', warehouseController.deleteWarehouse);
 
 router.get('/:warehouseId/stock', warehouseController.getWarehouseStock);
+router.get('/filter/:warehouseName', warehouseController.getWarehouseStock);
+router.get('/:warehouseId/stock', warehouseController.getWarehouseByName);
+router.get('/:warehouseId/addresses', warehouseController.getWarehouseAddresses);
 
 export default router;
