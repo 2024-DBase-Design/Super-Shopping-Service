@@ -7,7 +7,6 @@ import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
-import { FormHydration } from '@/components/input/dropdownInput';
 import { useRouter } from 'next/navigation';
 import useClientSide from '@/hooks/useClientSide';
 import { jwtDecode } from 'jwt-decode';
@@ -18,7 +17,6 @@ import { buildTwoEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 export default function Page() {
   const router = useRouter();
   const isClient = useClientSide();
-  const token = window.localStorage.getItem('token');
   let customerID: number = -1;
 
   const checkout = async (formValues: FormValues) => {
@@ -63,6 +61,7 @@ export default function Page() {
   // Only allows customers to access this page
   useEffect(() => {
     if (isClient) {
+      const token = window.localStorage.getItem('token');
       if (token) {
         try {
           const decoded = jwtDecode<DecodedToken>(token);
@@ -80,38 +79,40 @@ export default function Page() {
     }
   }, [router, isClient]);
 
-  const tempItem: CartItem[] = [];
-  const [cart, setCart] = useState(tempItem);
-  const tempPayment: FormHydration[] = [];
-  const [payments, setPayments] = useState(tempPayment);
-  const tempAddr: FormHydration[] = [];
-  const [addresses, setAddresses] = useState(tempAddr);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [payments, setPayments] = useState<string[]>([]);
+  const [addresses, setAddresses] = useState<string[]>([]);
+  const [miniCart, setMiniCart] = useState<CartItem[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [i, setI] = useState<number>(0);
 
-  let total: number = 0;
-  let miniCart: CartItem[] = [];
-  let i = 0;
-
-  getCart(customerID).then((res) => {
-    setCart(res);
-    total = calculateCost(res);
-    miniCart = cart.length >= 3 ? cart.slice(0, 3) : cart.slice(cart.length);
-    if (cart.length > 3) i++;
-  });
-  getPaymentOptions(customerID).then((res) => setPayments(res));
-  getDeliveryAddressOptions(customerID).then((res) => setAddresses(res));
+  let tempi = 0;
+  useEffect(() => {
+    setTotal(0);
+    setI(0);
+    getCart(customerID).then((res) => {
+      setCart(res);
+      setTotal(calculateCost(res));
+      setMiniCart(cart.length >= 3 ? cart.slice(0, 3) : cart.slice(cart.length));
+      if (cart.length > 3) tempi++;
+      setI(tempi);
+    });
+    getPaymentOptions(customerID).then((res) => setPayments(res));
+    getDeliveryAddressOptions(customerID).then((res) => setAddresses(res));
+  }, []);
 
   const inputs: FormInput[] = [
     {
       name: 'Pay With',
       inputType: InputTypeEnum.DropDown,
-      defaultValue: payments[0].label,
+      defaultValue: '',
       options: payments,
       validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Credit card' }]
     },
     {
       name: 'Delivery Address',
       inputType: InputTypeEnum.DropDown,
-      defaultValue: addresses[0].label,
+      defaultValue: '',
       options: addresses,
       validationRuleNames: [{ type: ValidationRuleEnum.Required, args: 'Delivery address' }]
     }
@@ -123,7 +124,7 @@ export default function Page() {
       <h1 className="text-white p-2 drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]">Checkout</h1>
       <div className="flex items-center justify-center">
         {miniCart.map((item) => {
-          i++;
+          tempi++;
           return (
             <div
               className={`${styles.cartItem} ${i === 4 ? styles.darkFilter : ''}`}

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CartItem } from '@/app/cart/page';
-import { FormHydration } from '@/components/input/dropdownInput';
 
 export const lastCreditCardNumber: string = '';
 
@@ -90,7 +89,7 @@ export function buildTwoEntityUrl(
 
 // Customer API calls
 
-export async function getPaymentOptions(id: number): Promise<FormHydration[]> {
+export async function getPaymentOptions(id: number): Promise<string[]> {
   // build URL
   const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CREDIT_CARD);
   // Send GET request to API
@@ -106,14 +105,14 @@ export async function getPaymentOptions(id: number): Promise<FormHydration[]> {
 
   // Handle successful API call
   const data = await response.json();
-  const options: FormHydration[] = data.map((payment: any) => {
-    return { label: '••••••••••••' + payment.cardNumber.slice(-4), value: payment.id.toString() };
+  const options: string[] = data.map((payment: any) => {
+    return payment.id.toString() + '••••••••••••' + payment.cardNumber.slice(-4);
   });
 
   return options;
 }
 
-export async function getDeliveryAddressOptions(id: number): Promise<FormHydration[]> {
+export async function getDeliveryAddressOptions(id: number): Promise<string[]> {
   // Build URL
   const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.ADDRESS);
 
@@ -131,11 +130,8 @@ export async function getDeliveryAddressOptions(id: number): Promise<FormHydrati
 
   // Handle successful API call
   const data = await response.json();
-  const options: FormHydration[] = data.map((address: any) => {
-    return {
-      label: `${address.street}, ${address.city} ${address.state} ${address.zip}`,
-      value: address.id.toString()
-    };
+  const options: string[] = data.map((address: any) => {
+    return `${address.id.toString()}-${address.street}, ${address.city} ${address.state} ${address.zip}`;
   });
 
   return options;

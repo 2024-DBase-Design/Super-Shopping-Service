@@ -246,7 +246,10 @@ export default function ProductDetail() {
   return (
     <div className={styles.profile}>
       <div className="flex">
-        <img className="max-w-800 w-screen rounded-none z-[-1]" src={value.product.image}></img>
+        <img
+          className="max-w-800 w-screen rounded-none z-[-1]"
+          src={value.product.image ?? ''}
+        ></img>
       </div>
       <Link className={styles.link + ' close-button white'} href="/supplier/products"></Link>
       <div className="main-body mt-[-5]" style={{ marginTop: '-1em' }}>

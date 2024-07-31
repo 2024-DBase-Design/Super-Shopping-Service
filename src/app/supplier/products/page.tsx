@@ -7,7 +7,7 @@ import SearchComponent from '@/components/search/search';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
 import Link from 'next/link';
-import styles from './Products.module.scss';
+import styles from './products.module.scss';
 import { EditIconComponent } from '@/components/svgs/edit';
 import { ButtonOptions, EditableListComponent } from '@/components/form/editableList';
 
