@@ -1,27 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
 import TextInputComponent from '../input/textInput';
 import { formIsValidName, FormValues } from '@/helpers/formValues';
-import DropDownInputComponent, { FormHydration } from '../input/dropdownInput';
+import DropDownInputComponent from '../input/dropdownInput';
 import AddressInputComponent from '../input/addressInput';
 import { ValidationRuleType } from '../input/validationRules';
 
 export type FormInput = {
   name: string;
   id?: string;
+  options?: string[];
   className?: string;
   inputType?: string;
   defaultValue?: any;
-  options?: FormHydration[];
   validationRuleNames?: ValidationRuleType[];
   manualValidate?: ClientEventEmitter;
 };
 
 export const enum InputTypeEnum {
   Text = 'text',
+  File = 'file',
   Password = 'password',
   Date = 'date',
   Number = 'number',
@@ -38,6 +39,7 @@ const FormComponent: React.FC<{
   id?: number;
 }> = ({ inputs, submitName, submitAction, className, buttonClassName, id }) => {
   const formValues: FormValues = new FormValues([]);
+  const [formIsValid, setFormIsValid] = useState(true);
 
   if (id) {
     formValues.addNewValue({ name: 'id', defaultValue: id });
@@ -51,7 +53,7 @@ const FormComponent: React.FC<{
     formValues.updateValue(name, value);
     formValues.updateValidity(name, isValid);
     if (isValid) {
-      formValues.checkFormValidity(name);
+      setFormIsValid(formValues.checkFormValidity(name));
     } else {
       formValues.updateValidity(formIsValidName, false);
     }
@@ -80,7 +82,7 @@ const FormComponent: React.FC<{
                 <DropDownInputComponent
                   name={input.name}
                   defaultValue={input.defaultValue}
-                  options={[]}
+                  options={input.options ?? []}
                   formValues={formValues}
                   validationRuleNames={input.validationRuleNames}
                   onValueChanged={(value, isValid) => handleInputChange(input.name, value, isValid)}
@@ -108,8 +110,8 @@ const FormComponent: React.FC<{
           ))}
           <button
             type="submit"
-            className={`${buttonClassName} flex mt-8 center justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600`}
-            style={{ opacity: formValues.getValidity(formIsValidName) ? 1 : 0.5 }}
+            className={`${buttonClassName} flex mt-8 w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600`}
+            style={{ opacity: formIsValid ? 1 : 0.5 }}
           >
             {submitName}
           </button>

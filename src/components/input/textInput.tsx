@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ErrorMessageComponent } from './errorMessage';
 import {
   getValidationTest,
@@ -49,10 +49,18 @@ const TextInputComponent: React.FC<TextInputProps> = ({
     }
   }
 
-  //jank that actually sets value to default value if it fails
-  if (defaultValue !== '') {
-    setTimeout(() => setValue(defaultValue)); //async to get around rerender error
-  }
+  useEffect(() => {
+    if (defaultValue) {
+      setValue(defaultValue);
+    }
+    if (
+      onValueChanged &&
+      (defaultValue ||
+        validationRuleNames?.filter((v) => v.type === ValidationRuleEnum.Required).length === 0)
+    ) {
+      onValueChanged(defaultValue, true);
+    }
+  }, [defaultValue]);
 
   async function validate(ToValidate: any) {
     setErrorMessages([]);
@@ -99,7 +107,7 @@ const TextInputComponent: React.FC<TextInputProps> = ({
           name={name.toLowerCase()}
           type={inputType}
           className={`pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'}`}
-          value={value}
+          value={value ?? ''}
           onChange={handleChange}
         />
       </div>
