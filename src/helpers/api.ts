@@ -16,7 +16,7 @@ export enum EntityType {
   ADDRESS = 'address',
   CREDIT_CARD = 'creditCard',
   CART = 'cart',
-  ORDER = 'order',
+  ORDER = 'orders',
   PRODUCT = 'products',
   STAFF = 'staff',
   STOCK = 'stock',

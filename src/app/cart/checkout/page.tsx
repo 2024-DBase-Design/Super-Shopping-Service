@@ -13,20 +13,51 @@ import useClientSide from '@/hooks/useClientSide';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
 import { getCart, getDeliveryAddressOptions, getPaymentOptions } from '@/helpers/api';
+import { buildTwoEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 
-const checkout = async (formValues: FormValues) => {
-  //TODO api call that clears cart, creates an order, and changes balance
-}
-
-function calculateCost(cartItems: CartItem[]){
-  return cartItems.reduce((total, item) => total += item.price, 0);
-}
 
 export default function Page() {
   const router = useRouter();
   const isClient = useClientSide();
   const token = window.localStorage.getItem('token');
   let customerID: number = -1;
+  
+
+  const checkout = async (formValues: FormValues) => {
+    // API call to create an order
+    try {
+      const response = await fetch(buildTwoEntityUrl(HttpMethod.POST, EntityType.CUSTOMER, customerID, EntityType.ORDER), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          cardId: formValues.getValue('Pay With'),
+          deliveryPlan: {
+            "type": "standard",
+            "price": 10,
+            "deliveryDate": "Tomorrow",
+            "sentDate": "Yesterday",
+          }
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      // If successful, change balance? push to order confirmation page (home page for now)
+      console.log('API call successful');
+      router.push('/home');
+
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+  
+  function calculateCost(cartItems: CartItem[]){
+    return cartItems.reduce((total, item) => total += item.price, 0);
+  }
 
   // Route Guarding for logged in users (on page load, check if user is logged in. If not, redirect to login page)
   // Only allows customers to access this page
