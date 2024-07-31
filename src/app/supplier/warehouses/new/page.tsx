@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/router';
 import useRoleAuth from '@/hooks/useRoleAuth';
 import React from 'react';
 import styles from '../detail.module.scss';
@@ -9,14 +8,40 @@ import Link from 'next/link';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
+import { buildOneEntityUrl, HttpMethod, EntityType } from '@/helpers/api';
+import { Warehouse } from '@prisma/client';
+import { useRouter } from 'next/navigation';
 
-const addNewWarehouse = (formValues: FormValues) => {
-  //If successful, should redirect to /supplier/warehouses/{newId}
-  // Stock cannot be added on a new/non-existant warehouse
-  // So don't worry about that here
-};
+const AddNewWarehouse: React.FC = () => {
+  const router = useRouter();
 
-export default function CustomerDetail() {
+  const addNewWarehouse = async (formValues: FormValues) => {
+    try {
+      const response = await fetch(buildOneEntityUrl(HttpMethod.POST, EntityType.WAREHOUSE), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          capacity: formValues.getValue('Capacity'),
+          address: formValues.getValue('Address'),
+          name: formValues.getValue('Name')
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const warehouseData: Warehouse = await response.json();
+
+      // Redirect to /supplier/warehouses/{newId}
+      router.push('/supplier/warehouses/' + warehouseData.id);
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  };
+
   //useRoleAuth(['staff'], '/login');
   const defaultGeneralFormInputs: FormInput[] = [
     {
@@ -53,4 +78,6 @@ export default function CustomerDetail() {
       <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
-}
+};
+
+export default AddNewWarehouse;

@@ -10,72 +10,53 @@ import Link from 'next/link';
 import styles from './warehouses.module.scss';
 import { EditIconComponent } from '@/components/svgs/edit';
 import { ButtonOptions, EditableListComponent } from '@/components/form/editableList';
+import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 
 type WarehouseFilter = {
   name: string;
 };
 
-type WarehouseWithName = {
-  warehouse: Warehouse;
-  name: string;
+const GetWarehouses = async (filter: WarehouseFilter): Promise<Warehouse[]> => {
+  try {
+    const response = await fetch(
+      buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE) + `/filter/${filter}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Error fetching warehouses');
+    }
+
+    const warehouses: Warehouse[] = await response.json();
+    return warehouses;
+  } catch (error) {
+    console.error('Error fetching warehouses:', (error as Error).message);
+    return [];
+  }
 };
 
-const testValue: WarehouseWithName[] = [
-  {
-    warehouse: {
-      id: 0,
-      capacity: 10,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    name: "Bobo's Emporium"
-  },
-  {
-    warehouse: {
-      id: 1,
-      capacity: 5902,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    name: "Charlie's Child Labor Factory"
-  },
-  {
-    warehouse: {
-      id: 2,
-      capacity: 12,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    name: "Tooth Fairy's Knick Knacks"
-  },
-  {
-    warehouse: {
-      id: 3,
-      capacity: 100,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    name: 'Warehouse A'
-  },
-  {
-    warehouse: {
-      id: 4,
-      capacity: 999,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    name: 'Warehouse B'
+// Delete a warehouse by id
+const DeleteWarehouse = async (id: number) => {
+  try {
+    const response = await fetch(buildOneEntityUrl(HttpMethod.DELETE, EntityType.WAREHOUSE, id), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Error deleting warehouse');
+    }
+  } catch (error) {
+    console.error('Error deleting warehouse:', (error as Error).message);
   }
-];
-
-//API Connection TODO
-async function GetWarehouses(filter: WarehouseFilter): Promise<WarehouseWithName[]> {
-  //warehouses do not have their name attached.
-  return testValue;
-}
-
-//API Connection TODO
-function DeleteWarehouse(id: number) {}
+};
 
 export default function Page() {
   const cols: TableCol[] = [
@@ -112,27 +93,27 @@ export default function Page() {
     custom: false
   };
 
-  function updateTable(warehouses: WarehouseWithName[]) {
+  function updateTable(warehouses: Warehouse[]) {
     const temp: Table = new Table(cols);
     for (const warehouse of warehouses) {
       temp.values.push([
         warehouse.name,
-        warehouse.warehouse.capacity,
+        warehouse.capacity,
         <Link
-          key={'e-' + warehouse.warehouse.id}
+          key={'e-' + warehouse.id}
           className={styles.link}
-          href={'/supplier/warehouses/' + warehouse.warehouse.id}
+          href={'/supplier/warehouses/' + warehouse.id}
         >
           <EditIconComponent fillColor="#00acbb"></EditIconComponent>
         </Link>,
         <EditableListComponent
-          key={'d-' + warehouse.warehouse.id}
+          key={'d-' + warehouse.id}
           name={'Warehouse'}
           eventEmitter={deleteEmitter}
           list={[
             {
               displayName: warehouse.name,
-              id: warehouse.warehouse.id,
+              id: warehouse.id,
               editFormInputs: []
             }
           ]}
