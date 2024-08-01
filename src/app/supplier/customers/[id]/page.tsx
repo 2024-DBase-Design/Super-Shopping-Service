@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/router';
-import useRoleAuth from '@/hooks/useRoleAuth';
+import useRoleAuth, { DecodedToken } from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss';
 import '@/styles/staffSession.scss';
@@ -18,6 +18,9 @@ import { FormInput } from '@/components/form/form';
 import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
 import { JsonValue } from '@prisma/client/runtime/library';
 import { CreditCard, Customer, Order, Product, OrderStatus, Address } from '@prisma/client';
+import { buildOneEntityUrl, buildTwoEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
+import useClientSide from '@/hooks/useClientSide';
+import { jwtDecode } from 'jwt-decode';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
@@ -186,23 +189,6 @@ const testValues: ProfileDetailValues = {
   ]
 };
 
-async function getProfileValues(id: number): Promise<ProfileDetailValues> {
-  //make api calls for a customer, their creditcards, and their delivery addresses
-  // add billing address information to the credit card object (see CreditCardAndAddress)
-
-  // This might not work for the item table if I bungled the OrderItem type.
-  // Message Jasmine if this is the case and you can't figure out how to cast/convert it.
-  return testValues;
-}
-
-function updateOrder(id: string, currentStatus: OrderStatus) {
-  // Should update the current order status to the next
-  // issued => sent
-  // sent => received
-  // Assume received will never be passed (only issued or sent)
-  // (I'm removing the button that calls this in that case)
-}
-
 function censorCC(creditCard: CreditCard) {
   return creditCard.cardNumber.replace(/\d(?=(?:\D*\d){4})/g, '•');
 }
@@ -227,6 +213,7 @@ function formatAddress(address: Address) {
 
 export default function CustomerDetail() {
   //useRoleAuth(['staff'], '/login');
+  const isClient = useClientSide();
   const defaultValue: ProfileDetailValues = {
     customer: {
       id: 0,
@@ -281,6 +268,103 @@ export default function CustomerDetail() {
       type: ColType.Basic
     }
   ];
+
+  const getProfileValues = async (id: number): Promise<ProfileDetailValues> => {
+    try {
+      if (isClient) {
+        const res = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id));
+
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: Customer = await res.json();
+
+        const res2 = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, data.id) + '/address'
+        );
+
+        if (!res2.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data2: Address[] = await res2.json();
+
+        const res3 = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, data.id) + '/creditCards'
+        );
+
+        if (!res3.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data3: CreditCard[] = await res3.json();
+
+        const creditCardsAndAddresses: CreditCardAndAddress[] = await Promise.all(
+          data3.map(async (card: CreditCard) => {
+            const addressResponse = await fetch(
+              buildOneEntityUrl(HttpMethod.GET, EntityType.ADDRESS, card.billingAddressId)
+            );
+
+            if (!addressResponse.ok) {
+              throw new Error('Address not found');
+            }
+
+            const address: Address = await addressResponse.json();
+            return { creditCard: card, billingAddress: address };
+          })
+        );
+
+        const res4 = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, data.id) + '/orders'
+        );
+
+        if (!res4.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data4: Order[] = await res4.json();
+
+        return {
+          customer: data,
+          orders: data4,
+          creditCards: creditCardsAndAddresses,
+          addresses: data2
+        };
+      }
+      return testValues;
+    } catch (error) {
+      console.error(error);
+      return testValues;
+    }
+  };
+
+  const updateOrder = async (id: string, currentStatus: OrderStatus) => {
+    try {
+      if (isClient) {
+        const response = await fetch(
+          buildTwoEntityUrl(
+            HttpMethod.PUT,
+            EntityType.CUSTOMER,
+            parseInt(id),
+            EntityType.ORDER,
+            parseInt(id) // TODO: GET ORDER ID FROM FORM
+          ),
+          {
+            method: 'PUT',
+            body: JSON.stringify({
+              status: currentStatus
+            })
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to update order');
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     getProfileValues(Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')).then((res) => {
