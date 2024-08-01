@@ -1,34 +1,59 @@
 'use client';
 
+import { useRouter } from 'next/router';
 import useRoleAuth, { DecodedToken } from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss';
-import '@/styles/session.scss';
-import { Address, CreditCard, Customer } from '@prisma/client';
+import '@/styles/staffSession.scss';
 import { AddressTypeEnum } from '@/helpers/address';
-import { EditableListComponent, EditableListItem } from '@/components/form/editableList';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import {
-  GeneratePrefilledAddressForm,
-  GeneratePrefilledCreditCardForm
-} from '@/components/form/defaultForms';
+  ButtonOptions,
+  EditableListComponent,
+  EditableListItem
+} from '@/components/form/editableList';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
-import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
-import { urlToUrlWithoutFlightMarker } from 'next/dist/client/components/app-router';
-import { jwtDecode } from 'jwt-decode';
+import { FormInput } from '@/components/form/form';
+import TableComponent, { ColType, Table, TableCol } from '@/components/table/table';
+import { JsonValue } from '@prisma/client/runtime/library';
+import { CreditCard, Customer, Order, Product, OrderStatus, Address } from '@prisma/client';
+import { buildOneEntityUrl, buildTwoEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 import useClientSide from '@/hooks/useClientSide';
+import { jwtDecode } from 'jwt-decode';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
   billingAddress: Address;
 };
 
-type ProfileValues = {
+type ProfileDetailValues = {
   customer: Customer;
+  orders: Order[];
   creditCards: CreditCardAndAddress[];
   addresses: Address[];
 };
 
-const testValues: ProfileValues = {
+type OrderItem = {
+  product: Product;
+  quantity: number;
+};
+
+const testProduct: Product = {
+  id: 0,
+  image: null,
+  name: 'squeaky shoes',
+  price: 0,
+  category: '',
+  brand: '',
+  size: '',
+  description: '',
+  supplierId: 0,
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
+
+const testValues: ProfileDetailValues = {
   customer: {
     id: 0,
     firstName: 'John',
@@ -42,6 +67,18 @@ const testValues: ProfileValues = {
     createdAt: new Date(),
     updatedAt: new Date()
   },
+  orders: [
+    {
+      id: '0',
+      customerId: 0,
+      status: 'ISSUED',
+      items: [{ product: testProduct, quantity: 2 } as OrderItem as unknown as JsonValue],
+      cardUsed: 374245455400126,
+      deliveryPlan: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ],
   creditCards: [
     {
       creditCard: {
@@ -73,7 +110,7 @@ const testValues: ProfileValues = {
     },
     {
       creditCard: {
-        id: 0,
+        id: 1,
         cardNumber: '374245455400126',
         expiryDate: '01/01',
         cvv: '123',
@@ -83,7 +120,7 @@ const testValues: ProfileValues = {
         updatedAt: new Date()
       },
       billingAddress: {
-        id: 1,
+        id: 2,
         addressLineOne: '123 Street Street',
         addressLineTwo: null,
         city: 'Cincinnati',
@@ -118,7 +155,7 @@ const testValues: ProfileValues = {
       warehouseId: null
     },
     {
-      id: 1,
+      id: 2,
       addressLineOne: '123 Street Street',
       addressLineTwo: null,
       city: 'Cincinnati',
@@ -134,7 +171,7 @@ const testValues: ProfileValues = {
       warehouseId: null
     },
     {
-      id: 1,
+      id: 3,
       addressLineOne: '123 Street Street',
       addressLineTwo: null,
       city: 'Cincinnati',
@@ -152,48 +189,118 @@ const testValues: ProfileValues = {
   ]
 };
 
-export default function Page() {
-  //useRoleAuth(['customer'], '/login');
-  const isClient = useClientSide();
-  const [values, setValues] = useState(testValues);
-  const tsBs: EditableListItem[] = [];
-  const [creditCards, setCreditCards] = useState(tsBs);
-  const creditCardEmitter: ClientEventEmitter = new ClientEventEmitter();
-  const [addresses, setAddresses] = useState(tsBs);
-  const addressEmitter: ClientEventEmitter = new ClientEventEmitter();
+function censorCC(creditCard: CreditCard) {
+  return creditCard.cardNumber.replace(/\d(?=(?:\D*\d){4})/g, '•');
+}
+function censorCCString(creditCard: string) {
+  return creditCard.replace(/\d(?=(?:\D*\d){4})/g, '•');
+}
 
-  async function getProfileValues(): Promise<ProfileValues> {
+function formatAddress(address: Address) {
+  if (address.addressLineOne === '') return '';
+
+  return (
+    address.addressLineOne +
+    '\r\n' +
+    (address.addressLineTwo ? address.addressLineTwo + '\r\n' : '') +
+    address.city +
+    ', ' +
+    address.state +
+    ' ' +
+    address.zip
+  );
+}
+
+export default function CustomerDetail() {
+  //useRoleAuth(['staff'], '/login');
+  const isClient = useClientSide();
+  const defaultValue: ProfileDetailValues = {
+    customer: {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      profilePicture: null,
+      balance: 0,
+      cart: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    orders: [
+      {
+        id: '0',
+        customerId: 0,
+        status: 'ISSUED',
+        items: [{}],
+        cardUsed: 0,
+        deliveryPlan: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    ],
+    creditCards: [],
+    addresses: []
+  };
+  const editableOrderFormInputs: FormInput[] = [];
+  const defaultEditableOrders: EditableListItem[] = [
+    { displayName: '', id: 0, editFormInputs: editableOrderFormInputs }
+  ];
+  const { id } = useParams();
+  const [values, setValues] = useState(defaultValue);
+  const [editableOrders, setEditableOrders] = useState(defaultEditableOrders);
+  const orderEventEmitter = new ClientEventEmitter();
+  const orderButtonOptions: ButtonOptions = {
+    edit: false,
+    delete: false,
+    addNew: false,
+    custom: true
+  };
+  const itemTableCols: TableCol[] = [
+    {
+      id: 0,
+      name: 'Name',
+      type: ColType.Basic
+    },
+    {
+      id: 1,
+      name: 'Quantity',
+      type: ColType.Basic
+    }
+  ];
+
+  const getProfileValues = async (id: number): Promise<ProfileDetailValues> => {
     try {
       if (isClient) {
-        const token = window.localStorage.getItem('token');
+        const res = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id));
 
-        if (!token) {
-          throw new Error('No token found');
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
         }
+        const data: Customer = await res.json();
 
-        const decoded = jwtDecode<DecodedToken>(token);
-        const customerResponse = await fetch(
-          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, decoded.id)
+        const res2 = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, data.id) + '/address'
         );
 
-        if (!customerResponse.ok) {
-          throw new Error('Customer not found');
+        if (!res2.ok) {
+          throw new Error('Network response was not ok');
         }
 
-        const customer: Customer = await customerResponse.json();
+        const data2: Address[] = await res2.json();
 
-        const creditCardResponse = await fetch(
-          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, decoded.id) + '/creditCards'
+        const res3 = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, data.id) + '/creditCards'
         );
 
-        if (!creditCardResponse.ok) {
-          throw new Error('Credit cards not found');
+        if (!res3.ok) {
+          throw new Error('Network response was not ok');
         }
 
-        const creditCards: CreditCard[] = await creditCardResponse.json();
+        const data3: CreditCard[] = await res3.json();
 
         const creditCardsAndAddresses: CreditCardAndAddress[] = await Promise.all(
-          creditCards.map(async (card: CreditCard) => {
+          data3.map(async (card: CreditCard) => {
             const addressResponse = await fetch(
               buildOneEntityUrl(HttpMethod.GET, EntityType.ADDRESS, card.billingAddressId)
             );
@@ -207,112 +314,141 @@ export default function Page() {
           })
         );
 
-        const addressResponse = await fetch(
-          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, decoded.id) + '/addresses'
+        const res4 = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, data.id) + '/orders'
         );
 
-        if (!addressResponse.ok) {
-          throw new Error('Addresses not found');
+        if (!res4.ok) {
+          throw new Error('Network response was not ok');
         }
 
-        const addresses: Address[] = await addressResponse.json();
+        const data4: Order[] = await res4.json();
 
         return {
-          customer,
+          customer: data,
+          orders: data4,
           creditCards: creditCardsAndAddresses,
-          addresses
+          addresses: data2
         };
       }
       return testValues;
     } catch (error) {
-      console.error('Error getting profile values:', (error as Error).message);
+      console.error(error);
       return testValues;
     }
-  }
+  };
+
+  const updateOrder = async (id: string, currentStatus: OrderStatus) => {
+    try {
+      if (isClient) {
+        const response = await fetch(
+          buildTwoEntityUrl(
+            HttpMethod.PUT,
+            EntityType.CUSTOMER,
+            parseInt(id),
+            EntityType.ORDER,
+            parseInt(id) // TODO: GET ORDER ID FROM FORM
+          ),
+          {
+            method: 'PUT',
+            body: JSON.stringify({
+              status: currentStatus
+            })
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to update order');
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
-    getProfileValues().then((res) => {
+    getProfileValues(Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '')).then((res) => {
       setValues(res);
-      const tempCreditCards: EditableListItem[] = [];
-      const tempAddresses: EditableListItem[] = [];
-      res.creditCards.forEach((c) => {
-        tempCreditCards.push({
-          displayName: c.creditCard.cardNumber.replace(/\d(?=(?:\D*\d){4})/g, '•'),
-          id: c.creditCard.id,
-          editFormInputs: GeneratePrefilledCreditCardForm(c.creditCard, c.billingAddress)
+      const tempEditableOrders: EditableListItem[] = [];
+      for (const order of res.orders) {
+        const itemsTable = new Table(itemTableCols);
+        const convertedItems = order.items as unknown as OrderItem[];
+        convertedItems.forEach((i) => itemsTable.values.push([i.product.name, i.quantity]));
+        tempEditableOrders.push({
+          displayName: order.createdAt.toUTCString(),
+          id: parseInt(order.id),
+          editFormInputs: editableOrderFormInputs,
+          customHeader: 'Update Order',
+          customContent: (
+            <>
+              <div className="mb-5">
+                <h2>ISSUED</h2>
+                <p>{order.createdAt.toUTCString()}</p>
+              </div>
+              <div className="mb-5">
+                <h2>CREDIT CARD</h2>
+                <p>{censorCCString(order.cardUsed.toString())}</p>
+              </div>
+              <div className="mb-5">
+                <h2>ITEMS</h2>
+                <TableComponent table={itemsTable}></TableComponent>
+              </div>
+              <div className="mb-5">
+                <h2>CURRENT STATUS</h2>
+                <p>{order.status}</p>
+              </div>
+              {order.status !== OrderStatus.RECEIVED && (
+                <button onClick={() => updateOrder(order.id, order.status)}>Update</button>
+              )}
+            </>
+          )
         });
-      });
-      res.addresses.forEach((a) => {
-        tempAddresses.push({
-          displayName:
-            a.addressLineOne +
-            '\r\n' +
-            (a.addressLineTwo ? a.addressLineTwo + '\r\n' : '') +
-            a.city +
-            ', ' +
-            a.state +
-            ' ' +
-            a.zip,
-          id: a.id,
-          editFormInputs: GeneratePrefilledAddressForm(a)
-        });
-      });
-      setCreditCards(tempCreditCards);
-      setAddresses(tempAddresses);
+      }
+      setEditableOrders(tempEditableOrders);
     });
   }, []);
-
-  // make appropriate api calls here
-  creditCardEmitter.on('edit', (formData: FormData) => {
-    console.log(formData); //has id
-  });
-  creditCardEmitter.on('delete', (id: number) => {
-    // delete the credit card and its billing address!
-    console.log(id);
-  });
-  creditCardEmitter.on('addNew', (formData: FormData) => {
-    console.log(formData);
-  });
-
-  addressEmitter.on('edit', (formData: FormData, id: number) => {
-    console.log(formData); // has id
-  });
-  addressEmitter.on('delete', (id: number) => {
-    console.log(id);
-  });
-  addressEmitter.on('addNew', (formData: FormData) => {
-    console.log(formData);
-  });
 
   return (
     <div className={styles.profile}>
       <p>Imagine a header is here</p>
+      <Link className={styles.link + ' close-button white'} href="/supplier/customers"></Link>
       <div className="flex justify-center items-center">
         <img src={values.customer.profilePicture ?? ''} className="drop-shadow-lg" />
       </div>
       <div className={styles.nameTag + ' drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]'}>
-        Hello, {values.customer.firstName + ' ' + values.customer.lastName}
+        {values.customer.firstName + ' ' + values.customer.lastName}
       </div>
       <div className="main-body">
-        <h4>Current Balance</h4>
-        <h4 className={styles.money + ' money'}>{values.customer.balance}</h4>
-        <br></br>
-        <h1>Credit Cards</h1>
+        <h1>ORDERS</h1>
         <div className="ml-4">
           <EditableListComponent
-            list={creditCards}
-            name="Credit Card"
-            eventEmitter={creditCardEmitter}
+            list={editableOrders}
+            name="Order"
+            eventEmitter={orderEventEmitter}
+            buttonOptions={orderButtonOptions}
           ></EditableListComponent>
         </div>
         <br></br>
-        <h1>Delivery Addresses</h1>
+        <h1>BALANCE</h1>
+        <p className={'money'}>{values.customer.balance}</p>
+        <br></br>
+        <h1>CREDIT CARDS</h1>
         <div className="ml-4">
-          <EditableListComponent
-            list={addresses}
-            name="Delivery Address"
-            eventEmitter={addressEmitter}
-          ></EditableListComponent>
+          {values.creditCards.map((c) => (
+            <div key={'c-' + c.creditCard.id}>
+              <p>{censorCC(c.creditCard)}</p>
+              <p className="pb-2">{formatAddress(c.billingAddress)}</p>
+            </div>
+          ))}
+        </div>
+        <br></br>
+        <h1>DELIVERY ADDRESSES</h1>
+        <div className="ml-4">
+          {values.addresses.map((a) => (
+            <div key={'a-' + a.id}>
+              <p className="pb-2">{formatAddress(a)}</p>
+            </div>
+          ))}
         </div>
       </div>
       <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>

@@ -186,3 +186,40 @@ export const getProductsWarehouses = async (req: Request, res: Response) => {
     res.status(500).json({ error: (error as Error).message });
   }
 };
+
+/**
+ * Get the stock for a product.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getProductStock = async (req: Request, res: Response) => {
+  try {
+    const productId = parseInt(req.params.productId);
+    if (isNaN(productId)) {
+      return res.status(400).json({ error: 'Invalid productId' });
+    }
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id: productId
+      },
+      include: {
+        stocks: true
+      }
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Calculate the total stock for the product
+    const totalStock = product.stocks.reduce((total, stock) => total + stock.quantity, 0);
+
+    // Return the total stock with status 200
+    res.status(200).json({ totalStock });
+  } catch (error) {
+    console.error('Error getting product stock:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};

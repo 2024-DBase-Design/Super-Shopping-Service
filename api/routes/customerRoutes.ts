@@ -4,6 +4,7 @@ import * as customerController from '../controllers/customerController';
 const router = Router();
 
 router.post('/', customerController.createCustomer);
+router.get('/login', customerController.getCustomers);
 router.get('/:customerId', customerController.getCustomerDetails);
 router.put('/:customerId', customerController.updateCustomerDetails);
 router.delete('/:customerId', customerController.deleteCustomerAccount);
@@ -26,7 +27,7 @@ router.delete('/:customerId/cart/:itemId', customerController.removeCartItem);
 router.post('/:customerId/orders', customerController.submitOrder);
 router.get('/:customerId/orders', customerController.getOrders);
 router.get('/:customerId/orders/:orderId', customerController.getOrderDetails);
-router.post('/:customerId/orders/:orderId', customerController.updateOrderStatus);
+router.put('/:customerId/orders/:orderId', customerController.updateOrderStatus);
 router.delete('/:customerId/orders/:orderId', customerController.cancelOrder);
 
 export default router;

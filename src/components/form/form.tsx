@@ -45,6 +45,14 @@ const FormComponent: React.FC<{
     formValues.addNewValue({ name: 'id', defaultValue: id });
   }
 
+  if (id) {
+    formValues.addNewValue({ name: 'id', defaultValue: id });
+  }
+
+  if (id) {
+    formValues.addNewValue({ name: 'id', defaultValue: id });
+  }
+
   for (const input of inputs) {
     formValues.addNewValue({ name: input.name, defaultValue: input.defaultValue });
   }

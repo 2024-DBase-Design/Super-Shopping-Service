@@ -22,6 +22,7 @@ type DropDownInputProps = {
   validationRuleNames?: ValidationRuleType[];
   onValueChanged?: (value: any, isValid: boolean) => void;
   forceValidate?: ClientEventEmitter;
+  inputClassName?: string;
 };
 
 const DropDownInputComponent: React.FC<DropDownInputProps> = ({
@@ -33,7 +34,8 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
   defaultValue,
   validationRuleNames,
   onValueChanged,
-  forceValidate
+  forceValidate,
+  inputClassName
 }) => {
   const [value, setValue] = useState<any>(defaultValue);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
@@ -95,8 +97,9 @@ const DropDownInputComponent: React.FC<DropDownInputProps> = ({
         <select
           id={name.toLowerCase()}
           name={name.toLowerCase()}
-          className={`pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'}`}
+          className={`pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:ring-1 sm:text-sm sm:leading-6 ${errorMessages.length > 0 ? 'error-outline' : 'transparent-outline'} ${inputClassName}`}
           onChange={handleChange}
+          defaultValue={defaultValue}
         >
           {options.map((option) => (
             <option key={option} value={option}>
