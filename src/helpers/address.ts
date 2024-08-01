@@ -15,6 +15,7 @@ export enum AddressTypeEnum {
 }
 
 export const States: string[] = [
+  '',
   'AK',
   'AL',
   'AR',
