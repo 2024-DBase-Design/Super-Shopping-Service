@@ -1,6 +1,6 @@
 'use client';
 
-import useRoleAuth from '@/hooks/useRoleAuth';
+import useRoleAuth, { DecodedToken } from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss';
 import '@/styles/session.scss';
@@ -12,6 +12,10 @@ import {
   GeneratePrefilledCreditCardForm
 } from '@/components/form/defaultForms';
 import { ClientEventEmitter } from '@/helpers/clientEventEmitter';
+import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
+import { urlToUrlWithoutFlightMarker } from 'next/dist/client/components/app-router';
+import { jwtDecode } from 'jwt-decode';
+import useClientSide from '@/hooks/useClientSide';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
@@ -148,21 +152,83 @@ const testValues: ProfileValues = {
   ]
 };
 
-async function getProfileValues(): Promise<ProfileValues> {
-  //make api calls for a customer, their creditcards, and their delivery addresses
-  // add billing address information to the credit card object (see CreditCardAndAddress)
-
-  return testValues;
-}
-
 export default function Page() {
   //useRoleAuth(['customer'], '/login');
+  const isClient = useClientSide();
   const [values, setValues] = useState(testValues);
   const tsBs: EditableListItem[] = [];
   const [creditCards, setCreditCards] = useState(tsBs);
   const creditCardEmitter: ClientEventEmitter = new ClientEventEmitter();
   const [addresses, setAddresses] = useState(tsBs);
   const addressEmitter: ClientEventEmitter = new ClientEventEmitter();
+
+  async function getProfileValues(): Promise<ProfileValues> {
+    try {
+      if (isClient) {
+        const token = window.localStorage.getItem('token');
+
+        if (!token) {
+          throw new Error('No token found');
+        }
+
+        const decoded = jwtDecode<DecodedToken>(token);
+        const customerResponse = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, decoded.id)
+        );
+
+        if (!customerResponse.ok) {
+          throw new Error('Customer not found');
+        }
+
+        const customer: Customer = await customerResponse.json();
+
+        const creditCardResponse = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, decoded.id) + '/creditCards'
+        );
+
+        if (!creditCardResponse.ok) {
+          throw new Error('Credit cards not found');
+        }
+
+        const creditCards: CreditCard[] = await creditCardResponse.json();
+
+        const creditCardsAndAddresses: CreditCardAndAddress[] = await Promise.all(
+          creditCards.map(async (card: CreditCard) => {
+            const addressResponse = await fetch(
+              buildOneEntityUrl(HttpMethod.GET, EntityType.ADDRESS, card.billingAddressId)
+            );
+
+            if (!addressResponse.ok) {
+              throw new Error('Address not found');
+            }
+
+            const address: Address = await addressResponse.json();
+            return { creditCard: card, billingAddress: address };
+          })
+        );
+
+        const addressResponse = await fetch(
+          buildOneEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, decoded.id) + '/addresses'
+        );
+
+        if (!addressResponse.ok) {
+          throw new Error('Addresses not found');
+        }
+
+        const addresses: Address[] = await addressResponse.json();
+
+        return {
+          customer,
+          creditCards: creditCardsAndAddresses,
+          addresses
+        };
+      }
+      return testValues;
+    } catch (error) {
+      console.error('Error getting profile values:', (error as Error).message);
+      return testValues;
+    }
+  }
 
   useEffect(() => {
     getProfileValues().then((res) => {
