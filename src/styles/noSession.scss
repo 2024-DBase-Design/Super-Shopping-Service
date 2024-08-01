@@ -33,10 +33,16 @@ label {
 
 .main-container {
     position: absolute;
-    height: 100vh;
+    height: auto;
     width: 100vw;
-    background-image: url('/fun-background.png');
-    background-size: auto;
+    background-image: url('/fun-background.png'); 
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: scroll;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
     overflow: hidden;
 }
 
@@ -48,4 +54,6 @@ label {
     );
     border-radius: 10px;
 }
-  
+@media (max-height: 850px) {
+    .main-container {overflow: unset;}
+}

@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import useClientSide from '@/hooks/useClientSide';
 import { DecodedToken } from '@/hooks/useRoleAuth';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -112,10 +113,7 @@ const LoginPage = () => {
 
   return (
     <div className={'main-container ' + styles.mainContainer}>
-      <div className={styles.brandLogo}>
-        <h1 className={shrikhand.className + ' ' + styles.header}>Silly Stuffs</h1>
-        <LogoComponent className={'mx-auto h-11 w-auto logo ' + styles.logo} />
-      </div>
+      <BrandHeaderComponent></BrandHeaderComponent>
       <div className={'form-container ' + styles.formContainer}>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -139,7 +137,7 @@ const LoginPage = () => {
               </Link>
             </p>
             <p className="mt-2 text-center text-xs text-white">
-              <Link href="/supplier" className="font-semibold">
+              <Link href="/supplier/login" className="font-semibold">
                 Go to Supplier Portal
               </Link>
             </p>

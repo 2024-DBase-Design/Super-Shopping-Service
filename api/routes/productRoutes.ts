@@ -11,5 +11,6 @@ router.delete('/:productId', productController.deleteProduct);
 
 /// Add route for searching all products by category, brand, name, size, or description
 router.get('/search', productController.searchProducts);
+router.get('/:productId/warehouses', productController.getProductsWarehouses);
 
 export default router;
