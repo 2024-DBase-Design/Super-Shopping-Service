@@ -1,0 +1,145 @@
+.header {
+  font-size: 8vw;
+  width: 100%;
+  text-align: center;
+  padding: 25px;
+  padding-bottom: 0;
+}
+
+.logo {
+  width: auto;
+  height: 15vh;
+}
+
+.homeCard {
+  background-color: white;
+  border-radius: 10px 10px 0 0;
+  margin: auto;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  h2 {
+    color: #04c3d8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 2em;
+    font-weight: bolder;
+    margin: 0;
+    padding: 10px;
+  }
+}
+
+.homeSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 50%;
+
+}
+
+.navBar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: white;
+  border-top: #eee solid 1px;
+  font-size: 1.5em;
+  padding: 10px;
+  height: 12vw;
+}
+
+.topSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  flex-direction: column;
+}
+
+.searchBar {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-style: italic; 
+  margin: 0 auto;
+  width: 90%;
+  height: 25%;
+  padding: 10px;
+  border-radius: 60px;
+  border: 1px solid #ccc;
+}
+
+.mainContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+
+.brandLogo{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-left: 1em;
+}
+
+.categoryOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  height: 80%;
+  background-color: orange;
+}
+
+.categoryTitle {
+  color: blue;
+}
+
+.categoryContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.recommendedOptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  height: 100%;
+  background-color: blue;
+}
+
+.reccomendedContainer {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+
+@media (max-height: 850px) {
+ .brandLogo {
+    margin-top: 1em;
+    flex-direction: row-reverse;
+    align-items: center;
+
+    h1{
+      width: calc((100vw - 4em)*.8);
+      font-size: 8vw; // Silly Stuffs is 12 characters
+      flex-shrink: 0;
+      flex-grow: 1;
+      min-height: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    svg{
+      width: calc((100vw - 4em)*.0);
+      min-height: 0;
+      margin-left: 10px;
+      flex-grow: 1; /* Allows SVG to grow and fill available space */
+      flex-shrink: 1; /* Allows SVG to shrink if necessary */
+      min-height: 0; /* Allows SVG to shrink below its content size */
+    }
+  }
+}

@@ -34,7 +34,7 @@ export class FormValues {
    */
   addNewValue(newValue: NewValue) {
     const [value, setValue] = useState(newValue.defaultValue);
-    const [valid, setvalid] = useState(false);
+    const [valid, setvalid] = useState(newValue.defaultValue ? true : false);
     this.valueDictionary.set(newValue.name, { value, setValue });
     this.validDictionary.set(newValue.name, { value: valid, setValue: setvalid });
   }

@@ -7,6 +7,7 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
+  output        = "../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -88,6 +89,7 @@ model Supplier {
 model Warehouse {
   id        Int      @id @default(autoincrement())
   capacity  Int
+  name      String
   createdAt DateTime @default(now()) @updatedAt
   updatedAt DateTime @default(now())
 
