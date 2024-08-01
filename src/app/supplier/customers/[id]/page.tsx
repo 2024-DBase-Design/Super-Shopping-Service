@@ -1,7 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/router';
-import useRoleAuth, { DecodedToken } from '@/hooks/useRoleAuth';
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.scss';
 import '@/styles/staffSession.scss';

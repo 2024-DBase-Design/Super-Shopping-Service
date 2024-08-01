@@ -12,7 +12,7 @@ import NavFooter from '@/components/nav/navFooter';
 import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
-import { GetAllProducts, GetProductStock } from '@/helpers/api';
+import { GetAllProducts, getStockAmount } from '@/helpers/api';
 import { useEffect } from 'react';
 
 type ProductWithStock = {
@@ -20,11 +20,11 @@ type ProductWithStock = {
   stock: number;
 };
 
-type ReccomendedProducts = {
+type RecommendedProducts = {
   products: ProductWithStock[];
 };
 
-const testValue: ReccomendedProducts = {
+const testValue: RecommendedProducts = {
   products: [
     {
       product: {
@@ -131,45 +131,39 @@ const testValue: ReccomendedProducts = {
   ]
 };
 
+const getRecommendedItems = async (): Promise<RecommendedProducts> => {
+  try {
+    const products: Product[] = await GetAllProducts();
+
+    if (products.length === 0) {
+      throw new Error('No products found');
+    }
+
+    const stock: number[] = await Promise.all(
+      products.map((product) => getStockAmount(product.id))
+    );
+
+    const productsWithStock: ProductWithStock[] = products.map((element, index) => {
+      return { product: element, stock: stock[index] };
+    });
+
+    const recommendedProducts: RecommendedProducts = { products: productsWithStock };
+
+    return recommendedProducts;
+  } catch (error) {
+    console.error(error);
+    return { products: [] };
+  }
+};
+
 const HomePage = () => {
-  const [recommendedProducts, setRecommendedProducts] = useState<ReccomendedProducts>({
+  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProducts>({
     products: []
   });
 
-  const getStockAmount = async (productId: number): Promise<number> => {
-    const stocks: Stock[] = await GetProductStock(productId);
-    const returnStock: number = stocks.reduce((acc, stock) => acc + stock.quantity, 0);
-    return returnStock;
-  };
-
-  const getReccomendedItems = async (): Promise<ReccomendedProducts> => {
-    try {
-      const products: Product[] = await GetAllProducts();
-
-      if (products.length === 0) {
-        throw new Error('No products found');
-      }
-
-      const stock: number[] = await Promise.all(
-        products.map((product) => getStockAmount(product.id))
-      );
-
-      const productsWithStock: ProductWithStock[] = products.map((element, index) => {
-        return { product: element, stock: stock[index] };
-      });
-
-      const recommendedProducts: ReccomendedProducts = { products: productsWithStock };
-
-      return recommendedProducts;
-    } catch (error) {
-      console.error(error);
-      return { products: [] };
-    }
-  };
-
   useEffect(() => {
     // Get recommended items
-    getReccomendedItems().then((res) => {
+    getRecommendedItems().then((res) => {
       setRecommendedProducts(res);
     });
   }, []);
