@@ -1,0 +1,31 @@
+.product_preview {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    img {
+        border: 5px solid lightblue;
+    }
+    background-color: white;
+}
+
+.product_preview:hover {
+    background-color: rgb(245, 245, 245);
+}
+
+.price_stock {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    color: blue;
+    font-weight: 800;
+    font-size: .9rem;
+}
+
+.stock {
+    color: gray;
+    font-size: .75rem;
+}

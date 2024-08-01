@@ -170,6 +170,41 @@ export async function getCart(id: number): Promise<CartItem[]> {
   return cart;
 }
 
+export async function GetAllProducts(): Promise<Product[]> {
+  // Get all products
+  const url = buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const products: Product[] = data.map((item: any) => ({
+    id: item.id,
+    image: item.image,
+    name: item.name,
+    price: item.price,
+    category: item.category,
+    brand: item.brand,
+    size: item.size,
+    description: item.description,
+    supplierId: item.supplierId,
+    createdAt: new Date(item.createdAt),
+    updatedAt: new Date(item.updatedAt)
+  }));
+
+  return products;
+}
+
 export async function GetProducts(filter: ProductFilter): Promise<Product[]> {
   // Get all products
   const url = buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT);
@@ -233,4 +268,24 @@ export async function GetStock(pid: number, wid: number): Promise<Stock> {
     throw new Error('Stock not found');
   }
   return stockOfInterest;
+}
+
+export async function GetProductStock(pid: number): Promise<Stock[]> {
+  // Get all stocks
+  const response = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.STOCK), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get stock');
+  }
+
+  const stocks: Stock[] = await response.json();
+
+  // Find the stocks that match the product ID
+  const stocksOfInterest = stocks.filter((s) => s.productId === pid);
+  return stocksOfInterest;
 }
