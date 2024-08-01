@@ -21,6 +21,7 @@
   --rgb-grey: 143, 142, 142;
   --off-white: #fafafa;
   --rgb-off-white: 250, 250, 250;
+  --yellow: #f8c64f;
 }
 
 @media (prefers-color-scheme: dark) {

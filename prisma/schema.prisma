@@ -21,8 +21,8 @@ datasource db {
 
 enum OrderStatus {
   ISSUED
-  SHIPPED
-  DELIVERED
+  SENT
+  RECEIVED
   CANCELLED
   ERROR
 }

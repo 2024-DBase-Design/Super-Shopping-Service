@@ -25,6 +25,22 @@ export const createCustomer = async (req: Request, res: Response) => {
 };
 
 /**
+ * Get all customers.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getCustomers = async (req: Request, res: Response) => {
+  try {
+    const customers = await prisma.customer.findMany();
+    res.json(customers);
+  } catch (error) {
+    console.error('Error fetching customers:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
  * Get a customer by ID.
  *
  * @param req Express request object.
