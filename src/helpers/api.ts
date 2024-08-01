@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CartItem } from '@/app/cart/page';
-import { FormHydration } from '@/components/input/dropdownInput';
+import { ProductFilter } from '@/app/supplier/products/page';
+import { Product, Stock } from '@prisma/client';
 
 export const lastCreditCardNumber: string = '';
 
@@ -90,7 +91,7 @@ export function buildTwoEntityUrl(
 
 // Customer API calls
 
-export async function getPaymentOptions(id: number): Promise<FormHydration[]> {
+export async function getPaymentOptions(id: number): Promise<string[]> {
   // build URL
   const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.CREDIT_CARD);
   // Send GET request to API
@@ -106,14 +107,14 @@ export async function getPaymentOptions(id: number): Promise<FormHydration[]> {
 
   // Handle successful API call
   const data = await response.json();
-  const options: FormHydration[] = data.map((payment: any) => {
-    return { label: '••••••••••••' + payment.cardNumber.slice(-4), value: payment.id.toString() };
+  const options: string[] = data.map((payment: any) => {
+    return payment.id.toString() + '••••••••••••' + payment.cardNumber.slice(-4);
   });
 
   return options;
 }
 
-export async function getDeliveryAddressOptions(id: number): Promise<FormHydration[]> {
+export async function getDeliveryAddressOptions(id: number): Promise<string[]> {
   // Build URL
   const url = buildTwoEntityUrl(HttpMethod.GET, EntityType.CUSTOMER, id, EntityType.ADDRESS);
 
@@ -131,11 +132,8 @@ export async function getDeliveryAddressOptions(id: number): Promise<FormHydrati
 
   // Handle successful API call
   const data = await response.json();
-  const options: FormHydration[] = data.map((address: any) => {
-    return {
-      label: `${address.street}, ${address.city} ${address.state} ${address.zip}`,
-      value: address.id.toString()
-    };
+  const options: string[] = data.map((address: any) => {
+    return `${address.id.toString()}-${address.street}, ${address.city} ${address.state} ${address.zip}`;
   });
 
   return options;
@@ -170,4 +168,124 @@ export async function getCart(id: number): Promise<CartItem[]> {
   });
 
   return cart;
+}
+
+export async function GetAllProducts(): Promise<Product[]> {
+  // Get all products
+  const url = buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const products: Product[] = data.map((item: any) => ({
+    id: item.id,
+    image: item.image,
+    name: item.name,
+    price: item.price,
+    category: item.category,
+    brand: item.brand,
+    size: item.size,
+    description: item.description,
+    supplierId: item.supplierId,
+    createdAt: new Date(item.createdAt),
+    updatedAt: new Date(item.updatedAt)
+  }));
+
+  return products;
+}
+
+export async function GetProducts(filter: ProductFilter): Promise<Product[]> {
+  // Get all products
+  const url = buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  // Handle successful API call
+  const data = await response.json();
+  const products: Product[] = data.map((item: any) => ({
+    id: item.id,
+    image: item.image,
+    name: item.name,
+    price: item.price,
+    category: item.category,
+    brand: item.brand,
+    size: item.size,
+    description: item.description,
+    supplierId: item.supplierId,
+    createdAt: new Date(item.createdAt),
+    updatedAt: new Date(item.updatedAt)
+  }));
+
+  // Filter products based on the filter (name)
+  if (filter.name) {
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(filter.name.toLowerCase())
+    );
+  }
+
+  return products;
+}
+
+export async function GetStock(pid: number, wid: number): Promise<Stock> {
+  // Get all stocks
+  const response = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.STOCK), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get stock');
+  }
+
+  const stocks: Stock[] = await response.json();
+
+  // Find the one that matches pid and wid (need the stock ID)
+  const stockOfInterest = stocks.find((s) => s.productId === pid && s.warehouseId === wid);
+  if (!stockOfInterest) {
+    throw new Error('Stock not found');
+  }
+  return stockOfInterest;
+}
+
+export async function GetProductStock(pid: number): Promise<Stock[]> {
+  // Get all stocks
+  const response = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.STOCK), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get stock');
+  }
+
+  const stocks: Stock[] = await response.json();
+
+  // Find the stocks that match the product ID
+  const stocksOfInterest = stocks.filter((s) => s.productId === pid);
+  return stocksOfInterest;
 }

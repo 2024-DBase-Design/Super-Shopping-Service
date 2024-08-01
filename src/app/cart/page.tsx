@@ -22,13 +22,13 @@ export type CartItem = {
 export default function Page() {
   const router = useRouter();
   const isClient = useClientSide();
-  const token = window.localStorage.getItem('token');
   let customerID: number = -1;
 
   // Route Guarding for logged in users (on page load, check if user is logged in. If not, redirect to login page)
   // Only allows customers to access this page
   useEffect(() => {
     if (isClient) {
+      const token = window.localStorage.getItem('token');
       if (token) {
         try {
           const decoded = jwtDecode<DecodedToken>(token);
