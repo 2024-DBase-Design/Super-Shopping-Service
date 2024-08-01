@@ -1,0 +1,43 @@
+.popUpBody {
+  max-height: calc(100vh * 0.9 - 1em);
+  max-width: calc(100vw * 0.9 - 1em);
+  overflow: scroll;
+  padding-top: 1em;
+  input,
+  select {
+    border: 1px solid var(--blue);
+  }
+  form {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  button {
+    margin: 0;
+  }
+}
+
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  left: 0;
+  height: calc(100% - 1px);
+  width: calc(100% - 1px);
+  float: left;
+  margin-right: -100%;
+  backdrop-filter: blur(2px);
+  padding: 0.1em;
+}
+
+.stickyX {
+  position: sticky;
+  float: right;
+  top: 0;
+  right: 0;
+  padding: 0;
+  backdrop-filter: blur(2px);
+  padding: 0.1em;
+  button {
+    padding-right: 0;
+  }
+}
