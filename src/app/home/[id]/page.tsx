@@ -1,14 +1,17 @@
 'use client';
 
-import { useRouter } from 'next/router';
-import useRoleAuth from '@/hooks/useRoleAuth';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import styles from '../detail.module.scss';
 import '@/styles/staffSession.scss';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Product } from '@prisma/client';
-import { pid } from 'process';
+import { getStockAmount } from '@/helpers/api';
+import { buildTwoEntityUrl, EntityType, GetProductByID, HttpMethod } from '@/helpers/api';
+import useClientSide from '@/hooks/useClientSide';
+import { jwtDecode } from 'jwt-decode';
+import { DecodedToken } from '@/hooks/useRoleAuth';
 
 type ProductWithStock = {
   product: Product;
@@ -34,39 +37,93 @@ const testValue: ProductWithStock = {
   stock: 12
 };
 
-const getProductValues = async (id: number): Promise<ProductWithStock> => {
-  return testValue;
+const defaultValue: ProductWithStock = {
+  product: {
+    id: 0,
+    image: null,
+    name: '',
+    price: 0,
+    category: '',
+    brand: '',
+    size: '',
+    description: '',
+    supplierId: 0,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  stock: 0
 };
-
-function addProductToCart(id: number) {}
 
 export default function ProductDetail() {
   //useRoleAuth(['staff'], '/login');
-  const defaultValue: ProductWithStock = {
-    product: {
-      id: 0,
-      image: null,
-      name: '',
-      price: 0,
-      category: '',
-      brand: '',
-      size: '',
-      description: '',
-      supplierId: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    stock: 0
-  };
+  const router = useRouter();
+  const isClient = useClientSide();
   const { id } = useParams();
   const pId = Array.isArray(id) ? parseInt(id.join('')) : parseInt(id ?? '');
-  const [value, setValue] = useState(defaultValue);
+  const [value, setValue] = useState<ProductWithStock>(defaultValue);
+  const [customerId, setCustomerId] = useState<number>(0);
+
+  const getProductValues = async (id: number): Promise<ProductWithStock> => {
+    const product1 = await GetProductByID(id);
+    const stock1 = await getStockAmount(id);
+    const productWithStock = { product: product1, stock: stock1 };
+    return productWithStock;
+  };
+  
+  async function addProductToCart(id: number) {
+    console.log('Adding product to cart:', id);
+    try {
+      // add item request to API
+      const response = await fetch(buildTwoEntityUrl(HttpMethod.POST, EntityType.CUSTOMER, customerId, EntityType.CART), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          productID: id,
+          quantity: 1
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      // Handle successful API call, redirect back to cart
+      console.log('API call successful, item added to cart');
+      router.push('/home');
+  
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
 
   useEffect(() => {
+    try {
+      if (isClient) {
+        const token = window.localStorage.getItem('token');
+        // get customer id
+        try {
+          if (token) {
+            const decoded = jwtDecode<DecodedToken>(token);
+            setCustomerId(decoded.id);
+          }
+        } catch (error) {
+          console.error('Error decoding token:', error);
+          window.localStorage.removeItem('token');
+          router.push('/login');
+        }
+      }
+    }
+    catch (error) {
+      throw new Error('isClient is false');
+    }
+
+    // get product details
     getProductValues(pId).then((res) => {
       setValue(res);
     });
-  }, []);
+  }, [router, isClient]);
 
   return (
     <div className={styles.profile}>

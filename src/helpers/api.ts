@@ -205,6 +205,26 @@ export async function GetAllProducts(): Promise<Product[]> {
   return products;
 }
 
+export async function GetProductByID(productId: number): Promise<Product> {
+  // Get all products
+  const url = buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT, productId);
+
+  // Send GET request to API
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const product: Product = await response.json();
+  return product;
+}
+
 export async function GetProducts(filter: ProductFilter): Promise<Product[]> {
   // Get all products
   const url = buildOneEntityUrl(HttpMethod.GET, EntityType.PRODUCT);
@@ -289,3 +309,9 @@ export async function GetProductStock(pid: number): Promise<Stock[]> {
   const stocksOfInterest = stocks.filter((s) => s.productId === pid);
   return stocksOfInterest;
 }
+
+export async function getStockAmount(productId: number): Promise<number> {
+  const stocks: Stock[] = await GetProductStock(productId);
+  const returnStock: number = stocks.reduce((acc, stock) => acc + stock.quantity, 0);
+  return returnStock;
+};
