@@ -1,6 +1,7 @@
 import { prisma } from '../index';
 import { Request, Response } from 'express';
 import { Prisma, Product } from '@prisma/client';
+import { ProductWithWarehouses, WarehouseProductInfo } from '@/app/supplier/products/[id]/page';
 
 /**
  * Add a new product.
@@ -131,6 +132,57 @@ export const searchProducts = async (req: Request, res: Response) => {
     res.status(200).json(products);
   } catch (error) {
     console.error('Error searching products:', (error as Error).message);
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+/**
+ * Get all warehouses that have a product in stock.
+ *
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getProductsWarehouses = async (req: Request, res: Response) => {
+  try {
+    const productId = parseInt(req.params.productId);
+    if (isNaN(productId)) {
+      return res.status(400).json({ error: 'Invalid productId' });
+    }
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id: productId
+      },
+      include: {
+        stocks: {
+          include: {
+            warehouse: true
+          }
+        }
+      }
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Extract warehouse information from the stocks
+    const warehouses: WarehouseProductInfo[] = product.stocks.map((stock) => ({
+      id: stock.warehouseId,
+      name: stock.warehouse.name,
+      stock: stock.quantity
+    }));
+
+    // Construct the response object
+    const response: ProductWithWarehouses = {
+      product,
+      warehouses
+    };
+
+    // Return the response with status 200
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error getting product warehouses:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });
   }
 };

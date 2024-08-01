@@ -1,0 +1,98 @@
+h1{
+    color: var(--blue);
+    font-family: Roboto;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+h3{
+    color: var(--grey)
+}
+
+.money{
+    color: var(--blue);
+}
+.money::before{
+    content: '$';
+}
+
+.main-body{
+    margin-top: 1em;
+    padding: 2em;
+    background-color: white;
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    height: max-content;
+}
+
+body{
+    background-image: url('/fun-background.png');
+    background-size: cover;
+}
+
+button{
+    background-image: linear-gradient(
+        to bottom,
+        rgba(var(--rgb-orange), 1),
+        rgba(var(--rgb-dark-orange), 1)
+    );
+    color: white;
+    padding: 1em;
+    border-radius: 1em;
+    text-align: center;
+    font-size: 1.25em;
+    display: block;
+}
+
+input, select{
+    text-overflow: ellipsis;
+}
+
+form{
+    width: 80%;
+    margin: auto;
+}
+
+form button{
+    width: 50%;
+    margin: auto;
+}
+
+.complex-select{
+    border: 2px solid var(--blue);
+    border-radius: 1.5em;
+    padding-right: .5em;
+    text-overflow: ellipsis;
+
+    //options container
+    div[role="listbox"]{
+        margin-left: calc(-1em + 2px);
+        margin-right: calc(.5em + 2px);
+    }
+    
+    div[role="option"]{
+        border: 2px solid var(--blue);
+        background-color: white;
+        padding: .5em;
+        border-bottom: none;
+        border-top: none;
+        left: -.5em;
+    }
+    div[role="option"]:nth-child(1){
+        border-top: 2px solid var(--blue);
+    }
+    div[role="option"]:nth-last-child(1){
+        border-radius: 1.5em;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-top: none;
+        border-bottom: 2px solid var(--blue);
+    }
+    div[aria-selected="true"]{
+        background-color: #FAFAFA;
+    }
+}
+.focusedBorder {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
