@@ -34,18 +34,6 @@
   flex-direction: column;
   justify-content: space-between;
   height: 50%;
-
-}
-
-.navBar {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: white;
-  border-top: #eee solid 1px;
-  font-size: 1.5em;
-  padding: 10px;
-  height: 12vw;
 }
 
 .topSection {
@@ -57,8 +45,8 @@
 }
 
 .searchBar {
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-style: italic; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-style: italic;
   margin: 0 auto;
   width: 90%;
   height: 25%;
@@ -67,14 +55,14 @@
   border: 1px solid #ccc;
 }
 
-.mainContainer{
+.mainContainer {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 100vh;
 }
 
-.brandLogo{
+.brandLogo {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -116,15 +104,14 @@
   gap: 10px;
 }
 
-
 @media (max-height: 850px) {
- .brandLogo {
+  .brandLogo {
     margin-top: 1em;
     flex-direction: row-reverse;
     align-items: center;
 
-    h1{
-      width: calc((100vw - 4em)*.8);
+    h1 {
+      width: calc((100vw - 4em) * 0.8);
       font-size: 8vw; // Silly Stuffs is 12 characters
       flex-shrink: 0;
       flex-grow: 1;
@@ -133,8 +120,8 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    svg{
-      width: calc((100vw - 4em)*.0);
+    svg {
+      width: calc((100vw - 4em) * 0);
       min-height: 0;
       margin-left: 10px;
       flex-grow: 1; /* Allows SVG to grow and fill available space */

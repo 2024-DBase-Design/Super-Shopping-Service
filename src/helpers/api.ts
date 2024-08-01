@@ -314,4 +314,4 @@ export async function getStockAmount(productId: number): Promise<number> {
   const stocks: Stock[] = await GetProductStock(productId);
   const returnStock: number = stocks.reduce((acc, stock) => acc + stock.quantity, 0);
   return returnStock;
-};
+}

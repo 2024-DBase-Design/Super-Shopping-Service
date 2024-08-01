@@ -8,7 +8,7 @@ import '@/styles/noSession.scss';
 import styles from './home.module.scss';
 import { shrikhand } from '../fonts';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
-import NavFooter from '@/components/nav/navFooter';
+import NavFooter, { getCustomerButtons } from '@/components/nav/navFooter';
 import Link from 'next/link';
 import { FormValues } from '@/helpers/formValues';
 import FormComponent, { FormInput, InputTypeEnum } from '@/components/form/form';
@@ -221,13 +221,7 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-      <div className={styles.navBar}>
-        <NavFooter
-          index={0}
-          icons_Src={['/home.svg', '/cart.svg', '/account.svg']}
-          btn_Functions={[() => console.log('1'), () => console.log('2'), () => console.log('3')]}
-        />
-      </div>
+      <NavFooter navButtons={getCustomerButtons(0)} />
     </div>
   );
 };

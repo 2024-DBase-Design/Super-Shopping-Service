@@ -10,6 +10,8 @@ import { useRouter } from 'next/navigation';
 import useClientSide from '@/hooks/useClientSide';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import NavFooter, { getCustomerButtons } from '@/components/nav/navFooter';
 
 export type CartItem = {
   id: number;
@@ -52,7 +54,7 @@ export default function Page() {
 
   return (
     <>
-      <div style={{ backgroundColor: 'grey' }}>Imagine the header is here</div>
+      <BrandHeaderComponent></BrandHeaderComponent>
       <div className="main-body">
         <h1>In Cart</h1>
         <div className={styles.cartItems}>
@@ -73,9 +75,7 @@ export default function Page() {
             </button>
           </Link>
         </div>
-      </div>
-      <div style={{ backgroundColor: 'grey', position: 'fixed', bottom: '0' }}>
-        Imagine the navbar is here
+        <NavFooter navButtons={getCustomerButtons(1)} />
       </div>
     </>
   );

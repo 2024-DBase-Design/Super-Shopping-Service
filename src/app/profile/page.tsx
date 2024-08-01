@@ -16,6 +16,8 @@ import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 import { urlToUrlWithoutFlightMarker } from 'next/dist/client/components/app-router';
 import { jwtDecode } from 'jwt-decode';
 import useClientSide from '@/hooks/useClientSide';
+import NavFooter, { getCustomerButtons } from '@/components/nav/navFooter';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
@@ -286,7 +288,7 @@ export default function Page() {
 
   return (
     <div className={styles.profile}>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent></BrandHeaderComponent>
       <div className="flex justify-center items-center">
         <img src={values.customer.profilePicture ?? ''} className="drop-shadow-lg" />
       </div>
@@ -314,8 +316,8 @@ export default function Page() {
             eventEmitter={addressEmitter}
           ></EditableListComponent>
         </div>
+        <NavFooter navButtons={getCustomerButtons(2)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }
