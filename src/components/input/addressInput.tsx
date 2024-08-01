@@ -75,7 +75,7 @@ const AddressInputComponent: React.FC<AddressInputProps> = ({
   }
 
   const handleInputChange = (name: string, value: string, isValid: boolean) => {
-    formValues.updateValidity("Address Line Two", true);
+    formValues.updateValidity('Address Line Two', true);
     formValues.updateValue(name, value);
     formValues.updateValidity(name, isValid);
     if (isValid) {
