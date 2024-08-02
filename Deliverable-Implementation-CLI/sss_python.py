@@ -454,20 +454,20 @@ def delete_product(product_id):
 
 
 @cli.command()
-@click.option("--name", help="Name of the product.")
-@click.option("--category", help="Category of the product.")
-@click.option("--brand", help="Brand of the product.", default=None)
-@click.option("--size", help="Size of the product.", default=None)
-@click.option("--description", help="Description of the product.", default=None)
-def search_products(name, category, brand, size, description):
+@click.option("--name", prompt="Name", help="Name of the product.")
+#@click.option("--category", prompt="Category", help="Category of the product.")
+#@click.option("--brand", prompt="Brand", help="Brand of the product.")
+#@click.option("--size", prompt="Size", help="Size of the product.")
+#@click.option("--description", prompt="Description", help="Description of the product.")
+def search_products(name): #category, brand, size, description):
     """Search for products given query parameters"""
     url = f"http://localhost:{PORT}/api/products/search"
     params = {
         "name": name,
-        "category": category,
-        "brand": brand,
-        "size": size,
-        "description": description,
+        #"category": category,
+        #"brand": brand,
+        #"size": size,
+        #"description": description,
     }
     response = requests.get(url, params=params)
     if response.status_code == 200:
@@ -1321,8 +1321,8 @@ def main():
                 args = ["delete-product", product_id]
                 cli.main(args=args, standalone_mode=False)
             elif product_choice == "6":
-                search_term = input("Search Term: ")
-                args = ["search-products", search_term]
+                # search_term = input("Search Term: ")
+                args = ["search-products"]
                 cli.main(args=args, standalone_mode=False)
             elif product_choice == "7":
                 product_id = input("Product ID: ")
