@@ -113,7 +113,6 @@ export const deleteProduct = async (req: Request, res: Response) => {
 export const searchProducts = async (req: Request, res: Response) => {
   try {
     const { name, category, brand, size, description } = req.query;
-    // add explit type here
 
     const products = await prisma.product.findMany({
       where: {
