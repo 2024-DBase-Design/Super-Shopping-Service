@@ -6,8 +6,6 @@ import requests
 BASE_URL = "http://localhost:{port}/api/customers"
 PORT = "3000"  # Replace with your server's port
 
-USER_ID = None
-
 def display_menu():
     """Display the main menu"""
     print("\nSuperShoppingService CLI")
