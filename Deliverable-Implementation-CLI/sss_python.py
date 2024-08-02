@@ -1206,17 +1206,13 @@ def main():
                     cli.main(args=args, standalone_mode=False)
                 elif cart_choice == "2":
                     customer_id = input("Customer ID: ")
-                    args = ["get-carts", customer_id]
-                    cli.main(args=args, standalone_mode=False)
-                elif cart_choice == "3":
-                    cart_id = input("Cart ID: ")
-                    args = ["get-cart", cart_id]
+                    args = ["get-cart", customer_id]
                     cli.main(args=args, standalone_mode=False)
                 elif cart_choice == "4":
-                    cart_id = input("Cart ID: ")
+                    customer_id = input("Customer ID: ")
                     product_id = input("Product ID: ")
                     quantity = input("Quantity: ")
-                    args = ["update-cart", cart_id, product_id, quantity]
+                    args = ["update-cart", customer_id, product_id, quantity]
                     cli.main(args=args, standalone_mode=False)
                 elif cart_choice == "5":
                     cart_id = input("Cart ID: ")
