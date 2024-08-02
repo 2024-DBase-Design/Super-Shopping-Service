@@ -317,12 +317,21 @@ def delete_cart_item(customer_id, cart_item_id):
 def create_order(customer_id, card_id, delivery_plan_type, delivery_plan_price, delivery_plan_delivery_date, delivery_plan_sent_date):
     """Create a new order"""
     url = f"{BASE_URL}/{customer_id}/orders".format(port=PORT)
-    delivery_plan = {"type": delivery_plan_type, "price": delivery_plan_price, "deliveryDate": delivery_plan_delivery_date, "sentDate": delivery_plan_sent_date}
-    payload = {"cardId": card_id, "deliveryPlan": delivery_plan}
+    delivery_plan = {
+        "type": delivery_plan_type,
+        "price": delivery_plan_price,
+        "deliveryDate": delivery_plan_delivery_date,
+        "sentDate": delivery_plan_sent_date
+    }
+    payload = {
+        "cardId": int(card_id),
+        "deliveryPlan": delivery_plan
+    }
     response = requests.post(url, json=payload)
     if response.status_code == 201:
         click.echo(response.json())
-
+    else:
+        click.echo(f"Error: {response.status_code} - {response.text}")
 
 @cli.command()
 @click.argument("customer_id")
