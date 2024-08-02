@@ -10,6 +10,8 @@ import Link from 'next/link';
 import styles from './customers.module.scss';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 import useClientSide from '@/hooks/useClientSide';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 
 type CustomerFilter = {
   name: string;
@@ -85,12 +87,12 @@ export default function Page() {
 
   return (
     <div>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true} />
       <SearchComponent eventEmitter={searchEmitter}></SearchComponent>
       <div className="main-body">
         <TableComponent table={table}></TableComponent>
+        <NavFooter navButtons={getStaffButtons(1)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }

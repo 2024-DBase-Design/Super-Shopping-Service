@@ -20,6 +20,7 @@ import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
 import build from 'next/dist/build';
 import { buildOneEntityUrl, EntityType, GetStock, HttpMethod } from '@/helpers/api';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
 
 export type WarehouseProductInfo = {
   name: string; //name of warehouse
@@ -408,8 +409,8 @@ export default function ProductDetail() {
           eventEmitter={warehouseEventEmitter}
           addNewFormInputs={addNewWarehouseFormInputs}
         ></EditableListComponent>
+        <NavFooter navButtons={getStaffButtons(0)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }

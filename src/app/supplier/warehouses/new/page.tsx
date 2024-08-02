@@ -11,6 +11,8 @@ import { FormValues } from '@/helpers/formValues';
 import { buildOneEntityUrl, HttpMethod, EntityType } from '@/helpers/api';
 import { Warehouse } from '@prisma/client';
 import { useRouter } from 'next/navigation';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 
 const AddNewWarehouse: React.FC = () => {
   const router = useRouter();
@@ -63,7 +65,7 @@ const AddNewWarehouse: React.FC = () => {
 
   return (
     <div className={styles.profile}>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true} />
       <div className={styles.nameTag + ' drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]'}>
         ADD WAREHOUSE
       </div>
@@ -74,8 +76,8 @@ const AddNewWarehouse: React.FC = () => {
           submitAction={addNewWarehouse}
           submitName="Add New"
         ></FormComponent>
+        <NavFooter navButtons={getStaffButtons(2)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 };

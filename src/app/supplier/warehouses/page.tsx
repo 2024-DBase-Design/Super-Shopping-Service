@@ -11,6 +11,8 @@ import styles from './warehouses.module.scss';
 import { EditIconComponent } from '@/components/svgs/edit';
 import { ButtonOptions, EditableListComponent } from '@/components/form/editableList';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
 
 type WarehouseFilter = {
   name: string;
@@ -138,7 +140,7 @@ export default function Page() {
 
   return (
     <div>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true} />
       <SearchComponent eventEmitter={searchEmitter}></SearchComponent>
       <div className="main-body">
         <div className="flex justify-between mb-5">
@@ -147,9 +149,9 @@ export default function Page() {
             <h3>+ ADD NEW</h3>
           </Link>
         </div>
-        <TableComponent table={table}></TableComponent>
+        <TableComponent table={table}></TableComponent>{' '}
+        <NavFooter navButtons={getStaffButtons(2)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }
