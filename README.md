@@ -1,6 +1,12 @@
-# SillyStuffs API
+# Database Project Submission: Super Shopping Service
 
-This project is an API for an application that manages art, clothing, toys, and other items. It is built using TypeScript leveraging Express.js for REST API calls and PostgreSQL for database storage. The application is containerized using Docker and Docker Compose.
+This is the github repository for our database project. In the root of Super Shopping Service, you will find our deliverables. The ER-Model, Database-Design/Relational Schema, and Demonstration Video are contained in their own subfolders, while our web application (original application/implementation) is in the root of the repository to ensure everything builds properly.
+
+The web implementation of Super Shopping Service is incomplete, but does have several features implemented. We elected to create a second implementation (a python CLI application) to demonstrate the functionality of our project, as the we application proved a bit too ambitious to finish given the timeline. Build instructions are included below so that you can see the work we put in on the frontend, even though it is unfinished.
+
+The database and backend implementation of Super Shopping Service is fully functional, and can be demonstrated in several different ways. You may make calls to our API using the public Postman collection linked below, or use our CLI (see instructions below). We recognize that our various implementations are not 100% complete or polished, but we shifted our focus to the underlying theory and database operations as instructed in the near-end-semester announcement, which is sound and working.
+
+The instructions for building the application below are required whether viewing the web application or the CLI, as both use the 
 
 ## Table of Contents
 
