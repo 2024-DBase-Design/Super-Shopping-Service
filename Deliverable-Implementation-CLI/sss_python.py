@@ -1192,7 +1192,7 @@ def main():
             elif customer_menu_choice == "4":
                 # Cart Management
                 print("\nCart Management")
-                print("1. Create Cart")
+                print("1. Add Cart Item")
                 print("2. Get Carts")
                 print("3. Get Cart")
                 print("4. Update Cart")
@@ -1201,7 +1201,7 @@ def main():
                 
                 if cart_choice == "1":
                     customer_id = input("Customer ID: ")
-                    args = ["create-cart", customer_id]
+                    args = ["add-cart-item", customer_id]
                     cli.main(args=args, standalone_mode=False)
                 elif cart_choice == "2":
                     customer_id = input("Customer ID: ")
