@@ -12,6 +12,7 @@ import { buildTwoEntityUrl, EntityType, GetProductByID, HttpMethod } from '@/hel
 import useClientSide from '@/hooks/useClientSide';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
+import NavFooter, { getCustomerButtons } from '@/components/nav/navFooter';
 
 type ProductWithStock = {
   product: Product;
@@ -69,30 +70,32 @@ export default function ProductDetail() {
     const productWithStock = { product: product1, stock: stock1 };
     return productWithStock;
   };
-  
+
   async function addProductToCart(id: number) {
     console.log('Adding product to cart:', id);
     try {
       // add item request to API
-      const response = await fetch(buildTwoEntityUrl(HttpMethod.POST, EntityType.CUSTOMER, customerId, EntityType.CART), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          productID: id,
-          quantity: 1
-        })
-      });
-  
+      const response = await fetch(
+        buildTwoEntityUrl(HttpMethod.POST, EntityType.CUSTOMER, customerId, EntityType.CART),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productID: id,
+            quantity: 1
+          })
+        }
+      );
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       // Handle successful API call, redirect back to cart
       console.log('API call successful, item added to cart');
       router.push('/home');
-  
     } catch (error) {
       console.error('There has been a problem with your fetch operation:', error);
     }
@@ -114,8 +117,7 @@ export default function ProductDetail() {
           router.push('/login');
         }
       }
-    }
-    catch (error) {
+    } catch (error) {
       throw new Error('isClient is false');
     }
 
@@ -152,8 +154,8 @@ export default function ProductDetail() {
         </div>
         <br></br>
         <div>{value.product.description}</div>
+        <NavFooter navButtons={getCustomerButtons(0)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }

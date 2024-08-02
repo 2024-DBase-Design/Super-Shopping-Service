@@ -12,6 +12,8 @@ import { EditIconComponent } from '@/components/svgs/edit';
 import { ButtonOptions, EditableListComponent } from '@/components/form/editableList';
 import { buildOneEntityUrl, GetProducts, HttpMethod, EntityType } from '@/helpers/api';
 import { useRouter } from 'next/navigation';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
 
 export type ProductFilter = {
   name: string;
@@ -165,7 +167,7 @@ export default function Page() {
 
   return (
     <div>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true} />
       <SearchComponent eventEmitter={searchEmitter}></SearchComponent>
       <div className="main-body">
         <div className="flex justify-between mb-5">
@@ -175,8 +177,8 @@ export default function Page() {
           </Link>
         </div>
         <TableComponent table={table}></TableComponent>
+        <NavFooter navButtons={getStaffButtons(0)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }

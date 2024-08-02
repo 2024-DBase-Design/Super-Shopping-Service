@@ -13,6 +13,7 @@ import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
 import { getCart, getDeliveryAddressOptions, getPaymentOptions } from '@/helpers/api';
 import { buildTwoEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
+import NavFooter, { getCustomerButtons } from '@/components/nav/navFooter';
 
 export default function Page() {
   const router = useRouter();
@@ -154,9 +155,7 @@ export default function Page() {
             buttonClassName="submit-button"
           ></FormComponent>
         </div>
-      </div>
-      <div style={{ backgroundColor: 'grey', position: 'fixed', bottom: '0' }}>
-        Imagine the navbar is here
+        <NavFooter navButtons={getCustomerButtons(1)} />
       </div>
     </>
   );

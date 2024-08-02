@@ -9,6 +9,8 @@ import useClientSide from '@/hooks/useClientSide';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from '@/hooks/useRoleAuth';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
 
 type StaffProfileValues = {
   staff: Staff;
@@ -124,7 +126,7 @@ export default function Page() {
 
   return (
     <div className={styles.profile}>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true}></BrandHeaderComponent>
       <div className="flex justify-center items-center">
         <img src={values.staff.profilePicture ?? ''} className="drop-shadow-lg" />
       </div>
@@ -149,9 +151,8 @@ export default function Page() {
             ' ' +
             values.address.zip}
         </p>
-        <br></br>
+        <NavFooter navButtons={getStaffButtons(3)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }

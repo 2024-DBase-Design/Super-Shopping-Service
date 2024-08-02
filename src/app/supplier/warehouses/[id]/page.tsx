@@ -12,6 +12,8 @@ import { Warehouse, Stock, Product, Address } from '@prisma/client';
 import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
 
 type StockWithName = {
   stock: Stock;
@@ -273,7 +275,7 @@ export default function CustomerDetail() {
 
   return (
     <div className={styles.profile}>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true} />
       <div className={styles.nameTag + ' drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]'}>
         EDIT WAREHOUSE
       </div>
@@ -296,7 +298,7 @@ export default function CustomerDetail() {
           submitName="Save Changes"
         ></FormComponent>
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
+      <NavFooter navButtons={getStaffButtons(2)} />
     </div>
   );
 }

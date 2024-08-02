@@ -7,7 +7,7 @@ import ProductPreviewComponent from '@/components/products/productPreview';
 import '@/styles/noSession.scss';
 import styles from './search.module.scss';
 import { shrikhand } from '../fonts';
-import NavFooter from '@/components/nav/navFooter';
+import NavFooter, { getCustomerButtons } from '@/components/nav/navFooter';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 
 const getStockAmount = async (productId: number): Promise<number> => {
@@ -82,13 +82,7 @@ const SearchPage = () => {
           </div>
         </div>
       </div>
-      <div className={styles.navBar}>
-        <NavFooter
-          index={0}
-          icons_Src={['/home.svg', '/cart.svg', '/account.svg']}
-          btn_Functions={[() => console.log('1'), () => console.log('2'), () => console.log('3')]}
-        />
-      </div>
+      <NavFooter navButtons={getCustomerButtons(0)} />
     </div>
   );
 };

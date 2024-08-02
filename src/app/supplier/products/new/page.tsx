@@ -11,6 +11,8 @@ import { ValidationRuleEnum } from '@/components/input/validationRules';
 import { FormValues } from '@/helpers/formValues';
 import { buildOneEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 import { Product } from '@prisma/client';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
 
 const AddNewProduct: React.FC = () => {
   const router = useRouter();
@@ -73,7 +75,7 @@ const AddNewProduct: React.FC = () => {
 
   return (
     <div className={styles.profile}>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true} />
       <div className={styles.nameTag + ' drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]'}>ADD PRODUCT</div>
       <Link className={styles.link + ' close-button white'} href="/supplier/products"></Link>
       <div className="main-body">
@@ -82,8 +84,8 @@ const AddNewProduct: React.FC = () => {
           submitAction={addNewProduct}
           submitName="Add New"
         ></FormComponent>
+        <NavFooter navButtons={getStaffButtons(0)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 };

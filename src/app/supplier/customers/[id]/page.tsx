@@ -19,6 +19,8 @@ import { CreditCard, Customer, Order, Product, OrderStatus, Address } from '@pri
 import { buildOneEntityUrl, buildTwoEntityUrl, EntityType, HttpMethod } from '@/helpers/api';
 import useClientSide from '@/hooks/useClientSide';
 import { jwtDecode } from 'jwt-decode';
+import { BrandHeaderComponent } from '@/components/brandHeader/brandHeader';
+import NavFooter, { getStaffButtons } from '@/components/nav/navFooter';
 
 type CreditCardAndAddress = {
   creditCard: CreditCard;
@@ -408,7 +410,7 @@ export default function CustomerDetail() {
 
   return (
     <div className={styles.profile}>
-      <p>Imagine a header is here</p>
+      <BrandHeaderComponent supplier={true} />
       <Link className={styles.link + ' close-button white'} href="/supplier/customers"></Link>
       <div className="flex justify-center items-center">
         <img src={values.customer.profilePicture ?? ''} className="drop-shadow-lg" />
@@ -448,8 +450,8 @@ export default function CustomerDetail() {
             </div>
           ))}
         </div>
+        <NavFooter navButtons={getStaffButtons(1)} />
       </div>
-      <p style={{ position: 'fixed', bottom: '0' }}>Imagine a footer is here</p>
     </div>
   );
 }

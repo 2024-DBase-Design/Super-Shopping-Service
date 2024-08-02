@@ -1,16 +1,31 @@
 .nav_footer {
-    width: 80%;
+  width: 80%;
 }
-.nav_footer_container{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+.nav_footer_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
-.nav_footer_selected{
-    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(330deg) brightness(115%) contrast(119%);
+.nav_footer_selected {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(330deg) brightness(115%) contrast(119%);
 }
 
 .nav_mouse {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+.navBar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: white;
+  border-top: #eee solid 1px;
+  font-size: 1.5em;
+  padding: 10px;
+  height: 12vw;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
 }

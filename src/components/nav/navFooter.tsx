@@ -1,35 +1,79 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import styles from './navFooter.module.scss';
-type NavFooterProps = {
-  index?: number;
-  icons_Src?: string[];
-  btn_Functions?: { (): void }[];
+import Link from 'next/link';
+import { HomeIconComponent } from '../svgs/home';
+import { ProfileIconComponent } from '../svgs/profile';
+import { CartNavIconComponent } from '../svgs/cartNav';
+import { BoxesIconComponent } from '../svgs/boxes';
+import { PeopleIconComponent } from '../svgs/people';
+import { WarehouseIconComponent } from '../svgs/warehouse';
+
+type NavButton = {
+  icon: ReactNode;
+  href: string;
 };
 
-const NavFooterComponent: React.FC<NavFooterProps> = ({
-  index = 0,
-  icons_Src = [],
-  btn_Functions = []
-}) => {
+export const getCustomerButtons = (current: number): NavButton[] => {
+  return [
+    {
+      icon: <HomeIconComponent fillColor={current === 0 ? '#c76e77' : '#8f8e8e'} />,
+      href: '/home'
+    },
+    {
+      icon: <CartNavIconComponent fillColor={current === 1 ? '#c76e77' : '#8f8e8e'} />,
+      href: '/cart'
+    },
+    {
+      icon: <ProfileIconComponent fillColor={current === 2 ? '#c76e77' : '#8f8e8e'} />,
+      href: '/profile'
+    }
+  ];
+};
+
+export const getStaffButtons = (current: number): NavButton[] => {
+  return [
+    {
+      icon: <BoxesIconComponent fillColor={current === 0 ? '#c76e77' : '#8f8e8e'} />,
+      href: '/supplier/products'
+    },
+    {
+      icon: <PeopleIconComponent fillColor={current === 1 ? '#c76e77' : '#8f8e8e'} />,
+      href: '/supplier/customers'
+    },
+    {
+      icon: <WarehouseIconComponent fillColor={current === 2 ? '#c76e77' : '#8f8e8e'} />,
+      href: '/supplier/warehouses'
+    },
+    {
+      icon: <ProfileIconComponent fillColor={current === 3 ? '#c76e77' : '#8f8e8e'} />,
+      href: '/supplier/profile'
+    }
+  ];
+};
+
+type NavFooterProps = {
+  navButtons: NavButton[];
+};
+
+const NavFooterComponent: React.FC<NavFooterProps> = ({ navButtons }) => {
   return (
-    <div className={`${styles.nav_footer}`}>
-      <div className={`${styles.nav_footer_container}`}>
-        {icons_Src.map((icon, i) => (
-          <div
-            key={i}
-            onClick={() => {
-              btn_Functions[i] ? btn_Functions[i]() : {};
-            }}
-            className={`${i === index ? styles.nav_footer_selected : ''} ${styles.nav_mouse}`}
-          >
-            <img alt="icon" width={40} height={40} src={icon} />
+    <>
+      <br></br>
+      <div className={styles.navBar}>
+        <div className={`${styles.nav_footer}`}>
+          <div className={`${styles.nav_footer_container}`}>
+            {navButtons.map((button, i) => (
+              <Link key={i} className={`${styles.nav_mouse}`} href={button.href}>
+                {button.icon}
+              </Link>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
