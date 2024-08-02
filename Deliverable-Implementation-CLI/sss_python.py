@@ -93,7 +93,7 @@ def delete_customer(customer_id):
     url = f"{BASE_URL}/{customer_id}".format(port=PORT)
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Customer deleted successfully.")
 
 
 # Address Management
@@ -164,7 +164,7 @@ def delete_address(customer_id, address_id):
     url = f"{BASE_URL}/{customer_id}/addresses/{address_id}".format(port=PORT)
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Address deleted successfully.")
 
 
 # Credit Card Management
@@ -254,7 +254,7 @@ def delete_credit_card(customer_id, credit_card_id):
     url = f"{BASE_URL}/{customer_id}/creditCards/{credit_card_id}".format(port=PORT)
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Credit card deleted successfully.")
 
 
 # Cart Management
@@ -302,7 +302,7 @@ def delete_cart_item(customer_id, cart_item_id):
     url = f"{BASE_URL}/{customer_id}/cart/{cart_item_id}".format(port=PORT)
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Item deleted successfully.")
 
 
 # Order Management
@@ -375,8 +375,7 @@ def delete_order(customer_id, order_id):
     url = f"{BASE_URL}/{customer_id}/orders/{order_id}".format(port=PORT)
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
-
+        print("Order deleted successfully.")
 
 #
 # ---------------------- PRODUCT MANAGEMENT ----------------------
@@ -450,7 +449,7 @@ def delete_product(product_id):
     url = f"http://localhost:{PORT}/api/products/{product_id}"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Product deleted successfully.")
 
 
 @cli.command()
@@ -560,7 +559,7 @@ def delete_staff(staff_id):
     url = f"http://localhost:{PORT}/api/staff/{staff_id}"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Staff member deleted successfully.")
 
 
 # Staff Address Management
@@ -627,7 +626,7 @@ def delete_staff_address(staff_id):
     url = f"http://localhost:{PORT}/api/staff/{staff_id}/address"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Address deleted successfully.")
 
 
 #
@@ -641,13 +640,15 @@ def create_stock(product_id, warehouse_id, quantity):
     """Create a new stock entry"""
     url = f"http://localhost:{PORT}/api/stock"
     payload = {
-        "productId": product_id,
-        "warehouseId": warehouse_id,
-        "quantity": quantity,
+        "productId": int(product_id),
+        "warehouseId": int(warehouse_id),
+        "quantity": int(quantity),
     }
     response = requests.post(url, json=payload)
     if response.status_code == 201:
         click.echo(response.json())
+    else:
+        click.echo(response.text)
 
 
 @cli.command()
@@ -710,7 +711,7 @@ def delete_stock(stock_id):
     url = f"http://localhost:{PORT}/api/stock/{stock_id}"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Stock entry deleted successfully.")
 
 
 #
@@ -767,7 +768,7 @@ def delete_supplier(supplier_id):
     url = f"http://localhost:{PORT}/api/suppliers/{supplier_id}"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Supplier deleted successfully.")
 
 
 # Supplier Address Management
@@ -836,7 +837,7 @@ def delete_supplier_address(supplier_id, supplier_address_id):
     url = f"http://localhost:{PORT}/api/suppliers/{supplier_id}/address/{supplier_address_id}"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print( "Address deleted successfully.")
 
 
 # Supplier Product Management
@@ -912,7 +913,7 @@ def delete_supplier_product(supplier_id, supplier_product_id):
     url = f"http://localhost:{PORT}/api/suppliers/{supplier_id}/products/{supplier_product_id}"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Product deleted successfully.")
 
 
 #
@@ -1001,7 +1002,7 @@ def delete_warehouse(warehouse_id):
     url = f"http://localhost:{PORT}/api/warehouses/{warehouse_id}"
     response = requests.delete(url)
     if response.status_code == 204:
-        click.echo(response.json())
+        print("Warehouse deleted successfully.")    
 
 
 @cli.command()
