@@ -1194,10 +1194,9 @@ def main():
                 # Cart Management
                 print("\nCart Management")
                 print("1. Add Cart Item")
-                print("2. Get Carts")
-                print("3. Get Cart")
-                print("4. Update Cart")
-                print("5. Delete Cart")
+                print("2. Get Cart")
+                print("3. Update Cart")
+                print("4. Delete Cart")
                 cart_choice = input("Enter your choice: ")
                 
                 if cart_choice == "1":
@@ -1208,13 +1207,13 @@ def main():
                     customer_id = input("Customer ID: ")
                     args = ["get-cart", customer_id]
                     cli.main(args=args, standalone_mode=False)
-                elif cart_choice == "4":
+                elif cart_choice == "3":
                     customer_id = input("Customer ID: ")
                     product_id = input("Product ID: ")
                     quantity = input("Quantity: ")
                     args = ["update-cart", customer_id, product_id, quantity]
                     cli.main(args=args, standalone_mode=False)
-                elif cart_choice == "5":
+                elif cart_choice == "4":
                     cart_id = input("Cart ID: ")
                     args = ["delete-cart", cart_id]
                     cli.main(args=args, standalone_mode=False)
