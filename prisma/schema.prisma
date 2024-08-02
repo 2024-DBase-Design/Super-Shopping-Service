@@ -46,7 +46,7 @@ model Customer {
   password       String
   profilePicture String?
   balance        Float   @default(0.0)
-  cart           Json
+  cart           Json    @default("[]")
 
   createdAt DateTime @default(now()) @updatedAt
   updatedAt DateTime @default(now())

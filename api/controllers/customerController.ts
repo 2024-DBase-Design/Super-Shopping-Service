@@ -385,7 +385,22 @@ export const addToCart = async (req: Request, res: Response) => {
       },
       quantity
     };
-    (customer.cart as Prisma.JsonArray).push(item);
+
+    let cart: Prisma.JsonArray = [];
+    if (customer.cart) {
+      cart = (customer.cart as Prisma.JsonArray) || [];
+      if (!Array.isArray(cart)) {
+        cart = []; // Ensure cart is an array
+      }
+    }
+
+    cart.push(item);
+
+    await prisma.customer.update({
+      where: { id: Number(req.params.customerId) },
+      data: { cart }
+    });
+
     res.status(201).json(item);
   } catch (error) {
     console.error('Error adding to cart:', (error as Error).message);
@@ -515,24 +530,31 @@ export const submitOrder = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid card used' });
     }
 
-    const items: ShoppingCartItem[] = customer.cart as unknown as ShoppingCartItem[];
+    const items: ShoppingCartItem[] =
+      customer.cart as Prisma.JsonArray as unknown as ShoppingCartItem[];
 
-    items.forEach(async (item) => {
+    let totalBalance = 0;
+    for (const item of items) {
       const product = await prisma.product.findUnique({
         where: { id: item.product.id }
       });
       if (!product) {
-        return res.status(404).json({ error: 'Cart product not found' });
+        return res.status(404).json({ error: `Product with ID ${item.product.id} not found` });
       }
+      totalBalance += item.quantity * product.price;
+    }
 
-      customer.balance += item.quantity * product.price;
+    const updatedCustomer = await prisma.customer.update({
+      where: { id: customer.id },
+      data: { balance: customer.balance + totalBalance }
     });
 
+    // Create the order
     const order = await prisma.order.create({
       data: {
         customerId: customer.id,
         status: 'ISSUED',
-        items: customer.cart as unknown as Prisma.JsonArray,
+        items: customer.cart as Prisma.JsonArray,
         cardUsed: cardUsed.id,
         deliveryPlan
       }
@@ -540,7 +562,7 @@ export const submitOrder = async (req: Request, res: Response) => {
 
     await prisma.customer.update({
       where: { id: customer.id },
-      data: { cart: [], balance: customer.balance }
+      data: { cart: [] }
     });
 
     res.status(201).json(order);
