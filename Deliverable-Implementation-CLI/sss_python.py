@@ -309,15 +309,16 @@ def delete_cart_item(customer_id, cart_item_id):
 @cli.command()
 @click.argument("customer_id")
 @click.option("--card-id", prompt="Card ID", help="ID of the credit card used.")
-@click.option(
-    "--delivery-plan",
-    prompt="Delivery Plan",
-    help="Delivery plan (type, price, deliveryDate, sentDate).",
-)
-def create_order(customer_id, card_id, delivery_plan):
+@click.option("--delivery-plan-type", prompt="Delivery Plan type", help="Delivery plan (type).")
+@click.option("--delivery-plan-price", prompt="Delivery Plan price", help="Delivery plan (price).")
+@click.option("--delivery-plan-delivery-date", prompt="Delivery Plan delivery-date", help="Delivery plan (delivery-date).")
+@click.option("--delivery-plan-sent-date", prompt="Delivery Plan sent-date", help="Delivery plan (sent-date).")
+
+def create_order(customer_id, card_id, delivery_plan_type, delivery_plan_price, delivery_plan_delivery_date, delivery_plan_sent_date):
     """Create a new order"""
     url = f"{BASE_URL}/{customer_id}/orders".format(port=PORT)
-    payload = {"cardId": card_id, "deliveryPlan": json.loads(delivery_plan)}
+    delivery_plan = {"type": delivery_plan_type, "price": delivery_plan_price, "deliveryDate": delivery_plan_delivery_date, "sentDate": delivery_plan_sent_date}
+    payload = {"cardId": card_id, "deliveryPlan": delivery_plan}
     response = requests.post(url, json=payload)
     if response.status_code == 201:
         click.echo(response.json())
@@ -1163,7 +1164,7 @@ def main():
                         customer_id,
                         "--card-number",
                         card_number,
-                        "--expiration-date",
+                        "--expiry-date",
                         expiration_date,
                         "--cvv",
                         cvv,
