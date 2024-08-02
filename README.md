@@ -71,7 +71,7 @@ Before you begin, ensure you have met the following requirements:
 
 For easy testing and integration, we have created a Postman collection that includes all the API endpoints available in this service. You can access the collection using the following public link:
 
-[View the SuperShoppingService Postman Collection](https://www.postman.com/lunar-module-pilot-51980864/workspace/super-shopping-service)
+[View the SuperShoppingService Postman Collection](https://www.postman.com/database-project-team/workspace/super-shopping-service)
 
 ## Development
 
