@@ -216,6 +216,7 @@ const HomePage = () => {
                 name={element.product.name}
                 price={element.product.price}
                 stock={element.stock}
+                id={element.product.id}
               />
             ))}
           </div>

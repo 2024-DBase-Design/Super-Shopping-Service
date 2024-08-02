@@ -9,16 +9,18 @@ type ProductPreviewProps = {
   price: number;
   image: string;
   stock: number;
+  id: number;
 };
 
 const ProductPreviewComponent: React.FC<ProductPreviewProps> = ({
   name = '',
   price = 0,
   image = '',
-  stock = 0
+  stock = 0,
+  id
 }) => {
   return (
-    <a href="">
+    <a href={'home/' + id}>
       <div className={`${styles.product_preview}`}>
         <img src={image} />
         <p>{name}</p>

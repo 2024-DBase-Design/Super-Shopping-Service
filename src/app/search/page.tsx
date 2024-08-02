@@ -76,6 +76,7 @@ const SearchPage = () => {
                 name={product.name}
                 price={product.price}
                 stock={await getStockAmount(product.id)}
+                id={product.id}
                 key={i}
               />
             ))}
