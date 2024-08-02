@@ -178,15 +178,20 @@ export const getWarehouseAddresses = async (req: Request, res: Response): Promis
  */
 export const getWarehouseByName = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name } = req.params;
-    const warehouse = await prisma.warehouse.findMany({
-      where: {
-        name: {
-          contains: name
+    const { warehouseName } = req.params;
+    let warehouses: Warehouse[] = [];
+    if (warehouseName === 'all') {
+      warehouses = await prisma.warehouse.findMany();
+    } else {
+      warehouses = await prisma.warehouse.findMany({
+        where: {
+          name: {
+            contains: warehouseName
+          }
         }
-      }
-    });
-    res.status(200).json(warehouse);
+      });
+    }
+    res.status(200).json(warehouses);
   } catch (error) {
     console.error('Error fetching warehouse by name:', (error as Error).message);
     res.status(500).json({ error: (error as Error).message });

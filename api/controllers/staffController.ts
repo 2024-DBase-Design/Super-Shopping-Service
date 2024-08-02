@@ -10,7 +10,7 @@ import { registerStaff } from './authController';
  */
 export const createStaff = async (req: Request, res: Response) => {
   try {
-    const staff_token = await registerStaff(req.body);
+    const staff_token = await registerStaff(req);
     res.status(201).json(staff_token);
   } catch (error) {
     console.error('Error creating staff:', (error as Error).message);

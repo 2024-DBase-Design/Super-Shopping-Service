@@ -50,36 +50,31 @@ const testValue: StaffProfileValues = {
 };
 
 export default function Page() {
-  const isClient = useClientSide();
-
   const GetProfileInformation = async (): Promise<StaffProfileValues> => {
     try {
-      if (isClient) {
-        const token = window.localStorage.getItem('token');
-        if (!token) {
-          throw new Error('No token found');
-        }
-        const decoded = jwtDecode<DecodedToken>(token);
-        const res = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.STAFF, decoded.id));
-
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data: Staff = await res.json();
-
-        const res2 = await fetch(
-          buildOneEntityUrl(HttpMethod.GET, EntityType.STAFF, data.id) + '/address'
-        );
-
-        if (!res2.ok) {
-          throw new Error('Network response was not ok');
-        }
-
-        const data2: Address = await res2.json();
-
-        return { staff: data, address: data2 };
+      const token = window.localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
       }
-      return testValue;
+      const decoded = jwtDecode<DecodedToken>(token);
+      const res = await fetch(buildOneEntityUrl(HttpMethod.GET, EntityType.STAFF, decoded.id));
+
+      if (!res.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data: Staff = await res.json();
+
+      const res2 = await fetch(
+        buildOneEntityUrl(HttpMethod.GET, EntityType.STAFF, data.id) + '/address'
+      );
+
+      if (!res2.ok) {
+        return { staff: data, address: testValue.address };
+      }
+
+      const data2: Address = await res2.json();
+
+      return { staff: data, address: data2 };
     } catch (error) {
       console.error(error);
       return testValue;

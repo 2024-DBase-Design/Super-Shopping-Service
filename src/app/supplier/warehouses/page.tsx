@@ -20,8 +20,11 @@ type WarehouseFilter = {
 
 const GetWarehouses = async (filter: WarehouseFilter): Promise<Warehouse[]> => {
   try {
+    if (!filter.name || filter.name === '') {
+      filter.name = 'all';
+    }
     const response = await fetch(
-      buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE) + `/filter/${filter}`,
+      buildOneEntityUrl(HttpMethod.GET, EntityType.WAREHOUSE) + `/filter/${filter.name}`,
       {
         method: 'GET',
         headers: {

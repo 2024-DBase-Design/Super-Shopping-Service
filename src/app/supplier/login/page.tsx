@@ -69,7 +69,7 @@ export default function SupplierLoginPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: formValues.getValue('Email Address'),
+          email: formValues.getValue('Name'),
           password: formValues.getValue('Password')
         })
       });
